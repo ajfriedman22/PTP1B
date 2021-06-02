@@ -53,6 +53,17 @@ for hbond in hbonds:
     file_object.write(label(hbond))
     file_object.write("\n")
 file_object.close()
+per = [] #Declare empty array for percentage of time h-bond is formed
+da_distances = md.compute_distances(traj, hbonds[:,[1,2]], periodic=False) #Compute distance between h-bond donor and acceptor
+da_angles = md.compute_angles(traj, hbonds[:,:], periodic=False) #Compute angle between h-bond donor and acceptor
+[num_t, num_h] = np.shape(da_distances)
+for j in range(num_h):
+    count = 0 #Initialize count
+    for i in range(num_t):
+        if da_distances[i,j] <= 0.25 and da_angles[i,j] >= 2.094: #If distance between donor and acceptor is less than 2.5A and the angle is greater than 120 degrees or ~ 2.094 radians
+            count +=1
+    per.append(100*count/num_t) #Percentage of time the h-bond is present
+np.savetxt('Hbonds_per_' + File_base + '.txt', per)
 print('Hbond Analysis Written')
 
 #Principle Component Analysis
@@ -84,17 +95,6 @@ ax1.bar( x = range(1 , len(per_var) +1) , height = per_var , tick_label = labels
 ax2.plot(range(1 , len(per_var) +1), accum_per_var, color = 'r' , marker = 'o')
 ax2.grid( True )
 xlocs , xlabs = plt.xticks()
-
-# adding value labels
-#for i , v in enumerate(per_var):
-#    x=xlocs[i]-0.25
-#    y=v+0.2
-#    ax1.text(x,y, str(v)+'%')
-
-#for i , v in enumerate(accum_per_var):
-#    x=xlocs[i]-0.1
-#    y=v-0.3
-#    ax2.text(x, y, format(v))
 
 ax1.set_ylabel ( 'Percentage of explained variance (%)', size = '12')
 ax2.set_ylabel ( 'Accumulated explained variance (%)', size = '12')
