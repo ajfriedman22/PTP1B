@@ -5,7 +5,7 @@ from itertools import product
 import argparse
 
 #Declare arguments
-parser = argparse.ArgumentParser(description = 'Determination of ligand binding and correlation to WPD loop orientation for PTP1B')
+parser = argparse.ArgumentParser(description = 'Determination of ligand binding and interactions with Helices of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
 parser.add_argument('-g', required=True, help= 'File name for input topology (gro format)')
 parser.add_argument('-f', required=True, help='base for all file names')
