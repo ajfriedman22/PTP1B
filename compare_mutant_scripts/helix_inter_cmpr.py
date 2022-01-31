@@ -46,7 +46,7 @@ def plot_func(inter, err, hel1, hel2, mut, p, p1, j, k):
         y, h, col = (1.1*inter[[1,3]].max()) + 2, 2, 'r'
         plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
         plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
-    fig.savefig(hel1 + '_' + hel2 + '_' + mut + '_inter.png')
+    fig.savefig(mut + '/' + hel1 + '_' + hel2 + '_' + mut + '_inter.png')
     plt.close(fig)
 
 def mut_inter(hel1, hel2, mut, res):
@@ -98,15 +98,15 @@ def plot_mult_cmpr(Label, index, lig, file_label, hel, hel_err):
         inter_mean_err.append(hel_err[n])
 
     #Set Colors
-    color_bar = ['black', 'black', 'black']
+    color_bar = ['black', 'gray', 'blue']
     for i in range(3, len(index)):
         diff = hel[i] - hel[3] 
-        if diff > (hel_err[i] + hel_err[2]) and diff < 0:
+        if abs(diff) > abs(hel_err[i] + hel_err[2]) and diff < 0:
             color_bar.append('red')
-        elif diff > (hel_err[i] + hel_err[2]) and diff > 0:
+        elif abs(diff) > abs(hel_err[i] + hel_err[2]) and diff > 0:
             color_bar.append('green')
         else:
-            color_bar.append('black')
+            color_bar.append('blue')
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
