@@ -126,7 +126,7 @@ def plot_mult_mut(inter, err, mut, label, P, lig, which):
     for j in range(len(label)):
         #Process data
         num_mut = len(mut)
-        num = np.linspace(0, num_mut*2, num = num_mut)
+        num = np.linspace(0, num_mut*3, num = num_mut)
         Method = mut
         inter_j = inter[:,j]
         err_j = err[:,j]
@@ -147,7 +147,7 @@ def plot_mult_mut(inter, err, mut, label, P, lig, which):
         ax1 = fig.add_subplot(111)
         ax1.set_title('Comparison of' + label[j] + 'Helix Interactions for ' + lig + ' ' + which)
         ax1.set_ylabel('Mean Number of Interactions')
-        ax1.bar(num, inter_j, color = Color, width=1.8)
+        ax1.bar(num, inter_j, color = Color, width=2.8)
         plt.errorbar(num, inter_j, yerr= err_j, fmt='o', color='black')
         plt.xticks(num, Method, fontsize=8)
         fig.savefig(label[j] + '_' + lig + '_' + which + '_inter.png')
@@ -246,25 +246,25 @@ plot_mult_mut(sim_mean_BBR, sim_err_BBR, sim_mut_BBR, inter, sim_P_BBR, 'BBR', '
 
 #Determine percent difference from WT
 mut_only = ['F196A', 'L192A', 'L192F', 'L195A', 'L195F', 'L195N', 'S286A', 'F280Y', 'E276L', 'E276F', 'K279M', 'K279W', 'V287T']
-per_diff_AD = np.zeros((len(mut_only), len(inter)))
-per_diff_BBR = np.zeros((len(mut_only), len(inter)))
+per_diff_AD = np.zeros((len(inter), len(mut_only)))
+per_diff_BBR = np.zeros((len(inter), len(mut_only)))
 for j in range(len(inter)):
     for i in range(len(mut_only)):
-        per_diff_AD[i][j] = (all_mean_AD[i+3][j] - all_mean_AD[2][j])/((all_mean_AD[i+3][j] + all_mean_AD[2][j])/2) * 100
-        per_diff_BBR[i][j] = (all_mean_BBR[i+3][j] - all_mean_BBR[2][j])/((all_mean_BBR[i+3][j] + all_mean_BBR[2][j])/2) * 100
+        per_diff_AD[j][i] = (all_mean_AD[i+3][j] - all_mean_AD[2][j])/((all_mean_AD[i+3][j] + all_mean_AD[2][j])/2) * 100
+        per_diff_BBR[j][i] = (all_mean_BBR[i+3][j] - all_mean_BBR[2][j])/((all_mean_BBR[i+3][j] + all_mean_BBR[2][j])/2) * 100
    
 #Plot table comparing residue interactions to WT
-ax = plt.figure(figsize=(8, 10), frameon=False) # no visible frame
-ax = sns.heatmap(per_diff_AD, annot=False, cmap = 'RdYlBu', xticklabels = mut_only, yticklabels = inter)
+ax = plt.figure(figsize=(10, 6), frameon=False) # no visible frame
+ax = sns.heatmap(per_diff_AD, annot=False, cmap = 'bwr', xticklabels = mut_only, yticklabels = inter)
 #ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Helical Distance Compared to WT for AD')
 plt.savefig('mutate_AD_helix_dist.png')
 plt.close()
 
-ax = plt.figure(figsize=(8, 10), frameon=False) # no visible frame
-ax = sns.heatmap(per_diff_BBR, annot=False, cmap = 'RdYlBu', xticklabels = mut_only, yticklabels = inter)
+ax = plt.figure(figsize=(10, 6), frameon=False) # no visible frame
+ax = sns.heatmap(per_diff_BBR, annot=False, cmap = 'bwr', xticklabels = mut_only, yticklabels = inter)
 #ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Helical Distance Compared to WT for BBR')
-plt.savefig('mutate_AD_helix_dist.png')
+plt.savefig('mutate_BBR_helix_dist.png')
 plt.close()
 
