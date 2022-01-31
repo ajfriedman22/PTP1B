@@ -3,44 +3,44 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 from itertools import product
-
+import seaborn as sns
 #Load data, determine correlated samples and caculate mean and error
 def load_data(mut, lig):
     a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3 = [],[],[],[],[]
     if lig == 'AD' or lig == 'BBR':
-        for i in open('../../../' + mut + '/' + lig + '/a3_a7_pt1_tot_inter.txt'):
+        for i in open('../../../' + mut + '/' + lig + '/analysis/a3_a7_pt1_tot_inter.txt'):
             a3_a7_pt1.append(float(i))
-        for i in open('../../../' + mut + '/' + lig + '/a3_a7_pt2_tot_inter.txt'):
+        for i in open('../../../' + mut + '/' + lig + '/analysis/a3_a7_pt2_tot_inter.txt'):
             a3_a7_pt2.append(float(i))
-        for i in open('../../../' + mut + '/' + lig + '/a6_a7_pt1_tot_inter.txt'):
+        for i in open('../../../' + mut + '/' + lig + '/analysis/a6_a7_pt1_tot_inter.txt'):
             a6_a7_pt1.append(float(i))
-        for i in open('../../../' + mut + '/' + lig + '/a6_a7_pt2_tot_inter.txt'):
+        for i in open('../../../' + mut + '/' + lig + '/analysis/a6_a7_pt2_tot_inter.txt'):
             a6_a7_pt2.append(float(i))
-        for i in open('../../../' + mut + '/' + lig + '/a6_a7_pt3_tot_inter.txt'):
+        for i in open('../../../' + mut + '/' + lig + '/analysis/a6_a7_pt3_tot_inter.txt'):
             a6_a7_pt3.append(float(i))
 
     elif lig == 'ApoO':
-        for i in open('~/doc/PTP1B/Apo_dis/config11/a3_a7_pt1_tot_inter.txt'):
+        for i in open('../../../../rebuild_a7_high/config11/analysis/a3_a7_pt1_tot_inter.txt'):
             a3_a7_pt1.append(float(i))
-        for i in open('~/doc/PTP1B/Apo_dis/config11/a3_a7_pt2_tot_inter.txt'):
+        for i in open('../../../../rebuild_a7_high/config11/analysis/a3_a7_pt2_tot_inter.txt'):
             a3_a7_pt2.append(float(i))
-        for i in open('~/doc/PTP1B/Apo_dis/config11/a6_a7_pt1_tot_inter.txt'):
+        for i in open('../../../../rebuild_a7_high/config11/analysis/a6_a7_pt1_tot_inter.txt'):
             a6_a7_pt1.append(float(i))
-        for i in open('~/doc/PTP1B/Apo_dis/config11/a6_a7_pt2_tot_inter.txt'):
+        for i in open('../../../../rebuild_a7_high/config11/analysis/a6_a7_pt2_tot_inter.txt'):
             a6_a7_pt2.append(float(i))
-        for i in open('~/doc/PTP1B/Apo_dis/config11/a6_a7_pt3_tot_inter.txt'):
+        for i in open('../../../../rebuild_a7_high/config11/analysis/a6_a7_pt3_tot_inter.txt'):
             a6_a7_pt3.append(float(i))
 
     elif lig == 'ApoC':
-        for i in open('~/doc/PTP1B/1sug/a3_a7_pt1_tot_inter.txt'):
+        for i in open('../../../../Apo_1SUG/analysis/1sug/a3_a7_pt1_tot_inter.txt'):
             a3_a7_pt1.append(float(i))
-        for i in open('~/doc/PTP1B/1sug/a3_a7_pt2_tot_inter.txt'):
+        for i in open('../../../../Apo_1SUG/analysis/1sug/a3_a7_pt2_tot_inter.txt'):
             a3_a7_pt2.append(float(i))
-        for i in open('~/doc/PTP1B/1sug/a6_a7_pt1_tot_inter.txt'):
+        for i in open('../../../../Apo_1SUG/analysis/1sug/a6_a7_pt1_tot_inter.txt'):
             a6_a7_pt1.append(float(i))
-        for i in open('~/doc/PTP1B/1sug/a6_a7_pt2_tot_inter.txt'):
+        for i in open('../../../../Apo_1SUG/analysis/1sug/a6_a7_pt2_tot_inter.txt'):
             a6_a7_pt2.append(float(i))
-        for i in open('~/doc/PTP1B/1sug/a6_a7_pt3_tot_inter.txt'):
+        for i in open('../../../../Apo_1SUG/analysis/1sug/a6_a7_pt3_tot_inter.txt'):
             a6_a7_pt3.append(float(i))
 
     tot_data = [a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3]
@@ -87,7 +87,7 @@ def load_data(mut, lig):
 #Plot
 def plot_indv_mut(inter_AD, inter_BBR, err_AD, err_BBR, label, mut, P_AD, P_BBR):
     for j in range(len(label)):
-        for k in range(1, len(mut)):
+        for k in range(3, len(mut)):
             #Get data into proper format
             inter = [inter_AD[0][j], inter_BBR[0][j], inter_AD[k][j], inter_BBR[k][j]]
             err = [err_AD[0][j], err_BBR[0][j], err_AD[k][j], err_BBR[k][j]]
@@ -173,11 +173,11 @@ all_err_BBR = np.zeros((len(mut), len(inter)))
 all_mean_AD[0][:], all_err_AD[0][:], a3_a7_pt1_ApoO, a3_a7_pt2_ApoO, a6_a7_pt1_ApoO, a6_a7_pt2_ApoO, a6_a7_pt3_ApoO  = load_data(mut[0], 'ApoO')
 all_mean_AD[1][:], all_err_AD[1][:], a3_a7_pt1_ApoC, a3_a7_pt2_ApoC, a6_a7_pt1_ApoC, a6_a7_pt2_ApoC, a6_a7_pt3_ApoC  = load_data(mut[1], 'ApoC')
 all_mean_BBR[0][:] = all_mean_AD[0][:]
-all_mean_BBR[0][:] = all_mean_AD[0][:]
+all_mean_BBR[1][:] = all_mean_AD[1][:]
 
 #Load data for WT
 all_mean_AD[2][:], all_err_AD[2][:], a3_a7_pt1_ADWT, a3_a7_pt2_ADWT, a6_a7_pt1_ADWT, a6_a7_pt2_ADWT, a6_a7_pt3_ADWT  = load_data(mut[2], 'AD')
-all_mean_BBR[2][:], all_err_BBR[2][:], a3_a7_pt1_BBRWT, a3_a7_pt2_BBRWT, a6_a7_pt1_BBRWT, a6_a7_pt2_BBRWT, a6_a7_pt3_BBR_WT = load_data(mut[2], 'BBR')
+all_mean_BBR[2][:], all_err_BBR[2][:], a3_a7_pt1_BBRWT, a3_a7_pt2_BBRWT, a6_a7_pt1_BBRWT, a6_a7_pt2_BBRWT, a6_a7_pt3_BBRWT = load_data(mut[2], 'BBR')
 
 #empty array for p values
 P_AD = np.zeros((len(mut), len(inter)))
@@ -246,11 +246,12 @@ plot_mult_mut(sim_mean_BBR, sim_err_BBR, sim_mut_BBR, inter, sim_P_BBR, 'BBR', '
 
 #Determine percent difference from WT
 mut_only = ['F196A', 'L192A', 'L192F', 'L195A', 'L195F', 'L195N', 'S286A', 'F280Y', 'E276L', 'E276F', 'K279M', 'K279W', 'V287T']
-per_diff_AD = np.zeros(len(mut_only))
-per_diff_BBR = np.zeros(len(mut_only))
-for i in range(len(mut_only)):
-    per_diff_AD[i] = (all_mean_AD[i+3] - all_mean_AD[2])/((all_mean_AD[i+3] + all_mean_AD[2])/2) * 100
-    per_diff_BBR[i] = (all_mean_BBR[i+3] - all_mean_BBR[2])/((all_mean_BBR[i+3] + all_mean_BBR[2])/2) * 100
+per_diff_AD = np.zeros((len(mut_only), len(inter)))
+per_diff_BBR = np.zeros((len(mut_only), len(inter)))
+for j in range(len(inter)):
+    for i in range(len(mut_only)):
+        per_diff_AD[i][j] = (all_mean_AD[i+3][j] - all_mean_AD[2][j])/((all_mean_AD[i+3][j] + all_mean_AD[2][j])/2) * 100
+        per_diff_BBR[i][j] = (all_mean_BBR[i+3][j] - all_mean_BBR[2][j])/((all_mean_BBR[i+3][j] + all_mean_BBR[2][j])/2) * 100
    
 #Plot table comparing residue interactions to WT
 ax = plt.figure(figsize=(8, 10), frameon=False) # no visible frame
