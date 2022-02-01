@@ -88,7 +88,7 @@ def plot_inter(WT_array, mut_array, mut, hel1, hel2, res):
         fig.savefig(mut + '/' + hel1 + '_' + hel2 + '_inter_' + str(res[i]) + '.png')
         plt.close(fig)
 
-def plot_mult_cmpr(Label, index, lig, file_label, hel, hel_err):
+def plot_mult_cmpr(Label, index, lig, file_label, hel, hel_err, p):
     #Set num and inter
     num, inter_mean,inter_mean_err = [],[],[]
     for i in range(len(index)):
@@ -98,15 +98,15 @@ def plot_mult_cmpr(Label, index, lig, file_label, hel, hel_err):
         inter_mean_err.append(hel_err[n])
 
     #Set Colors
-    color_bar = ['black', 'gray', 'lightblue']
+    color_bar = ['black', 'gray', 'blue']
     for i in range(3, len(index)):
-        diff = hel[i] - hel[3] 
-        if abs(diff) > abs(hel_err[i] + hel_err[2]) and diff < 0:
+        diff = hel[i] - hel[2] 
+        if p[i-3] < 0.05 and diff < 0:
             color_bar.append('green')
-        elif abs(diff) > abs(hel_err[i] + hel_err[2]) and diff > 0:
+        elif p[i-3] < 0.05 and diff > 0:
             color_bar.append('red')
         else:
-            color_bar.append('blue')
+            color_bar.append('lightblue')
 
     fig = plt.figure(figsize=(12,8))
     ax1 = fig.add_subplot(111)
@@ -558,6 +558,15 @@ plot_func(a6_a7, a6_a7_err, 'a6', 'a7', 'K279M', p37, p37B, 24, 25)
 plot_func(a6_a7, a6_a7_err, 'a6', 'a7', 'K279W', p38, p38B, 26, 27)
 plot_func(a6_a7, a6_a7_err, 'a6', 'a7', 'V287T', p39, p39B, 28, 29)
 
+#Make array of p-values for all mutants
+p_a3_a7_AD = [p8, p9, p10, p12, p13, p14, p26, p27, p28, p29, p30, p31, p32]
+p_a6_a7_AD = [p15, p16, p17, p19, p20, p21, p33, p34, p35, p36, p37, p38, p39]
+p_a3_a6_AD = [p1, p2, p3, p5, p6, p7, p19, p20, p21, p22, p23, p24, p25]
+
+p_a3_a7_BBR = [p8B, p9B, p10B, p12B, p13B, p14B, p26B, p27B, p28B, p29B, p30B, p31B, p32B]
+p_a6_a7_BBR = [p15B, p16B, p17B, p19B, p20B, p21B, p33B, p34B, p35B, p36B, p37B, p38B, p39B]
+p_a3_a6_BBR = [p1B, p2B, p3B, p5B, p6B, p7B, p19B, p20B, p21B, p22B, p23B, p24B, p25B]
+
 #Save All Values to Files
 Label = ['Apo Open', 'Apo Closed', 'WT AD', 'WT BBR', 'F196A AD', 'F196A BBR', 'L192A AD', 'L192A BBR', 'L192F AD', 'L192F BBR', 'L195A AD', 'L195A BBR', 'L195F AD', 'L195F BBR', 'L195N AD', 'L195N BBR', 'S286A AD', 'S286A BBR', 
         'F280Y AD', 'F280Y BBR', 'E276L AD', 'E276L BBR', 'E276F AD', 'E276F BBR', 'K279M AD', 'K279M BBR', 'K279W AD', 'K279W BBR', 'V287T AD', 'V287T BBR']
@@ -585,12 +594,12 @@ Label = ['Apo Open', 'Apo Closed', 'WT', 'F196A', 'L192A', 'L192F', 'L195A', 'L1
 index_AD = [30, 31, 0, 2, 4, 6, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
 index_BBR = [30, 31, 1, 3, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]
 
-plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a7_all', a3_a7, a3_a7_err)
-plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a7_all', a3_a7, a3_a7_err)
-plot_mult_cmpr(Label, index_AD, 'AD', 'a6_a7_all', a6_a7, a6_a7_err)
-plot_mult_cmpr(Label, index_BBR, 'BBR', 'a6_a7_all', a6_a7, a6_a7_err)
-plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a6_all', a3_a6, a3_a6_err)
-plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a6_all', a3_a6, a3_a6_err)
+plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a7_all', a3_a7, a3_a7_err, p_a3_a7_AD)
+plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a7_all', a3_a7, a3_a7_err, p_a3_a7_BBR)
+plot_mult_cmpr(Label, index_AD, 'AD', 'a6_a7_all', a6_a7, a6_a7_err, p_a6_a7_AD)
+plot_mult_cmpr(Label, index_BBR, 'BBR', 'a6_a7_all', a6_a7, a6_a7_err, p_a6_a7_BBR)
+plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a6_all', a3_a6, a3_a6_err, p_a3_a6_AD)
+plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a6_all', a3_a6, a3_a6_err, p_a3_a6_BBR)
 
 #Plot comparison of mutants with similar BFE
 Label_BFE, index_AD_BFE, index_BBR_BFE = [],[],[]
@@ -600,12 +609,13 @@ for i in sel_index:
     index_AD_BFE.append(index_AD[i])
     index_BBR_BFE.append(index_BBR[i])
 
-plot_mult_cmpr(Label_BFE, index_AD_BFE, 'AD', 'a3_a7_sim_BFE', a3_a7, a3_a7_err)
-plot_mult_cmpr(Label_BFE, index_BBR_BFE, 'BBR', 'a3_a7_sim_BFE', a3_a7, a3_a7_err)
-plot_mult_cmpr(Label_BFE, index_AD_BFE, 'AD', 'a6_a7_sim_BFE', a6_a7, a6_a7_err)
-plot_mult_cmpr(Label_BFE, index_BBR_BFE, 'BBR', 'a6_a7_sim_BFE', a6_a7, a6_a7_err)
-plot_mult_cmpr(Label_BFE, index_AD_BFE, 'AD', 'a3_a6_sim_BFE', a3_a6, a3_a6_err)
-plot_mult_cmpr(Label_BFE, index_BBR_BFE, 'BBR', 'a3_a6_sim_BFE', a3_a6, a3_a6_err)
+
+plot_mult_cmpr(Label_BFE, index_AD_BFE, 'AD', 'a3_a7_sim_BFE', a3_a7, a3_a7_err, p_a3_a7_AD)
+plot_mult_cmpr(Label_BFE, index_BBR_BFE, 'BBR', 'a3_a7_sim_BFE', a3_a7, a3_a7_err, p_a3_a7_BBR)
+plot_mult_cmpr(Label_BFE, index_AD_BFE, 'AD', 'a6_a7_sim_BFE', a6_a7, a6_a7_err, p_a6_a7_AD)
+plot_mult_cmpr(Label_BFE, index_BBR_BFE, 'BBR', 'a6_a7_sim_BFE', a6_a7, a6_a7_err, p_a6_a7_BBR)
+plot_mult_cmpr(Label_BFE, index_AD_BFE, 'AD', 'a3_a6_sim_BFE', a3_a6, a3_a6_err, p_a3_a6_AD)
+plot_mult_cmpr(Label_BFE, index_BBR_BFE, 'BBR', 'a3_a6_sim_BFE', a3_a6, a3_a6_err, p_a3_a6_BBR)
 
 #Set residue pairs
 group_3 = [186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200]
@@ -663,15 +673,15 @@ for j in range(len(mut_list)):
         plot_inter(a6_a7_inters_WT, array, mut_list[j], 'a6', 'a7', pair_a7_a6)
 
 #Plot table comparing residue interactions to WT
-ax = plt.figure(figsize=(8, 10), frameon=False) # no visible frame
-ax = sns.heatmap(AD_corr, annot=False, cmap = 'bwr', xticklabels = mut_list, yticklabels = corr_pairs)
+ax = plt.figure(figsize=(8, 12), frameon=False) # no visible frame
+ax = sns.heatmap(AD_corr, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_list, yticklabels = corr_pairs)
 ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Bond Disruption Compared to WT')
 plt.savefig('mutate_AD_corr_res.png')
 plt.close()
 
-ax = plt.figure(figsize=(8, 10), frameon=False) # no visible frame
-ax = sns.heatmap(BBR_corr, annot=False, cmap = 'bwr', xticklabels = mut_list, yticklabels = corr_pairs)
+ax = plt.figure(figsize=(8, 12), frameon=False) # no visible frame
+ax = sns.heatmap(BBR_corr, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_list, yticklabels = corr_pairs)
 ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Bond Disruption Compared to WT')
 plt.savefig('mutate_BBR_corr_res.png')
