@@ -134,13 +134,13 @@ def plot_mult_mut(inter, err, mut, label, P, lig, which):
         #Set Plot Colors
         Color = ['black', 'gray', 'blue']
         for k in range(3, num_mut):
-            if P[k, j] < 0.01:
-                if inter_j[k] - inter_j[0] < 0:
+            if P[k, j] < 0.05:
+                if inter_j[k] - inter_j[2] < 0:
                     Color.append('green')
-                if inter_j[k] - inter_j[0] > 0:
+                if inter_j[k] - inter_j[2] > 0:
                     Color.append('red')
             else:
-                Color.append('blue')
+                Color.append('lightblue')
 
         #Plot Function
         fig = plt.figure(figsize=(12, 8))
@@ -254,15 +254,15 @@ for j in range(len(inter)):
         per_diff_BBR[j][i] = (all_mean_BBR[i+3][j] - all_mean_BBR[2][j])/((all_mean_BBR[i+3][j] + all_mean_BBR[2][j])/2) * 100
    
 #Plot table comparing residue interactions to WT
-ax = plt.figure(figsize=(10, 6), frameon=False) # no visible frame
-ax = sns.heatmap(per_diff_AD, annot=False, cmap = 'bwr', xticklabels = mut_only, yticklabels = inter)
+ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
+ax = sns.heatmap(per_diff_AD, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_only, yticklabels = inter)
 #ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Helical Distance Compared to WT for AD')
 plt.savefig('mutate_AD_helix_dist.png')
 plt.close()
 
-ax = plt.figure(figsize=(10, 6), frameon=False) # no visible frame
-ax = sns.heatmap(per_diff_BBR, annot=False, cmap = 'bwr', xticklabels = mut_only, yticklabels = inter)
+ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
+ax = sns.heatmap(per_diff_BBR, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_only, yticklabels = inter)
 #ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Helical Distance Compared to WT for BBR')
 plt.savefig('mutate_BBR_helix_dist.png')

@@ -100,7 +100,7 @@ def plot_mult_cmpr(Label, index, lig, file_label, hel, hel_err, p):
     #Set Colors
     color_bar = ['black', 'gray', 'blue']
     for i in range(3, len(index)):
-        diff = hel[i] - hel[2] 
+        diff = inter_mean[i] - inter_mean[2] 
         if p[i-3] < 0.05 and diff < 0:
             color_bar.append('green')
         elif p[i-3] < 0.05 and diff > 0:
@@ -108,7 +108,7 @@ def plot_mult_cmpr(Label, index, lig, file_label, hel, hel_err, p):
         else:
             color_bar.append('lightblue')
 
-    fig = plt.figure(figsize=(12,8))
+    fig = plt.figure(figsize=(14,8))
     ax1 = fig.add_subplot(111)
     ax1.set_title('Comparison of Interactions between ' + str(file_label) + ' for ' + str(lig)) 
     ax1.set_ylabel('Mean Number of Interactions')
@@ -673,15 +673,15 @@ for j in range(len(mut_list)):
         plot_inter(a6_a7_inters_WT, array, mut_list[j], 'a6', 'a7', pair_a7_a6)
 
 #Plot table comparing residue interactions to WT
-ax = plt.figure(figsize=(8, 12), frameon=False) # no visible frame
-ax = sns.heatmap(AD_corr, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_list, yticklabels = corr_pairs)
+ax = plt.figure(figsize=(10, 10), frameon=True) # no visible frame
+ax = sns.heatmap(AD_corr, annot=False, cmap = 'bwr_r', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_list, yticklabels = corr_pairs)
 ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Bond Disruption Compared to WT')
 plt.savefig('mutate_AD_corr_res.png')
 plt.close()
 
-ax = plt.figure(figsize=(8, 12), frameon=False) # no visible frame
-ax = sns.heatmap(BBR_corr, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_list, yticklabels = corr_pairs)
+ax = plt.figure(figsize=(10, 10), frameon=True) # no visible frame
+ax = sns.heatmap(BBR_corr, annot=False, cmap = 'bwr_r', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_list, yticklabels = corr_pairs)
 ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Bond Disruption Compared to WT')
 plt.savefig('mutate_BBR_corr_res.png')
