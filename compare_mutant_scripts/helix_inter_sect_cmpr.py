@@ -143,9 +143,9 @@ def plot_mult_mut(inter, err, mut, label, P, lig, which):
                 Color.append('blue')
 
         #Plot Function
-        fig = plt.figure()
+        fig = plt.figure(figsize=(12, 8))
         ax1 = fig.add_subplot(111)
-        ax1.set_title('Comparison of' + label[j] + 'Helix Interactions for ' + lig + ' ' + which)
+        ax1.set_title('Comparison of ' + label[j] + ' Helix Interactions for ' + lig + ' ' + which)
         ax1.set_ylabel('Mean Number of Interactions')
         ax1.bar(num, inter_j, color = Color, width=2.8)
         plt.errorbar(num, inter_j, yerr= err_j, fmt='o', color='black')

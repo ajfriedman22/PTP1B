@@ -52,11 +52,11 @@ def plot_func(inter, err, hel1, hel2, mut, p, p1, j, k):
 def mut_inter(hel1, hel2, mut, res):
     mut_array = np.zeros([len(res), 2])
     num = 0
-    for i in open('../../../' + mut + '/AD/' + hel1 + '_' + hel2 + '_inter_all.txt').readlines():
+    for i in open('../../../' + mut + '/AD/analysis/' + hel1 + '_' + hel2 + '_inter_all.txt').readlines():
         mut_array[num][0] = 100 - float(i)
         num += 1
     num = 0
-    for i in open('../../../' + mut + '/BBR/' + hel1 + '_' + hel2 + '_inter_all.txt').readlines():
+    for i in open('../../../' + mut + '/BBR/analysis/' + hel1 + '_' + hel2 + '_inter_all.txt').readlines():
         mut_array[num][1] = 100 - float(i)
         num += 1
     return mut_array
@@ -98,17 +98,17 @@ def plot_mult_cmpr(Label, index, lig, file_label, hel, hel_err):
         inter_mean_err.append(hel_err[n])
 
     #Set Colors
-    color_bar = ['black', 'gray', 'blue']
+    color_bar = ['black', 'gray', 'lightblue']
     for i in range(3, len(index)):
         diff = hel[i] - hel[3] 
         if abs(diff) > abs(hel_err[i] + hel_err[2]) and diff < 0:
-            color_bar.append('red')
-        elif abs(diff) > abs(hel_err[i] + hel_err[2]) and diff > 0:
             color_bar.append('green')
+        elif abs(diff) > abs(hel_err[i] + hel_err[2]) and diff > 0:
+            color_bar.append('red')
         else:
             color_bar.append('blue')
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12,8))
     ax1 = fig.add_subplot(111)
     ax1.set_title('Comparison of Interactions between ' + str(file_label) + ' for ' + str(lig)) 
     ax1.set_ylabel('Mean Number of Interactions')
@@ -142,214 +142,214 @@ a6_a7_S286A_AD, a6_a7_F280Y_AD, a6_a7_E276L_AD, a6_a7_E276F_AD, a6_a7_K279M_AD, 
 a6_a7_S286A_BBR, a6_a7_F280Y_BBR, a6_a7_E276L_BBR, a6_a7_E276F_BBR, a6_a7_K279M_BBR, a6_a7_K279W_BBR, a6_a7_V287T_BBR = [],[],[],[],[],[],[]
 
 #Input Data for a3 and a6 interactions
-for i in open("../../../WT/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../WT/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_WT_AD.append(float(i))
-for i in open("../../../WT/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../WT/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_WT_BBR.append(float(i))
-for i in open("../../../F196A/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../F196A/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_F196A_AD.append(float(i))
-for i in open("../../../F196A/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../F196A/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_F196A_BBR.append(float(i))
-for i in open("../../../L192A/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../L192A/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L192A_AD.append(float(i))
-for i in open("../../../L192A/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../L192A/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L192A_BBR.append(float(i))
-for i in open("../../../L192F/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../L192F/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L192F_AD.append(float(i))
-for i in open("../../../L192F/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../L192F/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L192F_BBR.append(float(i))
-for i in open("../../../L195A/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../L195A/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L195A_AD.append(float(i))
-for i in open("../../../L195A/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../L195A/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L195A_BBR.append(float(i))
-for i in open("../../../L195F/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../L195F/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L195F_AD.append(float(i))
-for i in open("../../../L195F/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../L195F/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L195F_BBR.append(float(i))
-for i in open("../../../L195N/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../L195N/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L195N_AD.append(float(i))
-for i in open("../../../L195N/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../L195N/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_L195N_BBR.append(float(i))
-for i in open("../../../S286A/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../S286A/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_S286A_AD.append(float(i))
-for i in open("../../../S286A/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../S286A/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_S286A_BBR.append(float(i))
-for i in open("../../../F280Y/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../F280Y/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_F280Y_AD.append(float(i))
-for i in open("../../../F280Y/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../F280Y/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_F280Y_BBR.append(float(i))
-for i in open("../../../E276L/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../E276L/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_E276L_AD.append(float(i))
-for i in open("../../../E276L/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../E276L/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_E276L_BBR.append(float(i))
-for i in open("../../../E276F/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../E276F/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_E276F_AD.append(float(i))
-for i in open("../../../E276F/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../E276F/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_E276F_BBR.append(float(i))
-for i in open("../../../K279M/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../K279M/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_K279M_AD.append(float(i))
-for i in open("../../../K279M/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../K279M/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_K279M_BBR.append(float(i))
-for i in open("../../../K279W/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../K279W/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_K279W_AD.append(float(i))
-for i in open("../../../K279W/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../K279W/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_K279W_BBR.append(float(i))
-for i in open("../../../V287T/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../V287T/AD/analysis/a3_a6_inter.txt").readlines():
     a3_a6_V287T_AD.append(float(i))
-for i in open("../../../V287T/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../V287T/BBR/analysis/a3_a6_inter.txt").readlines():
     a3_a6_V287T_BBR.append(float(i))
-for i in open("../../../../rebuild_a7/a3_a6_inter.txt").readlines():
+for i in open("../../../../rebuild_a7/analysis/a3_a6_inter.txt").readlines():
     a3_a6_Apo_open.append(float(i))
-for i in open("../../../../Apo_dis/config9/a3_a6_inter.txt").readlines():
+for i in open("../../../../rebuild_a7_high/config9/analysis/a3_a6_inter.txt").readlines():
     a3_a6_Apo_open.append(float(i))
-for i in open("../../../../Apo_dis/config11/a3_a6_inter.txt").readlines():
+for i in open("../../../../rebuild_a7_high/config11/analysis/a3_a6_inter.txt").readlines():
     a3_a6_Apo_open.append(float(i))
-for i in open("../../../../1sug/a3_a6_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug/a3_a6_inter.txt").readlines():
     a3_a6_Apo_closed.append(float(i))
-for i in open("../../../../1sug2/a3_a6_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug2/a3_a6_inter.txt").readlines():
     a3_a6_Apo_closed.append(float(i))
-for i in open("../../../../1sug3/a3_a6_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug3/a3_a6_inter.txt").readlines():
     a3_a6_Apo_open.append(float(i))
 
 
 #Input Data for a3 and a7 interactions
-for i in open("../../../WT/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../WT/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_WT_AD.append(float(i))
-for i in open("../../../WT/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../WT/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_WT_BBR.append(float(i))
-for i in open("../../../F196A/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../F196A/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_F196A_AD.append(float(i))
-for i in open("../../../F196A/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../F196A/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_F196A_BBR.append(float(i))
-for i in open("../../../L192A/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../L192A/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L192A_AD.append(float(i))
-for i in open("../../../L192A/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../L192A/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L192A_BBR.append(float(i))
-for i in open("../../../L192F/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../L192F/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L192F_AD.append(float(i))
-for i in open("../../../L192F/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../L192F/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L192F_BBR.append(float(i))
-for i in open("../../../L195A/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../L195A/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L195A_AD.append(float(i))
-for i in open("../../../L195A/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../L195A/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L195A_BBR.append(float(i))
-for i in open("../../../L195F/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../L195F/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L195F_AD.append(float(i))
-for i in open("../../../L195F/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../L195F/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L195F_BBR.append(float(i))
-for i in open("../../../L195N/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../L195N/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L195N_AD.append(float(i))
-for i in open("../../../L195N/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../L195N/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_L195N_BBR.append(float(i))
-for i in open("../../../S286A/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../S286A/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_S286A_AD.append(float(i))
-for i in open("../../../S286A/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../S286A/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_S286A_BBR.append(float(i))
-for i in open("../../../F280Y/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../F280Y/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_F280Y_AD.append(float(i))
-for i in open("../../../F280Y/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../F280Y/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_F280Y_BBR.append(float(i))
-for i in open("../../../E276L/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../E276L/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_E276L_AD.append(float(i))
-for i in open("../../../E276L/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../E276L/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_E276L_BBR.append(float(i))
-for i in open("../../../E276F/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../E276F/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_E276F_AD.append(float(i))
-for i in open("../../../E276F/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../E276F/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_E276F_BBR.append(float(i))
-for i in open("../../../K279M/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../K279M/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_K279M_AD.append(float(i))
-for i in open("../../../K279M/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../K279M/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_K279M_BBR.append(float(i))
-for i in open("../../../K279W/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../K279W/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_K279W_AD.append(float(i))
-for i in open("../../../K279W/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../K279W/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_K279W_BBR.append(float(i))
-for i in open("../../../V287T/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../V287T/AD/analysis/a7_a3_inter.txt").readlines():
     a3_a7_V287T_AD.append(float(i))
-for i in open("../../../V287T/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../V287T/BBR/analysis/a7_a3_inter.txt").readlines():
     a3_a7_V287T_BBR.append(float(i))
-for i in open("../../../../rebuild_a7/a7_a3_inter.txt").readlines():
+for i in open("../../../../rebuild_a7/analysis/a7_a3_inter.txt").readlines():
     a3_a7_Apo_open.append(float(i))
-for i in open("../../../../Apo_dis/config9/a7_a3_inter.txt").readlines():
+for i in open("../../../../rebuild_a7_high/config9/analysis/a7_a3_inter.txt").readlines():
     a3_a7_Apo_open.append(float(i))
-for i in open("../../../../Apo_dis/config11/a7_a3_inter.txt").readlines():
+for i in open("../../../../rebuild_a7_high/config11/analysis/a7_a3_inter.txt").readlines():
     a3_a7_Apo_open.append(float(i))
-for i in open("../../../../1sug/a7_a3_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug/a7_a3_inter.txt").readlines():
     a3_a7_Apo_closed.append(float(i))
-for i in open("../../../../1sug2/a7_a3_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug2/a7_a3_inter.txt").readlines():
     a3_a7_Apo_closed.append(float(i))
-for i in open("../../../../1sug3/a7_a3_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug3/a7_a3_inter.txt").readlines():
     a3_a7_Apo_open.append(float(i))
 
 #Input Data for a6 and a7 interactions
-for i in open("../../../WT/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../WT/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_WT_AD.append(float(i))
-for i in open("../../../WT/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../WT/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_WT_BBR.append(float(i))
-for i in open("../../../F196A/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../F196A/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_F196A_AD.append(float(i))
-for i in open("../../../F196A/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../F196A/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_F196A_BBR.append(float(i))
-for i in open("../../../L192A/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../L192A/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L192A_AD.append(float(i))
-for i in open("../../../L192A/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../L192A/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L192A_BBR.append(float(i))
-for i in open("../../../L192F/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../L192F/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L192F_AD.append(float(i))
-for i in open("../../../L192F/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../L192F/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L192F_BBR.append(float(i))
-for i in open("../../../L195A/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../L195A/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L195A_AD.append(float(i))
-for i in open("../../../L195A/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../L195A/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L195A_BBR.append(float(i))
-for i in open("../../../L195F/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../L195F/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L195F_AD.append(float(i))
-for i in open("../../../L195F/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../L195F/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L195F_BBR.append(float(i))
-for i in open("../../../L195N/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../L195N/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L195N_AD.append(float(i))
-for i in open("../../../L195N/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../L195N/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_L195N_BBR.append(float(i))
-for i in open("../../../S286A/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../S286A/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_S286A_AD.append(float(i))
-for i in open("../../../S286A/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../S286A/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_S286A_BBR.append(float(i))
-for i in open("../../../F280Y/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../F280Y/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_F280Y_AD.append(float(i))
-for i in open("../../../F280Y/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../F280Y/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_F280Y_BBR.append(float(i))
-for i in open("../../../E276L/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../E276L/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_E276L_AD.append(float(i))
-for i in open("../../../E276L/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../E276L/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_E276L_BBR.append(float(i))
-for i in open("../../../E276F/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../E276F/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_E276F_AD.append(float(i))
-for i in open("../../../E276F/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../E276F/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_E276F_BBR.append(float(i))
-for i in open("../../../K279M/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../K279M/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_K279M_AD.append(float(i))
-for i in open("../../../K279M/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../K279M/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_K279M_BBR.append(float(i))
-for i in open("../../../K279W/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../K279W/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_K279W_AD.append(float(i))
-for i in open("../../../K279W/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../K279W/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_K279W_BBR.append(float(i))
-for i in open("../../../V287T/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../V287T/AD/analysis/a7_a6_inter.txt").readlines():
     a6_a7_V287T_AD.append(float(i))
-for i in open("../../../V287T/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../V287T/BBR/analysis/a7_a6_inter.txt").readlines():
     a6_a7_V287T_BBR.append(float(i))
-for i in open("../../../../rebuild_a7/a7_a6_inter.txt").readlines():
+for i in open("../../../../rebuild_a7/analysis/a7_a6_inter.txt").readlines():
     a6_a7_Apo_open.append(float(i))
-for i in open("../../../../Apo_dis/config9/a7_a6_inter.txt").readlines():
+for i in open("../../../../rebuild_a7_high/config9/analysis/a7_a6_inter.txt").readlines():
     a6_a7_Apo_open.append(float(i))
-for i in open("../../../../Apo_dis/config11/a7_a6_inter.txt").readlines():
+for i in open("../../../../rebuild_a7_high/config11/analysis/a7_a6_inter.txt").readlines():
     a6_a7_Apo_open.append(float(i))
-for i in open("../../../../1sug/a7_a6_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug/a7_a6_inter.txt").readlines():
     a6_a7_Apo_closed.append(float(i))
-for i in open("../../../../1sug2/a7_a6_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug2/a7_a6_inter.txt").readlines():
     a6_a7_Apo_closed.append(float(i))
-for i in open("../../../../1sug3/a7_a6_inter.txt").readlines():
+for i in open("../../../../Apo_1SUG/analysis/1sug3/a7_a6_inter.txt").readlines():
     a6_a7_Apo_open.append(float(i))
 
 #Calculate mean and sem for interactions
@@ -587,10 +587,10 @@ index_BBR = [30, 31, 1, 3, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]
 
 plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a7_all', a3_a7, a3_a7_err)
 plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a7_all', a3_a7, a3_a7_err)
-plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a7_all', a6_a7, a6_a7_err)
-plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a7_all', a6_a7, a6_a7_err)
-plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a7_all', a3_a6, a3_a6_err)
-plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a7_all', a3_a6, a3_a6_err)
+plot_mult_cmpr(Label, index_AD, 'AD', 'a6_a7_all', a6_a7, a6_a7_err)
+plot_mult_cmpr(Label, index_BBR, 'BBR', 'a6_a7_all', a6_a7, a6_a7_err)
+plot_mult_cmpr(Label, index_AD, 'AD', 'a3_a6_all', a3_a6, a3_a6_err)
+plot_mult_cmpr(Label, index_BBR, 'BBR', 'a3_a6_all', a3_a6, a3_a6_err)
 
 #Plot comparison of mutants with similar BFE
 Label_BFE, index_AD_BFE, index_BBR_BFE = [],[],[]
@@ -616,11 +616,11 @@ a7_a3_inters_WT = np.zeros([len(pair_a7_a3), 2])
 
 #Input Data for percent of presence of all a3 and a7 interactions
 num = 0
-for i in open("../../../WT/AD/a3_a7_inter_all.txt").readlines():
+for i in open("../../../WT/AD/analysis/a3_a7_inter_all.txt").readlines():
     a7_a3_inters_WT[num][0] = 100 - float(i)
     num += 1
 num = 0
-for i in open("../../../WT/BBR/a3_a7_inter_all.txt").readlines():
+for i in open("../../../WT/BBR/analysis/a3_a7_inter_all.txt").readlines():
     a7_a3_inters_WT[num][1] = 100 - float(i)
     num += 1
 
@@ -645,11 +645,11 @@ a6_a7_inters_WT = np.zeros([len(pair_a7_a6), 2])
 
 #Input Data for percent of presence of all a3 and a7 interactions
 num = 0
-for i in open("../../../WT/AD/a6_a7_inter_all.txt").readlines():
+for i in open("../../../WT/AD/analysis/a6_a7_inter_all.txt").readlines():
     a6_a7_inters_WT[num][0] = float(i)
     num += 1
 num = 0
-for i in open("../../../WT/BBR/a6_a7_inter_all.txt").readlines():
+for i in open("../../../WT/BBR/analysis/a6_a7_inter_all.txt").readlines():
     a6_a7_inters_WT[num][1] = float(i)
     num += 1
 
@@ -664,14 +664,14 @@ for j in range(len(mut_list)):
 
 #Plot table comparing residue interactions to WT
 ax = plt.figure(figsize=(8, 10), frameon=False) # no visible frame
-ax = sns.heatmap(AD_corr, annot=False, cmap = 'RdYlBu', xticklabels = mut_list, yticklabels = corr_pairs)
+ax = sns.heatmap(AD_corr, annot=False, cmap = 'bwr', xticklabels = mut_list, yticklabels = corr_pairs)
 ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Bond Disruption Compared to WT')
 plt.savefig('mutate_AD_corr_res.png')
 plt.close()
 
 ax = plt.figure(figsize=(8, 10), frameon=False) # no visible frame
-ax = sns.heatmap(BBR_corr, annot=False, cmap = 'RdYlBu', xticklabels = mut_list, yticklabels = corr_pairs)
+ax = sns.heatmap(BBR_corr, annot=False, cmap = 'bwr', xticklabels = mut_list, yticklabels = corr_pairs)
 ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Bond Disruption Compared to WT')
 plt.savefig('mutate_BBR_corr_res.png')
