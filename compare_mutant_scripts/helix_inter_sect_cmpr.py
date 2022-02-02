@@ -245,26 +245,34 @@ plot_mult_mut(sim_mean_AD, sim_err_AD, sim_mut_AD, inter, sim_P_AD, 'AD', 'sim_b
 plot_mult_mut(sim_mean_BBR, sim_err_BBR, sim_mut_BBR, inter, sim_P_BBR, 'BBR', 'sim_bind')
 
 #Determine percent difference from WT
-mut_only = ['F196A', 'L192A', 'L192F', 'L195A', 'L195F', 'L195N', 'S286A', 'F280Y', 'E276L', 'E276F', 'K279M', 'K279W', 'V287T']
-per_diff_AD = np.zeros((len(inter), len(mut_only)))
-per_diff_BBR = np.zeros((len(inter), len(mut_only)))
+mut_AD_only = ['L192A', 'L192F', 'L195A', 'L195F', 'L195N', 'S286A', 'E276L', 'E276F', 'K279M', 'K279W']
+iters = [4, 5, 6, 7, 8, 9, 11, 12, 13, 14]
+per_diff_AD = np.zeros((len(inter), len(mut_AD_only)))
 for j in range(len(inter)):
-    for i in range(len(mut_only)):
-        per_diff_AD[j][i] = (all_mean_AD[i+3][j] - all_mean_AD[2][j])/((all_mean_AD[i+3][j] + all_mean_AD[2][j])/2) * 100
-        per_diff_BBR[j][i] = (all_mean_BBR[i+3][j] - all_mean_BBR[2][j])/((all_mean_BBR[i+3][j] + all_mean_BBR[2][j])/2) * 100
-   
+    for i in range(len(mut_AD_only)):
+        n = iters[i]
+        per_diff_AD[j][i] = (all_mean_AD[n][j] - all_mean_AD[2][j])/((all_mean_AD[n][j] + all_mean_AD[2][j])/2) * 100
+ 
+mut_BBR_only = ['F196A', 'L192A', 'L192F', 'L195A', 'L195F', 'L195N', 'S286A', 'E276L', 'K279M', 'K279W', 'V287T']
+iters = [3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15]
+per_diff_BBR = np.zeros((len(inter), len(mut_BBR_only)))
+for j in range(len(inter)):
+    for i in range(len(mut_BBR_only)):
+        n = iters[i]
+        per_diff_BBR[j][i] = (all_mean_BBR[n][j] - all_mean_BBR[2][j])/((all_mean_BBR[n][j] + all_mean_BBR[2][j])/2) * 100
+ 
 #Plot table comparing residue interactions to WT
 ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-ax = sns.heatmap(per_diff_AD, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_only, yticklabels = inter)
+ax = sns.heatmap(per_diff_AD, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_AD_only, yticklabels = inter)
 #ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
-plt.title('Helical Distance Compared to WT for AD')
+plt.title('Mean Number of Interactions Compared to WT for AD')
 plt.savefig('mutate_AD_helix_dist.png')
 plt.close()
 
 ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-ax = sns.heatmap(per_diff_BBR, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_only, yticklabels = inter)
+ax = sns.heatmap(per_diff_BBR, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_BBR_only, yticklabels = inter)
 #ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
-plt.title('Helical Distance Compared to WT for BBR')
+plt.title('Mean Number of Interactions Compared to WT for BBR')
 plt.savefig('mutate_BBR_helix_dist.png')
 plt.close()
 
