@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 from itertools import product
+import seaborn as sns
+
 def plot_func(inter, err, hel1, hel2, p, p1, p2):
     num = [5, 10, 15, 20]
     Method = ['Apo Open', 'Apo Closed', 'AD', 'BBR']
@@ -392,4 +394,24 @@ output4.write('Apo Open:' + str(dL11_a7[0]) + '+/-' + str(dL11_a7_err[0]) + '\n'
 output4.write('Apo Closed:' + str(dL11_a7[1]) + '+/-' + str(dL11_a7_err[1]) + '\n')
 output4.write('AD:' + str(dL11_a7[2]) + '+/-' + str(dL11_a7_err[2]) + '\n')
 output4.write('BBR:' + str(dL11_a7[3]) + '+/-' + str(dL11_a7_err[3]) + '\n')
+
+#Compute percentage difference from mean number of interactions for all three helices relative to the Apo closed State
+label = ['Apo Open', 'AD', 'BBR']
+helices = ['a3 and a6', 'a3 and a7', 'a6 and a7', 'L-11 and a7']
+per_diff_all = np.zeros((len(helices), len(label)))
+index = [0, 2, 3]
+for i in range(len(index)):
+    n = index[i]
+    per_diff_all[0][i] = ((da3_a6[n] - da3_a6[1]) / ((da3_a6[n] + da3_a6[1])/2)) * 100
+    per_diff_all[1][i] = ((da3_a7[n] - da3_a7[1]) / ((da3_a7[n] + da3_a7[1])/2)) * 100
+    per_diff_all[2][i] = ((da6_a7[n] - da6_a7[1]) / ((da6_a7[n] + da6_a7[1])/2)) * 100
+    per_diff_all[3][i] = ((dL11_a7[n] - dL11_a7[1]) / ((dL11_a7[n] + dL11_a7[1])/2)) * 100
+
+#Make heatmap to show the changes in helical interactions relative to the Apo Closed State
+ax = plt.figure(figsize=(8, 10), frameon=True) # no visible frame
+ax = sns.heatmap(per_diff_all, annot=False, cmap = 'bwr_r', cbar = True, vmin = -100, vmax = 100, cbar_kws={'label': 'Percentage Difference from Apo Closed'}, xticklabels = label, yticklabels = helices)
+#ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
+plt.title('Helical Interactions Compared to Apo Closed WPD Loop')
+plt.savefig('Hel_inter_cmpr.png')
+plt.close()
 
