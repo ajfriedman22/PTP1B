@@ -10,7 +10,7 @@ def plot_func(inter, err, hel1, hel2, p, p1, p2):
     ax1 = fig.add_subplot(111)
     ax1.set_title('Comparison of Interactions b/w ' + hel1 + ' ' + hel2, fontsize = 20) 
     ax1.set_ylabel('Distance b/w Residues', fontsize = 18)
-    ax1.bar(num, inter, color = ['black', 'black', 'darkblue', 'darkred'], width=4.5)
+    ax1.bar(num, inter, color = ['black', 'gray', 'blue', 'red'], width=4.5)
     plt.errorbar(num, inter, yerr= err, fmt='o', color='black')
     plt.xticks(num, Method, fontsize=14)
     if p < 0.05 and p > 0.01:
@@ -109,29 +109,29 @@ dL11_a7_WT_AD, dL11_a7_WT_BBR, dL11_a7_a7, dL11_a7_dis9, dL11_a7_dis11, dL11_a7_
 dL11_a7_BBR_a7, dL11_a7_AD_dis11, dL11_a7_AD_alt, dL11_a7_AD_alt2 = [],[],[],[]
 
 #Input Data for a3 and a6 residue inter
-for i in open("../../../mutate/WT/AD/a3_a6_inter.txt").readlines():
+for i in open("../../../mutate/WT/AD/analysis/a3_a6_inter.txt").readlines():
     da3_a6_WT_AD.append(float(i))
-for i in open("../../../mutate/WT/BBR/a3_a6_inter.txt").readlines():
+for i in open("../../../mutate/WT/BBR/analysis/a3_a6_inter.txt").readlines():
     da3_a6_WT_BBR.append(float(i))
-for i in open("../../../rebuild_a7/a3_a6_inter.txt").readlines():
+for i in open("../../../rebuild_a7/analysis/a3_a6_inter.txt").readlines():
     da3_a6_a7.append(float(i))
-for i in open("../../../Apo_dis/config9/a3_a6_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config9/analysis/a3_a6_inter.txt").readlines():
     da3_a6_dis9.append(float(i))
-for i in open("../../../Apo_dis/config11/a3_a6_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config11/analysis/a3_a6_inter.txt").readlines():
     da3_a6_dis11.append(float(i))
-for i in open("../../../1sug/a3_a6_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug/a3_a6_inter.txt").readlines():
     da3_a6_1sug.append(float(i))
-for i in open("../../../1sug2/a3_a6_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug2/a3_a6_inter.txt").readlines():
     da3_a6_1sug2.append(float(i))
-for i in open("../../../1sug3/a3_a6_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug3/a3_a6_inter.txt").readlines():
     da3_a6_1sug3.append(float(i))
-for i in open("../../../BBR_a7/a3_a6_inter.txt").readlines():
+for i in open("../../../BBR_a7/analysis/a3_a6_inter.txt").readlines():
     da3_a6_BBR_a7.append(float(i))
-for i in open("../../../1sug_dis_AD/config11/a3_a6_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config11/a3_a6_inter.txt").readlines():
     da3_a6_AD_dis11.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_1/a3_a6_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt/a3_a6_inter.txt").readlines():
     da3_a6_AD_alt.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_2/a3_a6_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt2/a3_a6_inter.txt").readlines():
     da3_a6_AD_alt2.append(float(i))
 
 #Determine approximate time scale for correlated motions
@@ -166,29 +166,29 @@ corr_array(da3_a6_AD_alt, corr_mean, 60, 300, da3_a6_AD)
 corr_array(da3_a6_AD_alt2, corr_mean, 30, 300, da3_a6_AD)
 
 #Input Data for a3 and a7 residue inter
-for i in open("../../../mutate/WT/AD/a7_a3_inter.txt").readlines():
+for i in open("../../../mutate/WT/AD/analysis/a7_a3_inter.txt").readlines():
     da3_a7_WT_AD.append(float(i))
-for i in open("../../../mutate/WT/BBR/a7_a3_inter.txt").readlines():
+for i in open("../../../mutate/WT/BBR/analysis/a7_a3_inter.txt").readlines():
     da3_a7_WT_BBR.append(float(i))
-for i in open("../../../rebuild_a7/a7_a3_inter.txt").readlines():
+for i in open("../../../rebuild_a7/analysis/a7_a3_inter.txt").readlines():
     da3_a7_a7.append(float(i))
-for i in open("../../../Apo_dis/config9/a7_a3_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config9/analysis/a7_a3_inter.txt").readlines():
     da3_a7_dis9.append(float(i))
-for i in open("../../../Apo_dis/config11/a7_a3_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config11/analysis/a7_a3_inter.txt").readlines():
     da3_a7_dis11.append(float(i))
-for i in open("../../../1sug/a7_a3_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug/a7_a3_inter.txt").readlines():
     da3_a7_1sug.append(float(i))
-for i in open("../../../1sug2/a7_a3_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug2/a7_a3_inter.txt").readlines():
     da3_a7_1sug2.append(float(i))
-for i in open("../../../1sug3/a7_a3_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug3/a7_a3_inter.txt").readlines():
     da3_a7_1sug3.append(float(i))
-for i in open("../../../BBR_a7/a7_a3_inter.txt").readlines():
+for i in open("../../../BBR_a7/analysis/a7_a3_inter.txt").readlines():
     da3_a7_BBR_a7.append(float(i))
-for i in open("../../../1sug_dis_AD/config11/a7_a3_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config11/a7_a3_inter.txt").readlines():
     da3_a7_AD_dis11.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_1/a7_a3_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt/a7_a3_inter.txt").readlines():
     da3_a7_AD_alt.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_2/a7_a3_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt2/a7_a3_inter.txt").readlines():
     da3_a7_AD_alt2.append(float(i))
 
 #Determine approximate time scale for correlated motions
@@ -223,29 +223,29 @@ corr_array(da3_a7_AD_alt, corr_mean, 60, 300, da3_a7_AD)
 corr_array(da3_a7_AD_alt2, corr_mean, 30, 300, da3_a7_AD)
 
 #Input Data for a6 and a7 residue inter
-for i in open("../../../mutate/WT/AD/a7_a6_inter.txt").readlines():
+for i in open("../../../mutate/WT/AD/analysis/a7_a6_inter.txt").readlines():
     da6_a7_WT_AD.append(float(i))
-for i in open("../../../mutate/WT/BBR/a7_a6_inter.txt").readlines():
+for i in open("../../../mutate/WT/BBR/analysis/a7_a6_inter.txt").readlines():
     da6_a7_WT_BBR.append(float(i))
-for i in open("../../../rebuild_a7/a7_a6_inter.txt").readlines():
+for i in open("../../../rebuild_a7/analysis/a7_a6_inter.txt").readlines():
     da6_a7_a7.append(float(i))
-for i in open("../../../Apo_dis/config9/a7_a6_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config9/analysis/a7_a6_inter.txt").readlines():
     da6_a7_dis9.append(float(i))
-for i in open("../../../Apo_dis/config11/a7_a6_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config11/analysis/a7_a6_inter.txt").readlines():
     da6_a7_dis11.append(float(i))
-for i in open("../../../1sug/a7_a6_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug/a7_a6_inter.txt").readlines():
     da6_a7_1sug.append(float(i))
-for i in open("../../../1sug2/a7_a6_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug2/a7_a6_inter.txt").readlines():
     da6_a7_1sug2.append(float(i))
-for i in open("../../../1sug3/a7_a6_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug3/a7_a6_inter.txt").readlines():
     da6_a7_1sug3.append(float(i))
-for i in open("../../../BBR_a7/a7_a6_inter.txt").readlines():
+for i in open("../../../BBR_a7/analysis/a7_a6_inter.txt").readlines():
     da6_a7_BBR_a7.append(float(i))
-for i in open("../../../1sug_dis_AD/config11/a7_a6_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config11/a7_a6_inter.txt").readlines():
     da6_a7_AD_dis11.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_1/a7_a6_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt/a7_a6_inter.txt").readlines():
     da6_a7_AD_alt.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_2/a7_a6_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt2/a7_a6_inter.txt").readlines():
     da6_a7_AD_alt2.append(float(i))
 
 #Determine approximate time scale for correlated motions
@@ -280,29 +280,29 @@ corr_array(da6_a7_AD_alt, corr_mean, 60, 300, da6_a7_AD)
 corr_array(da6_a7_AD_alt2, corr_mean, 30, 300, da6_a7_AD)
 
 #Input Data for a3 and WPD residue inter
-for i in open("../../../mutate/WT/AD/a7_L11_inter.txt").readlines():
+for i in open("../../../mutate/WT/AD/analysis/a7_L11_inter.txt").readlines():
     dL11_a7_WT_AD.append(float(i))
-for i in open("../../../mutate/WT/BBR/a7_L11_inter.txt").readlines():
+for i in open("../../../mutate/WT/BBR/analysis/a7_L11_inter.txt").readlines():
     dL11_a7_WT_BBR.append(float(i))
-for i in open("../../../rebuild_a7/a7_L11_inter.txt").readlines():
+for i in open("../../../rebuild_a7/analysis/a7_L11_inter.txt").readlines():
     dL11_a7_a7.append(float(i))
-for i in open("../../../Apo_dis/config9/a7_L11_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config9/analysis/a7_L11_inter.txt").readlines():
     dL11_a7_dis9.append(float(i))
-for i in open("../../../Apo_dis/config11/a7_L11_inter.txt").readlines():
+for i in open("../../../rebuild_a7_high/config11/analysis/a7_L11_inter.txt").readlines():
     dL11_a7_dis11.append(float(i))
-for i in open("../../../1sug/a7_L11_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug/a7_L11_inter.txt").readlines():
     dL11_a7_1sug.append(float(i))
-for i in open("../../../1sug2/a7_L11_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug2/a7_L11_inter.txt").readlines():
     dL11_a7_1sug2.append(float(i))
-for i in open("../../../1sug3/a7_L11_inter.txt").readlines():
+for i in open("../../../Apo_1SUG/analysis/1sug3/a7_L11_inter.txt").readlines():
     dL11_a7_1sug3.append(float(i))
-for i in open("../../../BBR_a7/a7_L11_inter.txt").readlines():
+for i in open("../../../BBR_a7/analysis/a7_L11_inter.txt").readlines():
     dL11_a7_BBR_a7.append(float(i))
-for i in open("../../../1sug_dis_AD/config11/a7_L11_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config11/a7_L11_inter.txt").readlines():
     dL11_a7_AD_dis11.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_1/a7_L11_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt/a7_L11_inter.txt").readlines():
     dL11_a7_AD_alt.append(float(i))
-for i in open("../../../1sug_AD_dis_alt/run_2/a7_L11_inter.txt").readlines():
+for i in open("../../../1sug_dis_AD/analysis/config_alt2/a7_L11_inter.txt").readlines():
     dL11_a7_AD_alt2.append(float(i))
 
 #Determine approximate time scale for correlated motions
