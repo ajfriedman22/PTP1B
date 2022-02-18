@@ -15,11 +15,12 @@ def import_data(file_path):
 def plot_bond(save_path, hbond_name, mean, err, mean_all):
     num = [0, 1, 2, 3, 4, 5, 6]
     Label = ['WT', 'F196A', 'L192F', 'L195F', 'E276F', 'F280Y', 'V287T']
+    bar_colors = ['gray', 'red', 'gray', 'pink', 'pink', 'blue', 'red']
     fig = plt.figure(figsize=(14,8))
     ax1 = fig.add_subplot(111)
     ax1.set_title('Comparison of Presence of bond b/w ' + str(hbond_name)) 
     ax1.set_ylabel('Percent time h-bond was formed')
-    ax1.bar(num, mean_all, width=0.9)
+    ax1.bar(num, mean_all, color = bar_colors, width=0.9)
     plt.xticks(num, Label, fontsize=8)
     fig.savefig(save_path + '/' + hbond_name + '_all.png')
     plt.close(fig)         
@@ -69,6 +70,7 @@ for i in range(len(hbond_names)):
     #Present more with increased activity
     diff = mean[2] - mean[0]
     diff1 = mean[1] - mean[0]
+    diff_WT = per_hbonds[0][i] - per_hbonds[2][i]
 #    if diff > 30:
 #        plot_bond('more_inc', hbond_names, i, group_per, group_per_err)
     #Present less with increased activity
@@ -106,7 +108,10 @@ for i in range(len(hbond_names)):
     #If bond is just more present with decreased activity
     elif diff2 > 15:
         plot_bond('more_dec', hbond_names[i], mean, err, mean_all)
-   
+
+    #Plot bonds which appear a similar amount of time with 
+    if abs(diff_WT) < 5:
+        plot_bond('WT_sim', hbond_names[i], mean, err, mean_all)
     
     #Specific requests
     if hbond_names[i] == 'THR177-N -- TYR152-O\n':
