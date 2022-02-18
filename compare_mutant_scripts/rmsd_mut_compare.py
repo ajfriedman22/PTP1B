@@ -32,7 +32,7 @@ def plot_compare(RMSD_mean, RMSD_err, Label, sect, n):
 
 #File paths for all input files
 file_path = ['../Apo_dis', 'L192F/Apo', 'E276F/Apo', 'F280Y/Apo', 'L195F/Apo', 'F196A/Apo', 'V287T/Apo'] #Indices to rank in order of closest activity to WT to Furthest
-sections = ['WPD', 'P', 'a3', 'a4', 'a5', 'a6', 'a7', 'Q']
+sections = ['WPD', 'WPD_a3', 'P', 'a3', 'a4', 'a5', 'a6', 'a7', 'Q']
 
 #open all files
 RMSD_mean = np.zeros((len(file_path), len(sections)))
