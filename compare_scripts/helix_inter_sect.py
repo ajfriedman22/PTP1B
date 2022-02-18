@@ -4,18 +4,20 @@ import matplotlib.pyplot as plt
 from scipy import stats
 from itertools import product
 import seaborn as sns
+
+
 #Load data, determine correlated samples and caculate mean and error
 def load_data(folder):
     a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3 = [],[],[],[],[]
-    for i in open('../../../' + folder + '/analysis/a3_a7_pt1_tot_inter.txt'):
+    for i in open('../../../' + folder + '/a3_a7_pt1_tot_inter.txt'):
         a3_a7_pt1.append(float(i))
-    for i in open('../../../' + folder + '/analysis/a3_a7_pt2_tot_inter.txt'):
+    for i in open('../../../' + folder + '/a3_a7_pt2_tot_inter.txt'):
         a3_a7_pt2.append(float(i))
-    for i in open('../../../' + folder + '/analysis/a6_a7_pt1_tot_inter.txt'):
+    for i in open('../../../' + folder + '/a6_a7_pt1_tot_inter.txt'):
         a6_a7_pt1.append(float(i))
-    for i in open('../../../' + folder + '/analysis/a6_a7_pt2_tot_inter.txt'):
+    for i in open('../../../' + folder + '/a6_a7_pt2_tot_inter.txt'):
         a6_a7_pt2.append(float(i))
-    for i in open('../../../' + folder + '/analysis/a6_a7_pt3_tot_inter.txt'):
+    for i in open('../../../' + folder + '/a6_a7_pt3_tot_inter.txt'):
         a6_a7_pt3.append(float(i))
 
 
@@ -58,10 +60,10 @@ def load_data(folder):
 
 def plot_all(inter, err, label_inter, P, label_x, j):
     num = np.linspace(0, len(label_x), num = len(label_x))
-    inter_j = inter[:][j]
-    err_j = err[:][j]
-    p1 = P[0][j]
-    p2 = P[1][j]
+    inter_j = inter[:,j]
+    err_j = err[:,j]
+    p = P[0,j]
+    p1 = P[1,j]
     Color = ['gray', 'black', 'blue', 'red']
     #Plot Function
     fig = plt.figure(figsize=(12, 8))
@@ -69,56 +71,44 @@ def plot_all(inter, err, label_inter, P, label_x, j):
     ax1.set_title('Comparison of ' + label_inter[j] + ' Helix Interactions')
     ax1.set_ylabel('Mean Number of Interactions')
     ax1.bar(num, inter_j, color = Color, width=0.9)
-    
-    plt.errorbar(num, inter_j, yerr= err_j, fmt='o', color='black')
-    plt.xticks(num, label_x, fontsize=8)
-    fig.savefig(label_inter[j] + '_cmpr_inter.png')
-    plt.close(fig)
+    if p1 < 0.05 and p1 > 0.01:
+        x1, x2 = 0, 2 #Columns for Apo and BBR
+        y, h, col = (1.1*inter_j[[0, 2]].max()), 1, 'b'
+        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
     if p < 0.01 and p > 0.001:
-        x1, x2 = 5, 15 #Columns for Apo and AD
+        x1, x2 = 0, 2 #Columns for Apo and AD
         y, h, col = (1.1*inter_j[[0, 2]].max()), 1, 'b'
         plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
         plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
     if p < 0.001:
-        x1, x2 = 5, 15 #Columns for Apo and AD
+        x1, x2 = 0, 2 #Columns for Apo and AD
         y, h, col = (1.1*inter_j[[0, 2]].max()), 1, 'b'
         plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
         plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
     if p1 < 0.05 and p1 > 0.01:
-        x1, x2 = 5, 20 #Columns for Apo and BBR
+        x1, x2 = 0, 3 #Columns for Apo and BBR
         y, h, col = (1.1*inter_j[[0, 3]].max()), 1, 'r'
         plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
         plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
     if p1 < 0.01 and p1 > 0.001:
-        x1, x2 = 5, 20 #Columns for Apo and BBR
+        x1, x2 = 0, 3 #Columns for Apo and BBR
         y, h, col = (1.1*inter_j[[0, 3]].max()), 1, 'r'
         plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
         plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
     if p1 < 0.001:
-        x1, x2 = 5, 20 #Columns for Apo and BBR
+        x1, x2 = 0, 3 #Columns for Apo and BBR
         y, h, col = (1.1*inter_j[[0, 3]].max()), 1, 'r'
         plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
         plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
-    if p2 < 0.05 and p2 > 0.01:
-        x1, x2 = 5, 10 #Columns for Apo and AD
-        y, h, col = (1.1*inter_j[[0, 1]].max()), 1, 'k'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p2 < 0.01 and p2 > 0.001:
-        x1, x2 = 5, 10 #Columns for Apo and AD
-        y, h, col = (1.1*inter_j[[0, 1]].max()), 1, 'k'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p2 < 0.001:
-        x1, x2 = 5, 10 #Columns for Apo and AD
-        y, h, col = (1.1*inter_j[[0, 1]].max()), 1, 'k'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
+    plt.errorbar(num, inter_j, yerr= err_j, fmt='o', color='black')
+    plt.xticks(num, label_x, fontsize=8)
+    fig.savefig(label_inter[j] + '_cmpr_inter.png')
+    plt.close(fig)
     #Write to file
-    output = open(label[j] + '_cmpr_inter.txt', 'w')
+    output = open(label_inter[j] + '_cmpr_inter.txt', 'w')
     for k in range(len(label_x)):
         output.write(str(label_x[k]) + ': ' + str(inter_j[k]) + ' +/- ' + str(err_j[k]) + '\n')
-        output.write('P-value:' + str(P[k,j]) + '\n')
     output.close()
 
 #Set Array of file folders
@@ -138,7 +128,7 @@ for i in Folders_Apo_open:
     ApoO_a6_a7_pt3.extend(a6_a7_pt3)
 
 ApoC_a3_a7_pt1, ApoC_a3_a7_pt2, ApoC_a6_a7_pt1, ApoC_a6_a7_pt2, ApoC_a6_a7_pt3 = [],[],[],[],[]
-for i in Folders_Apo_open:
+for i in Folders_Apo_closed:
     a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3 = load_data(i)
     ApoC_a3_a7_pt1.extend(a3_a7_pt1)
     ApoC_a3_a7_pt2.extend(a3_a7_pt2)
@@ -147,7 +137,7 @@ for i in Folders_Apo_open:
     ApoC_a6_a7_pt3.extend(a6_a7_pt3)
 
 AD_a3_a7_pt1, AD_a3_a7_pt2, AD_a6_a7_pt1, AD_a6_a7_pt2, AD_a6_a7_pt3 = [],[],[],[],[]
-for i in Folders_Apo_open:
+for i in Folders_AD:
     a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3 = load_data(i)
     AD_a3_a7_pt1.extend(a3_a7_pt1)
     AD_a3_a7_pt2.extend(a3_a7_pt2)
@@ -156,7 +146,7 @@ for i in Folders_Apo_open:
     AD_a6_a7_pt3.extend(a6_a7_pt3)
 
 BBR_a3_a7_pt1, BBR_a3_a7_pt2, BBR_a6_a7_pt1, BBR_a6_a7_pt2, BBR_a6_a7_pt3 = [],[],[],[],[]
-for i in Folders_Apo_open:
+for i in Folders_BBR:
     a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3 = load_data(i)
     BBR_a3_a7_pt1.extend(a3_a7_pt1)
     BBR_a3_a7_pt2.extend(a3_a7_pt2)
@@ -166,17 +156,17 @@ for i in Folders_Apo_open:
 
 #Caculate P-value relative to Apo Open
 P_rel_ApoO = np.zeros((2, 5))
-P_rel_ApoO[0][0] = stats.ttest_ind(ADa3_a7_pt1, ApoOa3_a7_pt1, equal_var = False) #Welch's t-test
-P_rel_ApoO[0][1] = stats.ttest_ind(ADa3_a7_pt2, ApoOa3_a7_pt2, equal_var = False) #Welch's t-test
-P_rel_ApoO[0][2] = stats.ttest_ind(ADa6_a7_pt1, ApoOa6_a7_pt1, equal_var = False) #Welch's t-test
-P_rel_ApoO[0][3] = stats.ttest_ind(ADa6_a7_pt2, ApoOa6_a7_pt2, equal_var = False) #Welch's t-test
-P_rel_ApoO[0][4] = stats.ttest_ind(ADa6_a7_pt3, ApoOa6_a7_pt3, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[0][0] = stats.ttest_ind(AD_a3_a7_pt1, ApoO_a3_a7_pt1, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[0][1] = stats.ttest_ind(AD_a3_a7_pt2, ApoO_a3_a7_pt2, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[0][2] = stats.ttest_ind(AD_a6_a7_pt1, ApoO_a6_a7_pt1, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[0][3] = stats.ttest_ind(AD_a6_a7_pt2, ApoO_a6_a7_pt2, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[0][4] = stats.ttest_ind(AD_a6_a7_pt3, ApoO_a6_a7_pt3, equal_var = False) #Welch's t-test
 
-P_rel_ApoO[1][0] = stats.ttest_ind(BBRa3_a7_pt1, ApoOa3_a7_pt1, equal_var = False) #Welch's t-test
-P_rel_ApoO[1][1] = stats.ttest_ind(BBRa3_a7_pt2, ApoOa3_a7_pt2, equal_var = False) #Welch's t-test
-P_rel_ApoO[1][2] = stats.ttest_ind(BBRa6_a7_pt1, ApoOa6_a7_pt1, equal_var = False) #Welch's t-test
-P_rel_ApoO[1][3] = stats.ttest_ind(BBRa6_a7_pt2, ApoOa6_a7_pt2, equal_var = False) #Welch's t-test
-P_rel_ApoO[1][4] = stats.ttest_ind(BBRa6_a7_pt3, ApoOa6_a7_pt3, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[1][0] = stats.ttest_ind(BBR_a3_a7_pt1, ApoO_a3_a7_pt1, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[1][1] = stats.ttest_ind(BBR_a3_a7_pt2, ApoO_a3_a7_pt2, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[1][2] = stats.ttest_ind(BBR_a6_a7_pt1, ApoO_a6_a7_pt1, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[1][3] = stats.ttest_ind(BBR_a6_a7_pt2, ApoO_a6_a7_pt2, equal_var = False) #Welch's t-test
+s, P_rel_ApoO[1][4] = stats.ttest_ind(BBR_a6_a7_pt3, ApoO_a6_a7_pt3, equal_var = False) #Welch's t-test
 
 #Mean and Standard Error into one vector
 label_all = ['Apo Open', 'Apo Closed',  'AD', 'BBR']
@@ -234,7 +224,8 @@ all_err[3][4] = stats.sem(BBR_a6_a7_pt3)
 
 #Plot individual graphs
 for i in range(len(inter)):
-    plot_all(all_mean, all_err, inter, P_rel_ApoO, label_all, i):
+    plot_all(all_mean, all_err, inter, P_rel_ApoO, label_all, i)
+
 
 #Determine percent difference from Apo Closed
 label = ['Apo Open', 'AD', 'BBR']
@@ -243,12 +234,13 @@ index = [0, 2, 3]
 for j in range(len(inter)):
     for i in range(len(label)):
         n = index[i]
-        per_diff[j][i] = (all_mean[n][j] - all_mean[1][j])/((all_mean[n][j] + all_mean[1][j])/2) * 100
-   
+        per_diff[j,i] = (all_mean[n,j] - all_mean[1,j])/((all_mean[n,j] + all_mean[1,j])/2) * 100
+print(per_diff)
+
 #Plot table comparing residue interactions to WT
 ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-ax = sns.heatmap(per_diff, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from WT'}, vmin = -200, vmax = 200, xticklabels = mut_only, yticklabels = inter)
-ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
+ax = sns.heatmap(per_diff, annot=False, cmap = 'bwr', cbar = True, cbar_kws={'label': 'Percentage Difference from Apo Closed'}, vmin = -200, vmax = 200, xticklabels = label, yticklabels = inter)
+#ax.add_artist(lines.Line2D([0, 20], [7, 7], color = 'black', linestyle= '--', linewidth = 4))
 plt.title('Helical Distance Compared to WT for AD')
 plt.savefig('mutate_AD_helix_dist.png')
 plt.close()
