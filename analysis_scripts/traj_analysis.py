@@ -901,7 +901,13 @@ if rms_chk == True:
         ref_P = ref_bb.atom_slice(top_ref_bb.select('213 <= resid and resid <= 222' )) #Limit trajectory to the P loop of PTP1B only
         rmsd_P = md.rmsd(traj_P, ref_P, parallel=True, precentered=False)
         np.savetxt('rmsd_P_ref.txt', rmsd_P)
-    
+         
+        #Caculate RMSD for the Substrate Binding Loop loop
+        traj_S = traj_bb.atom_slice(top_bb.select('112 <= resid and resid <= 119' )) #Limit trajectory to the S loop of PTP1B only
+        ref_S = ref_bb.atom_slice(top_ref_bb.select('112 <= resid and resid <= 119' )) #Limit trajectory to the S loop of PTP1B only
+        rmsd_S = md.rmsd(traj_S, ref_S, parallel=True, precentered=False)
+        np.savetxt('rmsd_SBL_ref.txt', rmsd_P)
+   
         #Caculate RMSD for the a3 helix
         traj_a3 = traj_bb.atom_slice(top_bb.select('185 <= resid and resid <= 199' ))
         ref_a3 = ref_bb.atom_slice(top_ref_bb.select('185 <= resid and resid <= 199' ))
@@ -956,7 +962,13 @@ if rms_chk == True:
         ref_P = ref_bb.atom_slice(top_ref_bb.select('212 <= resid and resid <= 221' )) #Limit trajectory to the P loop of PTP1B only
         rmsd_P = md.rmsd(traj_P, ref_P, parallel=True, precentered=False)
         np.savetxt('rmsd_P_ref.txt', rmsd_P)
-    
+        
+        #Caculate RMSD for the Substrate Binding Loop loop
+        traj_S = traj_bb.atom_slice(top_bb.select('112 <= resid and resid <= 119' )) #Limit trajectory to the S loop of PTP1B only
+        ref_S = ref_bb.atom_slice(top_ref_bb.select('112 <= resid and resid <= 119' )) #Limit trajectory to the S loop of PTP1B only
+        rmsd_S = md.rmsd(traj_S, ref_S, parallel=True, precentered=False)
+        np.savetxt('rmsd_SBL_ref.txt', rmsd_S)
+
         #Caculate RMSD for the a3 helix
         traj_a3 = traj_bb.atom_slice(top_bb.select('184 <= resid and resid <= 198' ))
         ref_a3 = ref_bb.atom_slice(top_ref_bb.select('184 <= resid and resid <= 198' ))
