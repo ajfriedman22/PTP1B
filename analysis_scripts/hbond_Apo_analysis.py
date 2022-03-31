@@ -5,11 +5,15 @@ import argparse
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
 parser.add_argument('-g', required=True, help= 'File name for input topology (gro format)')
+parser.add_argument('-f', required=True, help= 'Distinction for group of hbonds of interest')
+parser.add_argument('-p', required=True, help= 'File path for list of h-bonds of interest')
 
 #Parse arguments
 args = parser.parse_args()
 File_traj = args.t + '.xtc'
 File_gro = args.g + '.gro'
+File_path = args.p
+File_name = args.f
 
 #Load trajectories
 traj = md.load(File_traj, top=File_gro)
@@ -20,8 +24,8 @@ traj_ns = traj.remove_solvent() #Remove solvent from the trajectory leaving only
 print('Topology Loaded')
 
 #Load atoms and names corresponding to h-bonds of note
-bond_name = open('/ocean/projects/cts160011p/afriedma/PTP1B/mutate/compare_Apo/Hbond/Hbonds_uncommon_Apo.txt', 'r').readlines()
-bond_atom = open('/ocean/projects/cts160011p/afriedma/PTP1B/mutate/compare_Apo/Hbond/Hbonds_uncommon_atom_Apo.txt', 'r').readlines()
+bond_name = open(File_path + 'Hbonds_uncommon_' + File_name + '.txt', 'r').readlines()
+bond_atom = open(File_path + 'Hbonds_uncommon_atom_' + File_name + '.txt', 'r').readlines()
 
 #Convert atoms list to array
 hbonds = np.zeros((len(bond_atom),3))
@@ -43,6 +47,6 @@ for j in range(num_h): #Loop through all h-bonds
         if da_distances[i,j] <= 0.25 and da_angles[i,j] >= 2.094: #If distance between donor and acceptor is less than 2.5A and the angle is greater than 120 degrees or ~ 2.094 radians
             count +=1
     per.append(100*count/num_t) #Percentage of time each h-bond is present in trajectory
-np.savetxt('Hbonds_per_Apo_uncommon.txt',per)
+np.savetxt('Hbonds_per_' + File_name + '_uncommon.txt',per)
 
 print('Analysis Complete')
