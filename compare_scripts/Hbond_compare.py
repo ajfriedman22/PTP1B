@@ -6,59 +6,53 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 #Open files listing H_bonds in read-only format
-file_a7 = open('../../rebuild_a7/Hbonds_a7.txt','r') #WPD open, a7 ordered, no AD
-file_a7_AD = open('../../AD_rebuild_a7/Hbonds_a7_AD.txt', 'r') #WPD open, a7 ordered, AD present
-file_a7_BBR = open('../../BBR_a7/Hbonds_BBR_a7.txt', 'r') #WPD open, a7 ordered, BBR present
-file_Apo = open('../../Apo/Hbonds_Apo.txt','r') #WPD open, no a7, no AD
-file_AD = open('../../AD/Hbonds_AD.txt','r') #WPD open, no a7, AD present
-file_1sug = open('../../1sug/Hbonds_1sug.txt','r') #WPD closed, a7 ordered, no AD
-file_1sug2 = open('../../1sug2/Hbonds_1sug2.txt','r') #WPD closed, a7 ordered, no AD
-file_1sug3 = open('../../1sug3/Hbonds_1sug3.txt','r') #WPD closed/open, a7 ordered, no AD
-file_1sug_AD = open('../../1sug_AD/Hbonds_1sug_AD.txt','r') #WPD closed/open, a7 ordered, AD present
-file_1sug_BBR = open('../../1sug_BBR/Hbonds_BBR_1sug.txt', 'r') #WPD closed, a7 ardered, BBR present
-file_1sug_na7 = open('../../1sug_no_a7/Hbonds_1sug_na7.txt','r') #WPD closed, no a7, no AD
-file_1sug_na7_AD = open('../../1sug_no_a7_AD/Hbonds_1sug_na7_AD.txt','r') #WPD closed, no a7, no AD
-file_1sug_dis = open('../../1sug_dis/config11/Hbonds_1sug_dis11.txt', 'r') #WPD closed, disordered a7, no AD
-file_1sug_dis_AD = open('../../1sug_dis_AD/config11/Hbonds_1sug_dis_AD11.txt', 'r') #WPD closed/open, disordered a7, AD present
-file_1sug_alt_AD = open('../../1sug_AD_dis_alt/Hbonds_1sug_AD_alt.txt', 'r') #WPD closed/open, disordered a7, AD present
+list_a7 = open('../../rebuild_a7/analysis/Hbonds_a7.txt','r').readlines() #WPD open, a7 ordered, no AD
+list_a7_AD = open('../../AD_rebuild_a7/analysis/Hbonds_a7_AD.txt', 'r').readlines() #WPD open, a7 ordered, AD present
+list_a7_BBR = open('../../BBR_a7/analysis/Hbonds_BBR_a7.txt', 'r').readlines() #WPD open, a7 ordered, BBR present
+list_Apo = open('../../Apo/analysis/Hbonds_Apo.txt','r').readlines() #WPD open, no a7, no AD
+list_Apo_dis7 = open('../../rebuild_a7_high/config7/analysis/Hbonds_Apo_dis7.txt','r').readlines() #WPD open, no a7, no AD
+list_Apo_dis9 = open('../../rebuild_a7_high/config9/analysis/Hbonds_Apo_dis9.txt','r').readlines() #WPD open, no a7, no AD
+list_Apo_dis11 = open('../../rebuild_a7_high/config11/analysis/Hbonds_Apo_dis11.txt','r').readlines() #WPD open, no a7, no AD
+list_Apo_dis_alt = open('../../Apo_dis/analysis/Hbonds_Apo_dis.txt','r').readlines() #WPD open, no a7, no AD
+list_AD = open('../../AD/analysis/Hbonds_AD.txt','r').readlines() #WPD open, no a7, AD present
+list_1sug = open('../../Apo_1SUG/analysis/1sug/Hbonds_1sug.txt','r').readlines() #WPD closed, a7 ordered, no AD
+list_1sug2 = open('../../Apo_1SUG/analysis/1sug2/Hbonds_1sug2.txt','r').readlines() #WPD closed, a7 ordered, no AD
+list_1sug3 = open('../../Apo_1SUG/analysis/1sug3/Hbonds_1sug3.txt','r').readlines() #WPD closed/open, a7 ordered, no AD
+list_1sug_AD = open('../../1sug_AD/analysis/Hbonds_1sug_AD.txt','r').readlines() #WPD closed/open, a7 ordered, AD present
+list_1sug_BBR = open('../../BBR_1sug/analysis/Hbonds_BBR_1sug.txt', 'r').readlines() #WPD closed, a7 ardered, BBR present
+list_1sug_na7 = open('../../1sug_no_a7/analysis/Hbonds_1sug_na7.txt','r').readlines() #WPD closed, no a7, no AD
+list_1sug_na7_AD = open('../../1sug_no_a7_AD/analysis/Hbonds_1sug_na7_AD.txt','r').readlines() #WPD closed, no a7, no AD
+list_1sug_dis = open('../../1sug_dis/analysis/config11/Hbonds_1sug_dis11.txt', 'r').readlines() #WPD closed, disordered a7, no AD
+list_1sug_dis11_AD = open('../../1sug_dis_AD/analysis/config11/Hbonds_1sug_dis_AD11.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
+list_1sug_dis11_2AD = open('../../1sug_dis_AD/analysis/config11_2/Hbonds_1sug_dis_AD11_2.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
+list_1sug_alt_AD = open('../../1sug_dis_AD/analysis/config_alt/Hbonds_1sug_AD_dis_alt.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
+list_1sug_alt2_AD = open('../../1sug_dis_AD/analysis/config_alt2/Hbonds_1sug_AD_dis_alt2.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
 
 #Open file for atom numbers all bonds
-list_atom_a7 =  open('../../rebuild_a7/Hbonds_atom_a7.txt', 'r').readlines()
-list_atom_a7_AD = open('../../AD_rebuild_a7/Hbonds_atom_a7_AD.txt', 'r').readlines()
-list_atom_a7_BBR = open('../../BBR_a7/Hbonds_atom_BBR_a7.txt', 'r').readlines()
-list_atom_AD = open('../../AD/Hbonds_atom_AD.txt', 'r').readlines()
-list_atom_Apo = open('../../Apo/Hbonds_atom_Apo.txt', 'r').readlines()
-list_atom_1sug = open('../../1sug/Hbonds_atom_1sug.txt', 'r').readlines()
-list_atom_1sug2 = open('../../1sug2/Hbonds_atom_1sug2.txt', 'r').readlines()
-list_atom_1sug3 = open('../../1sug3/Hbonds_atom_1sug3.txt', 'r').readlines()
-list_atom_1sug_AD = open('../../1sug_AD/Hbonds_atom_1sug_AD.txt', 'r').readlines()
-list_atom_1sug_BBR = open('../../1sug_BBR/Hbonds_atom_BBR_1sug.txt', 'r').readlines()
-list_atom_1sug_na7 = open('../../1sug_no_a7/Hbonds_atom_1sug_na7.txt', 'r').readlines()
-list_atom_1sug_na7_AD = open('../../1sug_no_a7_AD/Hbonds_atom_1sug_no_a7_AD.txt', 'r').readlines()
-list_atom_1sug_dis = open('../../1sug_dis/config11/Hbonds_atom_1sug_dis11.txt', 'r').readlines()
-list_atom_1sug_dis_AD = open('../../1sug_dis_AD/config11/Hbonds_atom_1sug_dis_AD11.txt', 'r').readlines()
-list_atom_1sug_alt_AD = open('../../1sug_AD_dis_alt/Hbonds_atom_1sug_AD_alt.txt', 'r').readlines()
+list_atom_a7 = open('../../rebuild_a7/analysis/Hbonds_atom_a7.txt','r').readlines() #WPD open, a7 ordered, no AD
+list_atom_a7_AD = open('../../AD_rebuild_a7/analysis/Hbonds_atom_a7_AD.txt', 'r').readlines() #WPD open, a7 ordered, AD present
+list_atom_a7_BBR = open('../../BBR_a7/analysis/Hbonds_atom_BBR_a7.txt', 'r').readlines() #WPD open, a7 ordered, BBR present
+list_atom_Apo = open('../../Apo/analysis/Hbonds_atom_Apo.txt','r').readlines() #WPD open, no a7, no AD
+list_atom_Apo_dis7 = open('../../rebuild_a7_high/config7/analysis/Hbonds_atom_Apo_dis7.txt','r').readlines() #WPD open, no a7, no AD
+list_atom_Apo_dis9 = open('../../rebuild_a7_high/config9/analysis/Hbonds_atom_Apo_dis9.txt','r').readlines() #WPD open, no a7, no AD
+list_atom_Apo_dis11 = open('../../rebuild_a7_high/config11/analysis/Hbonds_atom_Apo_dis11.txt','r').readlines() #WPD open, no a7, no AD
+list_atom_Apo_dis_alt = open('../../Apo_dis/analysis/Hbonds_atom_Apo_dis.txt','r').readlines() #WPD open, no a7, no AD
+list_atom_AD = open('../../AD/analysis/Hbonds_atom_AD.txt','r').readlines() #WPD open, no a7, AD present
+list_atom_1sug = open('../../Apo_1SUG/analysis/1sug/Hbonds_atom_1sug.txt','r').readlines() #WPD closed, a7 ordered, no AD
+list_atom_1sug2 = open('../../Apo_1SUG/analysis/1sug2/Hbonds_atom_1sug2.txt','r').readlines() #WPD closed, a7 ordered, no AD
+list_atom_1sug3 = open('../../Apo_1SUG/analysis/1sug3/Hbonds_atom_1sug3.txt','r').readlines() #WPD closed/open, a7 ordered, no AD
+list_atom_1sug_AD = open('../../1sug_AD/analysis/Hbonds_atom_1sug_AD.txt','r').readlines() #WPD closed/open, a7 ordered, AD present
+list_atom_1sug_BBR = open('../../BBR_1sug/analysis/Hbonds_atom_BBR_1sug.txt', 'r').readlines() #WPD closed, a7 ardered, BBR present
+list_atom_1sug_na7 = open('../../1sug_no_a7/analysis/Hbonds_atom_1sug_na7.txt','r').readlines() #WPD closed, no a7, no AD
+list_atom_1sug_na7_AD = open('../../1sug_no_a7_AD/analysis/Hbonds_atom_1sug_na7_AD.txt','r').readlines() #WPD closed, no a7, no AD
+list_atom_1sug_dis = open('../../1sug_dis/analysis/config11/Hbonds_atom_1sug_dis11.txt', 'r').readlines() #WPD closed, disordered a7, no AD
+list_atom_1sug_dis11_AD = open('../../1sug_dis_AD/analysis/config11/Hbonds_atom_1sug_dis_AD11.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
+list_atom_1sug_dis11_2AD = open('../../1sug_dis_AD/analysis/config11_2/Hbonds_atom_1sug_dis_AD11_2.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
+list_atom_1sug_alt_AD = open('../../1sug_dis_AD/analysis/config_alt/Hbonds_atom_1sug_AD_dis_alt.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
+list_atom_1sug_alt2_AD = open('../../1sug_dis_AD/analysis/config_alt2/Hbonds_atom_1sug_AD_dis_alt2.txt', 'r').readlines() #WPD closed/open, disordered a7, AD present
 
 #Open output file or create if it doesn't exsist
 output_uncomm = open('Hbond_uncommon.txt', 'w')
-
-#Read in data from input files
-list_a7 = file_a7.readlines()
-list_a7_AD = file_a7_AD.readlines()
-list_a7_BBR = file_a7_BBR.readlines()
-list_Apo = file_Apo.readlines()
-list_AD = file_AD.readlines()
-list_1sug = file_1sug.readlines()
-list_1sug2 = file_1sug2.readlines()
-list_1sug3 = file_1sug3.readlines()
-list_1sug_AD = file_1sug_AD.readlines()
-list_1sug_BBR = file_1sug_BBR.readlines()
-list_1sug_na7 = file_1sug_na7.readlines()
-list_1sug_na7_AD = file_1sug_na7_AD.readlines()
-list_1sug_dis = file_1sug_dis.readlines()
-list_1sug_dis_AD = file_1sug_dis_AD.readlines()
-list_1sug_alt_AD = file_1sug_alt_AD.readlines()
-
 print('Input Files Open')
 
 #Empty list for common hbonds
@@ -67,21 +61,21 @@ AD_break, AD_form = [],[]
 
 #Write all lines in common with all Apo files
 for i in list_a7:
-    if i in list_Apo and i in list_1sug and i in list_1sug_na7 and i in list_1sug_dis and i in list_1sug2 and i in list_1sug3:
+    if i in list_Apo and i in list_1sug and i in list_1sug_na7 and i in list_1sug_dis and i in list_1sug2 and i in list_1sug3 and i in list_Apo_dis7 and i in list_Apo_dis9 and i in list_Apo_dis11 and i in list_Apo_dis_alt:
         Apo_common.append(i)
 
 #Write all lines in common with all AD files
 for i in list_a7_AD:
-    if i in list_AD and i in list_1sug_AD and i in list_1sug_na7_AD and i in list_1sug_dis_AD and i in list_1sug_alt_AD:
+    if i in list_AD and i in list_1sug_AD and i in list_1sug_na7_AD and i in list_1sug_dis11_AD and i in list_1sug_dis11_2AD and i in list_1sug_alt_AD and i in list_1sug_alt2_AD:
         AD_common.append(i)
 #Write bonds that are common between all simms
 for i in list_a7:
-    if i in list_a7_AD and i in list_Apo and i in list_AD and i in list_1sug and i in list_1sug2 and i in list_1sug3 and i in list_1sug_AD and i in list_1sug_na7 and i in list_1sug_na7_AD and i in list_1sug_dis and i in list_1sug_dis_AD and i in list_1sug_alt_AD and i in list_a7_BBR and i in list_1sug_BBR:
+    if i in list_a7_AD and i in list_Apo and i in list_AD and i in list_1sug and i in list_1sug2 and i in list_1sug3 and i in list_1sug_AD and i in list_1sug_na7 and i in list_1sug_na7_AD and i in list_1sug_dis and i in list_1sug_dis11_AD and i in list_1sug_dis11_2AD and i in list_1sug_alt_AD and i in list_1sug_alt2_AD and i in list_a7_BBR and i in list_1sug_BBR and i in list_Apo_dis7 and i in list_Apo_dis9 and i in list_Apo_dis11 and i in list_Apo_dis_alt:
         Common_all.append(i)
 
 #Write bonds in common betwen Apo open files
 for i in list_a7:
-    if i in list_Apo and i in list_1sug3:
+    if i in list_Apo and i in list_1sug3 and i in list_Apo_dis7 and i in list_Apo_dis9 and i in list_Apo_dis11 and i in list_Apo_dis_alt:
         Apo_open.append(i)
 
 #Write bonds in common between Apo closed files
@@ -91,12 +85,12 @@ for i in list_1sug:
 
 #Write bonds in common b/w AD open files
 for i in list_a7_AD:
-    if i in list_AD and i in list_1sug_AD and i in list_1sug_dis_AD and i in list_1sug_alt_AD:
+    if i in list_AD and i in list_1sug_AD and i in list_1sug_dis11_AD and i in list_1sug_alt_AD and i in list_1sug_alt2_AD:
         AD_open.append(i)
 
 #Write bonds in common b/w AD bound to crys + open
-for i in list_1sug_dis_AD:
-    if i in list_1sug_alt_AD:
+for i in list_1sug_dis11_AD:
+    if i in list_1sug_alt_AD and i in list_1sug_dis11_2AD and i in list_1sug_alt2_AD:
         AD_open_crys.append(i)
 
 #Write bonds in common b/w AD closed files
@@ -227,6 +221,42 @@ for i in list_Apo:
         output_uncomm.write(i)
     num += 1
 num = 0
+for i in list_Apo_dis7:
+    if i not in Common_all and i not in uncomm:
+        uncomm.append(i)
+        File_atom_uncomm.write(list_atom_Apo_dis7[num])
+        atoms = list_atom_Apo_dis7[num].split()
+        File_atom_uncomm_1sug.write(str(float(atoms[0])-17) + ' ' + str(float(atoms[1])-17) + ' ' + str(float(atoms[2])-17) + '\n')
+        output_uncomm.write(i)
+    num += 1
+num = 0
+for i in list_Apo_dis9:
+    if i not in Common_all and i not in uncomm:
+        uncomm.append(i)
+        File_atom_uncomm.write(list_atom_Apo_dis9[num])
+        atoms = list_atom_Apo_dis9[num].split()
+        File_atom_uncomm_1sug.write(str(float(atoms[0])-17) + ' ' + str(float(atoms[1])-17) + ' ' + str(float(atoms[2])-17) + '\n')
+        output_uncomm.write(i)
+    num += 1
+num = 0
+for i in list_Apo_dis11:
+    if i not in Common_all and i not in uncomm:
+        uncomm.append(i)
+        File_atom_uncomm.write(list_atom_Apo_dis11[num])
+        atoms = list_atom_Apo_dis11[num].split()
+        File_atom_uncomm_1sug.write(str(float(atoms[0])-17) + ' ' + str(float(atoms[1])-17) + ' ' + str(float(atoms[2])-17) + '\n')
+        output_uncomm.write(i)
+    num += 1
+num = 0
+for i in list_Apo_dis_alt:
+    if i not in Common_all and i not in uncomm:
+        uncomm.append(i)
+        File_atom_uncomm.write(list_atom_Apo_dis_alt[num])
+        atoms = list_atom_Apo_dis_alt[num].split()
+        File_atom_uncomm_1sug.write(str(float(atoms[0])-17) + ' ' + str(float(atoms[1])-17) + ' ' + str(float(atoms[2])-17) + '\n')
+        output_uncomm.write(i)
+    num += 1
+num = 0
 for i in list_AD:
     if i not in Common_all and i not in uncomm:
         uncomm.append(i)
@@ -299,11 +329,20 @@ for i in list_1sug_dis:
         output_uncomm.write(i)
     num += 1
 num = 0
-for i in list_1sug_dis_AD:
+for i in list_1sug_dis11_AD:
     if i not in Common_all and i not in uncomm:
         uncomm.append(i)
-        File_atom_uncomm_1sug.write(list_atom_1sug_dis_AD[num])
-        atoms = list_atom_1sug_dis_AD[num].split()
+        File_atom_uncomm_1sug.write(list_atom_1sug_dis11_AD[num])
+        atoms = list_atom_1sug_dis11_AD[num].split()
+        File_atom_uncomm.write(str(float(atoms[0])+17) + ' ' + str(float(atoms[1])+17) + ' ' + str(float(atoms[2])+17) + '\n')
+        output_uncomm.write(i)
+    num += 1
+num = 0
+for i in list_1sug_dis11_2AD:
+    if i not in Common_all and i not in uncomm:
+        uncomm.append(i)
+        File_atom_uncomm_1sug.write(list_atom_1sug_dis11_2AD[num])
+        atoms = list_atom_1sug_dis11_2AD[num].split()
         File_atom_uncomm.write(str(float(atoms[0])+17) + ' ' + str(float(atoms[1])+17) + ' ' + str(float(atoms[2])+17) + '\n')
         output_uncomm.write(i)
     num += 1
@@ -313,6 +352,15 @@ for i in list_1sug_alt_AD:
         uncomm.append(i)
         File_atom_uncomm_1sug.write(list_atom_1sug_alt_AD[num])
         atoms = list_atom_1sug_alt_AD[num].split()
+        File_atom_uncomm.write(str(float(atoms[0])+17) + ' ' + str(float(atoms[1])+17) + ' ' + str(float(atoms[2])+17) + '\n')
+        output_uncomm.write(i)
+    num += 1
+num = 0
+for i in list_1sug_alt2_AD:
+    if i not in Common_all and i not in uncomm:
+        uncomm.append(i)
+        File_atom_uncomm_1sug.write(list_atom_1sug_alt2_AD[num])
+        atoms = list_atom_1sug_alt2_AD[num].split()
         File_atom_uncomm.write(str(float(atoms[0])+17) + ' ' + str(float(atoms[1])+17) + ' ' + str(float(atoms[2])+17) + '\n')
         output_uncomm.write(i)
     num += 1
