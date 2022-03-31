@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 
 def load_rmsf(path):
-    raw = open('../../' + path + '/analysis/rmsf_ref.txt').readlines()
+    raw = open('../../' + path + '/analysis/rmsf_ref_self.txt').readlines()
     r = np.zeros(len(raw))
     for i in range(len(raw)):
         r[i] = float(raw[i])
@@ -29,7 +29,7 @@ def plot_two(RMSF_all, ind, Label):
     ax1.plot(res, rmsf_0, label=label_0)
     ax1.plot(res, rmsf_1, label=label_1)
     ax1.legend(loc='upper right')
-    fig.savefig('RMSF_compare_' + label_0 + '_' + label_1 + '.png') 
+    fig.savefig('RMSF_compare_' + label_0 + '_' + label_1 + '_self.png') 
 
 def plot_three(RMSF_all, ind, Label):
     #Seperate Data for Plotting
@@ -53,7 +53,7 @@ def plot_three(RMSF_all, ind, Label):
     ax1.plot(res, rmsf_1, label=label_1)
     ax1.plot(res, rmsf_2, label=label_2)
     ax1.legend(loc='upper right')
-    fig.savefig('RMSF_compare_' + label_0 + '_' + label_1 + '_' + label_2 + '.png') 
+    fig.savefig('RMSF_compare_' + label_0 + '_' + label_1 + '_' + label_2 + '_self.png') 
 
 def plot_three_zoom(RMSF_all, ind, Label, res_range):
     #Seperate Data for Plotting
@@ -85,7 +85,7 @@ def plot_three_zoom(RMSF_all, ind, Label, res_range):
     ax1.plot(res, rmsf_1, label=label_1)
     ax1.plot(res, rmsf_2, label=label_2)
     ax1.legend(loc='upper right')
-    fig.savefig('RMSF_compare_' + label_0 + '_' + label_1 + '_' + label_2 + '_' + str(res_range[0]) + '_' + str(res_range[1]) + '.png') 
+    fig.savefig('RMSF_compare_' + label_0 + '_' + label_1 + '_' + label_2 + '_' + str(res_range[0]) + '_' + str(res_range[1]) + '_self.png') 
 
 #File paths for all input files
 file_path = ['../Apo_dis', 'F196A/Apo', 'L192F/Apo', 'L195F/Apo', 'F280Y/Apo', 'E276F/Apo', 'V287T/Apo']
@@ -117,4 +117,9 @@ plot_three(RMSF, [0, 1, 6], Label)
 plot_three_zoom(RMSF, [0, 6, 4], Label, [113, 120])
 plot_three_zoom(RMSF, [0, 2, 6], Label, [113, 120])
 plot_three_zoom(RMSF, [0, 1, 6], Label, [113, 120])
+
+#Plot only the residues 290-293
+plot_three_zoom(RMSF, [0, 6, 4], Label, [289, 292])
+plot_three_zoom(RMSF, [0, 2, 6], Label, [289, 292])
+plot_three_zoom(RMSF, [0, 1, 6], Label, [289, 292])
 
