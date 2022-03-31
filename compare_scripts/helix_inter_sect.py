@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 from itertools import product
 import seaborn as sns
-
+import pandas as pd
 
 #Load data, determine correlated samples and caculate mean and error
 def load_data(folder):
@@ -59,7 +59,7 @@ def load_data(folder):
     return a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3
 
 def plot_all(inter, err, label_inter, P, label_x, j):
-    num = np.linspace(0, len(label_x), num = len(label_x))
+    num = np.linspace(0, 3, num = 4)
     inter_j = inter[:,j]
     err_j = err[:,j]
     p = P[0,j]
@@ -111,8 +111,55 @@ def plot_all(inter, err, label_inter, P, label_x, j):
         output.write(str(label_x[k]) + ': ' + str(inter_j[k]) + ' +/- ' + str(err_j[k]) + '\n')
     output.close()
 
+def box_plot(Apo_open, Apo_close, AD, BBR, pair, p, p1):
+    Apo_open_df = pd.DataFrame({'Apo Open': Apo_open})
+    Apo_close_df = pd.DataFrame({'Apo Closed': Apo_close})
+    AD_df = pd.DataFrame({'AD': AD})
+    BBR_df = pd.DataFrame({'BBR': BBR})
+    mean = np.array([np.mean(Apo_open), np.mean(Apo_close), np.mean(AD), np.mean(BBR)])
+
+    df = pd.concat([Apo_open_df, Apo_close_df, AD_df, BBR_df])
+
+    ax = sns.stripplot(data = df, dodge=True, alpha=0.25, zorder=1, palette='bright')
+    ax = sns.pointplot(data = df, join=False, scale=0.75, palette='dark')
+    
+    if p < 0.05 and p > 0.01:
+        x1, x2 = 0, 2 #Columns for Apo and AD
+        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
+        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
+    if p < 0.01 and p > 0.001:
+        x1, x2 = 0, 2 #Columns for Apo and AD
+        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
+        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
+    if p < 0.001:
+        x1, x2 = 0, 2 #Columns for Apo and AD
+        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
+        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
+    if p1 < 0.05 and p1 > 0.01:
+        x1, x2 = 0, 3 #Columns for Apo and BBR
+        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
+        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
+    if p1 < 0.01 and p1 > 0.001:
+        x1, x2 = 0, 3 #Columns for Apo and BBR
+        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
+        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
+    if p1 < 0.001:
+        x1, x2 = 0, 3 #Columns for Apo and BBR
+        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
+        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
+
+    plt.title('Residue Interactions b/w ' + str(pair))
+    plt.savefig('Hel_inter_' + str(pair) + '_box.png')
+    plt.close()
+
 #Set Array of file folders
-Folders_Apo_open = ['rebuild_a7/analysis', 'rebuild_a7_high/config9/analysis', 'rebuild_a7_high/config11/analysis']
+Folders_Apo_open = ['Apo_dis/analysis', 'rebuild_a7_high/config9/analysis', 'rebuild_a7_high/config11/analysis']
 Folders_Apo_closed = ['Apo_1SUG/analysis/1sug', 'Apo_1SUG/analysis/1sug2', 'Apo_1SUG/analysis/1sug3']
 Folders_AD = ['mutate/WT/AD/analysis', '1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2']
 Folders_BBR = ['mutate/WT/BBR/analysis', 'BBR_a7/analysis']
@@ -226,6 +273,12 @@ all_err[3][4] = stats.sem(BBR_a6_a7_pt3)
 for i in range(len(inter)):
     plot_all(all_mean, all_err, inter, P_rel_ApoO, label_all, i)
 
+box_plot(ApoO_a3_a7_pt1, ApoC_a3_a7_pt1, AD_a3_a7_pt1, BBR_a3_a7_pt1, 'a3_a7_pt1', P_rel_ApoO[0][0], P_rel_ApoO[1][0])
+box_plot(ApoO_a3_a7_pt2, ApoC_a3_a7_pt2, AD_a3_a7_pt2, BBR_a3_a7_pt2, 'a3_a7_pt2', P_rel_ApoO[0][1], P_rel_ApoO[1][1])
+box_plot(ApoO_a6_a7_pt1, ApoC_a6_a7_pt1, AD_a6_a7_pt1, BBR_a6_a7_pt1, 'a6_a7_pt1', P_rel_ApoO[0][2], P_rel_ApoO[1][2])
+box_plot(ApoO_a6_a7_pt2, ApoC_a6_a7_pt2, AD_a6_a7_pt2, BBR_a6_a7_pt2, 'a6_a7_pt2', P_rel_ApoO[0][3], P_rel_ApoO[1][3])
+box_plot(ApoO_a6_a7_pt3, ApoC_a6_a7_pt3, AD_a6_a7_pt3, BBR_a6_a7_pt3, 'a6_a7_pt3', P_rel_ApoO[0][4], P_rel_ApoO[1][4])
+
 
 #Determine percent difference from Apo Closed
 label = ['Apo Open', 'AD', 'BBR']
@@ -234,7 +287,11 @@ index = [0, 2, 3]
 for j in range(len(inter)):
     for i in range(len(label)):
         n = index[i]
-        per_diff[j,i] = (all_mean[n,j] - all_mean[1,j])/((all_mean[n,j] + all_mean[1,j])/2) * 100
+        per = (all_mean[n,j] - all_mean[1,j])/((all_mean[n,j] + all_mean[1,j])/2) * 100
+        if np.isnan(per) == False:
+            per_diff[j,i] = per
+        else:
+            per_diff[j,i] = 0
 print(per_diff)
 
 #Plot table comparing residue interactions to WT
