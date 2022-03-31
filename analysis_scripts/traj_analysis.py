@@ -108,7 +108,6 @@ if rms_chk == True:
     ref_pdb = md.load_pdb(ref)
     top_ref = ref_pdb.topology
     ref_bb = ref_pdb.atom_slice(top_ref.select('backbone'))
-
 print('Topology Loaded')
 
 if rms_chk == True:
@@ -432,12 +431,12 @@ if hbond_check == True:
         hbonds = md.baker_hubbard(traj_ns, freq = 0.1, exclude_water=True, periodic=True) #Find all h-bonds present >10% of the trajectory
         label = lambda hbond : '%s -- %s' % (traj.topology.atom(hbond[0]), traj.topology.atom(hbond[2])) #Seperate the names of the h-bonds based on topology nomenclature
         if lig == 'both':
-            file_lig.write('AD:\n'
+            file_lig.write('AD:\n')
             for hbond in hbonds: #search all h-bonds
                 if (hbond[0] in ligand) and (hbond[2] in protein) or (hbond[2] in ligand) and (hbond[0] in protein): #seperate only those h-bonds which form between the ligand and the protein
                     file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
                     file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
-            file_lig.write('BBR:\n'
+            file_lig.write('BBR:\n')
             for hbond in hbonds: #search all h-bonds
                 if (hbond[0] in ligand2) and (hbond[2] in protein) or (hbond[2] in ligand2) and (hbond[0] in protein): #seperate only those h-bonds which form between the ligand and the protein
                     file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
