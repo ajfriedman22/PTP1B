@@ -16,6 +16,39 @@ sys.path.insert(1,'/ocean/projects/cts160011p/afriedma/code/PTP1B/util')
 import mdfunc
 import uncorr
 
+def compute_rmsd(traj, ref):
+    rmsd = md.rmsd(traj, ref, parallel=True, precentered=False)
+    t = uncorr.ind(rmsd)
+    rmsd_uncorr = uncorr.sort(rmsd, t)
+    return rmsd_uncorr, t
+
+def compute_save_rmsd_sect(ref, ref_top, traj, top, sect, ref_type, name, ref_name, miss_first):
+    #Seperate section for the reference and trajectory
+    if sect[1] == 0:
+        if ref_type != 'Apo_closed':
+            ref_sect = ref.atom_slice(ref_top.select(str(sect[0]) + ' == resid')) #Limit trajectory to the section of choice
+        else:
+            ref_sect = ref.atom_slice(ref_top.select(str(sect[0] - 1) + ' == resid')) #Limit trajectory to the section of choice
+        if miss_first == False: #If protein contains the first residue either with or without the a7 helix residues
+            traj_sect = traj.atom_slice(top.select(str(sect[0]) + ' == resid')) #Limit trajectory to the section of choice
+        else:
+            traj_sect = traj.atom_slice(top.select(str(sect[0] - 1) + ' == resid')) #Limit trajectory to the section of choice
+    else:
+        if ref_type != 'Apo_closed':
+            ref_sect = ref.atom_slice(ref_top.select(str(sect[0]) + ' <= resid and resid <= ' + str(sect[1]))) #Limit trajectory to the section of choice
+        else:
+            ref_sect = ref.atom_slice(ref_top.select(str(sect[0] - 1) + ' <= resid and resid <= ' + str(sect[1] - 1))) #Limit trajectory to the section of choice
+        if miss_first == False: #If protein contains the first residue either with or without the a7 helix residues
+            traj_sect = traj.atom_slice(top.select(str(sect[0]) + ' <= resid and resid <= ' + str(sect[1]))) #Limit trajectory to the section of choice
+        else:
+            traj_sect = traj.atom_slice(top.select(str(sect[0] - 1) + ' <= resid and resid <= ' + str(sect[1] - 1))) #Limit trajectory to the section of choice
+    
+    #Compute RMSD for section of interest
+    rmsd_sect_uncorr, t_sect = compute_rmsd(traj_sect, ref_sect)
+    
+    #Save RMSD to file
+    np.savetxt('rmsd_' + name + '_ref_' + str(ref_name) + '.txt', rmsd_sect_uncorr)
+
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
@@ -67,6 +100,12 @@ if rms_chk == True:
     ref_bb = ref_pdb.atom_slice(top_ref.select('backbone'))
 print('Topology Loaded')
 
+#Detemine if first residue is missing
+if traj_prot.n_residues == 299:
+    miss_first = False
+else:
+    miss_first = True
+
 if rms_chk == True:
     if ref_type == 'Apo_open' or ref_name == 'self':
         #Calculate RMSF from reference structure
@@ -75,228 +114,28 @@ if rms_chk == True:
         np.savetxt('rmsf_ref_' + str(ref_name) + '.txt', rmsf_data)
 
         #Calculate RMSD for full protein
-        rmsd_full = md.rmsd(traj_bb, ref_bb, parallel=True, precentered=False)
-        t_full = uncorr.ind(rmsd_full)
-        rmsd_full_uncorr = uncorr.sort(rmsd_full, t_full)
+        rmsd_full_uncorr, t_full = compute_rmsd(traj_bb, ref_bb)
 
         np.savetxt('rmsd_full_ref_' + str(ref_name) + '.txt', rmsd_full_uncorr)
         
     #Set Topology
     top_bb = traj_bb.topology
     top_ref_bb = ref_bb.topology
-    if ref_type != 'Apo_closed':
-        ref_WPD = ref_bb.atom_slice(top_ref_bb.select('176 <= resid and resid <= 184' )) #Limit trajectory to the WPD loop of PTP1B only
-        ref_WPD_a3 = ref_bb.atom_slice(top_ref_bb.select('184 <= resid and resid <= 187' )) #Limit trajectory
-        ref_P = ref_bb.atom_slice(top_ref_bb.select('213 <= resid and resid <= 222' )) #Limit trajectory to the P loop of PTP1B only
-        ref_CYS = ref_bb.atom_slice(top_ref_bb.select('resid == 214' )) #Limit trajectory to CYS215 of PTP1B only
-        ref_SBL = ref_bb.atom_slice(top_ref_bb.select('112 <= resid and resid <= 119' )) #Limit trajectory to the S loop of PTP1B only
-        ref_a3 = ref_bb.atom_slice(top_ref_bb.select('185 <= resid and resid <= 199' ))
-        ref_a3_top = ref_bb.atom_slice(top_ref_bb.select('185 <= resid and resid <= 190' ))
-        ref_a4 = ref_bb.atom_slice(top_ref_bb.select('220 <= resid and resid <= 237' ))
-        ref_a4_P = ref_bb.atom_slice(top_ref_bb.select('218 <= resid and resid <= 227' ))
-        ref_a5 = ref_bb.atom_slice(top_ref_bb.select('244 <= resid and resid <= 251' ))
-        ref_a6 = ref_bb.atom_slice(top_ref_bb.select('263 <= resid and resid <= 280' ))
-        ref_a6_bot = ref_bb.atom_slice(top_ref_bb.select('274 <= resid and resid <= 280' ))
-        if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-            ref_a7 = ref_bb.atom_slice(top_ref_bb.select('286 <= resid and resid <= 294' ))
-        ref_L11 = ref_bb.atom_slice(top_ref_bb.select('150 <= resid and resid <= 153' ))
-        ref_Q = ref_bb.atom_slice(top_ref_bb.select('258 <= resid and resid <= 262' ))
-        ref_beg = ref_bb.atom_slice(top_ref_bb.select('26 <= resid and resid <= 35' ))
-    else:
-        ref_WPD = ref_bb.atom_slice(top_ref_bb.select('175 <= resid and resid <= 183' )) #Limit trajectory to the WPD loop of PTP1B only
-        ref_WPD_a3 = ref_bb.atom_slice(top_ref_bb.select('183 <= resid and resid <= 186' )) #Limit trajectory
-        ref_P = ref_bb.atom_slice(top_ref_bb.select('212 <= resid and resid <= 221' )) #Limit trajectory to the P loop of PTP1B only
-        ref_CYS = ref_bb.atom_slice(top_ref_bb.select('resid == 213' )) #Limit trajectory to CYS215 of PTP1B only
-        ref_SBL = ref_bb.atom_slice(top_ref_bb.select('111 <= resid and resid <= 118' )) #Limit trajectory to the S loop of PTP1B only
-        ref_a3 = ref_bb.atom_slice(top_ref_bb.select('184 <= resid and resid <= 198' ))
-        ref_a3_top = ref_bb.atom_slice(top_ref_bb.select('184 <= resid and resid <= 189' ))
-        ref_a4 = ref_bb.atom_slice(top_ref_bb.select('219 <= resid and resid <= 236' ))
-        ref_a4_P = ref_bb.atom_slice(top_ref_bb.select('217 <= resid and resid <= 226' ))
-        ref_a5 = ref_bb.atom_slice(top_ref_bb.select('243 <= resid and resid <= 250' ))
-        ref_a6 = ref_bb.atom_slice(top_ref_bb.select('262 <= resid and resid <= 279' ))
-        ref_a6_bot = ref_bb.atom_slice(top_ref_bb.select('273 <= resid and resid <= 279' ))
-        if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-            ref_a7 = ref_bb.atom_slice(top_ref_bb.select('285 <= resid and resid <= 293' ))
-        ref_L11 = ref_bb.atom_slice(top_ref_bb.select('149 <= resid and resid <= 152' ))
-        ref_Q = ref_bb.atom_slice(top_ref_bb.select('257 <= resid and resid <= 261' ))
-        ref_beg = ref_bb.atom_slice(top_ref_bb.select('25 <= resid and resid <= 34' ))
-
-    if traj_prot.n_residues == 299 or traj_prot.n_residues == 287: #If protein contains the first residue either with or without the a7 helix residues
-        print('True')
-        #Caculate RMSD for the WPD loop
-        traj_WPD = traj_bb.atom_slice(top_bb.select('176 <= resid and resid <= 184' )) #Limit trajectory to the WPD loop of PTP1B only
-        #Caculate RMSD for the connection b/w WPD loop and a3 helix
-        traj_WPD_a3 = traj_bb.atom_slice(top_bb.select('184 <= resid and resid <= 187' )) #Limit trajectory to res 185 to 188
-        #Caculate RMSD for the P loop
-        traj_P = traj_bb.atom_slice(top_bb.select('213 <= resid and resid <= 222' )) #Limit trajectory to the P loop of PTP1B only
-        traj_CYS = traj_bb.atom_slice(top_bb.select('resid == 214' )) #Limit trajectory to CYS215 of PTP1B only
-        #Caculate RMSD for the Substrate Binding Loop loop
-        traj_SBL = traj_bb.atom_slice(top_bb.select('112 <= resid and resid <= 119' )) #Limit trajectory to the S loop of PTP1B only
-        #Caculate RMSD for the a3 helix
-        traj_a3 = traj_bb.atom_slice(top_bb.select('185 <= resid and resid <= 199' ))
-        traj_a3_top = traj_bb.atom_slice(top_bb.select('185 <= resid and resid <= 190'))
-        #Caculate RMSD for the a4 helix
-        traj_a4 = traj_bb.atom_slice(top_bb.select('220 <= resid and resid <= 237' ))
-        traj_a4_P = traj_bb.atom_slice(top_bb.select('218 <= resid and resid <= 227' ))
-        #Caculate RMSD for the a5 helix
-        traj_a5 = traj_bb.atom_slice(top_bb.select('244 <= resid and resid <= 251' ))
-        #Caculate RMSD for the a6 helix
-        traj_a6 = traj_bb.atom_slice(top_bb.select('263 <= resid and resid <= 280' ))
-        traj_a6_bot = traj_bb.atom_slice(top_bb.select('274 <= resid and resid <= 280' ))
-
-        if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-            #Caculate RMSD for the a7 helix
-            traj_a7 = traj_bb.atom_slice(top_bb.select('286 <= resid and resid <= 294' ))
-        traj_L11 = traj_bb.atom_slice(top_bb.select('150 <= resid and resid <= 153' ))
-        #Caculate RMSD for the Q Loop
-        traj_Q = traj_bb.atom_slice(top_bb.select('258 <= resid and resid <= 262' ))
-        #Caculate RMSD for the loop b/w a2 and a3
-        traj_beg = traj_bb.atom_slice(top_bb.select('26 <= resid and resid <= 35' ))
-
-    else:
-        #Caculate RMSD for the WPD loop
-        traj_WPD = traj_bb.atom_slice(top_bb.select('175 <= resid and resid <= 183' )) #Limit trajectory to the WPD loop of PTP1B only
-        #Caculate RMSD for the connection b/w WPD loop and a3 helix
-        traj_WPD_a3 = traj_bb.atom_slice(top_bb.select('183 <= resid and resid <= 186' )) #Limit trajectory to res 185 to 188
-        #Caculate RMSD for the P loop
-        traj_P = traj_bb.atom_slice(top_bb.select('212 <= resid and resid <= 221' )) #Limit trajectory to the P loop of PTP1B only
-        traj_CYS = traj_bb.atom_slice(top_bb.select('resid == 213' )) #Limit trajectory to CYS215 of PTP1B only
-        #Caculate RMSD for the Substrate Binding Loop loop
-        traj_SBL = traj_bb.atom_slice(top_bb.select('111 <= resid and resid <= 118' )) #Limit trajectory to the S loop of PTP1B only
-        #Caculate RMSD for the a3 helix
-        traj_a3 = traj_bb.atom_slice(top_bb.select('184 <= resid and resid <= 198' ))
-        traj_a3_top = traj_bb.atom_slice(top_bb.select('184 <= resid and resid <= 189'))
-        #Caculate RMSD for the a4 helix
-        traj_a4 = traj_bb.atom_slice(top_bb.select('219 <= resid and resid <= 236' ))
-        traj_a4_P = traj_bb.atom_slice(top_bb.select('217 <= resid and resid <= 226' ))
-        #Caculate RMSD for the a5 helix
-        traj_a5 = traj_bb.atom_slice(top_bb.select('243 <= resid and resid <= 250' ))
-        #Caculate RMSD for the a6 helix
-        traj_a6 = traj_bb.atom_slice(top_bb.select('262 <= resid and resid <= 279' ))
-        traj_a6_bot = traj_bb.atom_slice(top_bb.select('273 <= resid and resid <= 279' ))
-        
-        if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-            #Caculate RMSD for the a7 helix
-            traj_a7 = traj_bb.atom_slice(top_bb.select('285 <= resid and resid <= 293' ))
-        traj_L11 = traj_bb.atom_slice(top_bb.select('150 <= resid and resid <= 153' ))
-        traj_Q = traj_bb.atom_slice(top_bb.select('257 <= resid and resid <= 261' ))
-        traj_beg = traj_bb.atom_slice(top_bb.select('25 <= resid and resid <= 34' ))
-
-    #Caculate RMSD for the WPD loop
-    rmsd_WPD = md.rmsd(traj_WPD, ref_WPD, parallel=True, precentered=False)
     
-    #Caculate RMSD for the connection b/w WPD loop and a3 helix
-    rmsd_WPD_a3 = md.rmsd(traj_WPD, ref_WPD, parallel=True, precentered=False)
-    
-    #Caculate RMSD for the P loop
-    rmsd_P = md.rmsd(traj_P, ref_P, parallel=True, precentered=False)
-    rmsd_CYS = md.rmsd(traj_CYS, ref_CYS, parallel=True, precentered=False)
-   
-    #Caculate RMSD for the Substrate Binding Loop loop
-    rmsd_SBL = md.rmsd(traj_SBL, ref_SBL, parallel=True, precentered=False)
-   
-    #Caculate RMSD for the a3 helix
-    rmsd_a3 = md.rmsd(traj_a3, ref_a3, parallel=True, precentered=False)
-    rmsd_a3_top = md.rmsd(traj_a3_top, ref_a3_top, parallel=True, precentered=False)
+    #Set sections of interest
+    if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is presenty
+        sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'a7', 'L11', 'Q', 'beg'] #Section names
+        sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
+                [274, 280], [286, 294], [150, 153], [258, 262], [26, 35]])#Section start and end points
+    else: 
+        sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'L11', 'Q', 'beg'] #Section names
+        sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
+                [274, 280], [150, 153], [258, 262], [26, 35]])#Section start and end points
 
-    #Caculate RMSD for the a4 helix
-    rmsd_a4 = md.rmsd(traj_a4, ref_a4, parallel=True, precentered=False)
-    rmsd_a4_P = md.rmsd(traj_a4_P, ref_a4_P, parallel=True, precentered=False)
-   
-    #Caculate RMSD for the a5 helix
-    rmsd_a5 = md.rmsd(traj_a5, ref_a5, parallel=True, precentered=False)
+    #Compute RMSD for all sections of interest
+    for i in range(len(sect_names)):
+        compute_save_rmsd_sect(ref_bb, top_ref_bb, traj_bb, top_bb, sect_res[1,:], ref_type, sect_names[i], ref_name, miss_first)
 
-    #Caculate RMSD for the a6 helix
-    rmsd_a6 = md.rmsd(traj_a6, ref_a6, parallel=True, precentered=False)
-    rmsd_a6_bot = md.rmsd(traj_a6_bot, ref_a6_bot, parallel=True, precentered=False)
-    
-    if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-        #Caculate RMSD for the a7 helix
-        rmsd_a7 = md.rmsd(traj_a7, ref_a7, parallel=True, precentered=False)
-    
-    #Caculate RMSD for the L11
-    rmsd_L11 = md.rmsd(traj_L11, ref_L11, parallel=True, precentered=False)
-       
-    #Caculate RMSD for the a3 helix
-    rmsd_Q = md.rmsd(traj_Q, ref_Q, parallel=True, precentered=False)
-
-    #Caculate RMSD for the loop between a2 and a3
-    rmsd_beg = md.rmsd(traj_beg, ref_beg, parallel=True, precentered=False)
-
-    #Seperate uncorrelated samples
-    t_WPD = uncorr.ind(rmsd_WPD)
-    rmsd_WPD_uncorr = uncorr.sort(rmsd_WPD, t_WPD)
-
-    t_WPD_a3 = uncorr.ind(rmsd_WPD_a3)
-    rmsd_WPD_a3_uncorr = uncorr.sort(rmsd_WPD, t_WPD_a3)
-
-    t_P = uncorr.ind(rmsd_P)
-    rmsd_P_uncorr = uncorr.sort(rmsd_P, t_P)
-
-    t_CYS = uncorr.ind(rmsd_CYS)
-    rmsd_CYS_uncorr = uncorr.sort(rmsd_CYS, t_CYS)
-
-    t_SBL = uncorr.ind(rmsd_SBL)
-    rmsd_SBL_uncorr = uncorr.sort(rmsd_SBL, t_SBL)
-
-    t_a3 = uncorr.ind(rmsd_a3)
-    rmsd_a3_uncorr = uncorr.sort(rmsd_a3, t_a3)
-
-    t_a3 = uncorr.ind(rmsd_a3)
-    rmsd_a3_uncorr = uncorr.sort(rmsd_a3, t_a3)
-
-    t_a3_top = uncorr.ind(rmsd_a3_top)
-    rmsd_a3_top_uncorr = uncorr.sort(rmsd_a3_top, t_a3_top)
-
-    t_a4 = uncorr.ind(rmsd_a4)
-    rmsd_a4_uncorr = uncorr.sort(rmsd_a4, t_a4)
-
-    t_a4_P = uncorr.ind(rmsd_a4_P)
-    rmsd_a4_P_uncorr = uncorr.sort(rmsd_a4_P, t_a4_P)
-
-    t_a5 = uncorr.ind(rmsd_a5)
-    rmsd_a5_uncorr = uncorr.sort(rmsd_a5, t_a5)
-
-    t_a6 = uncorr.ind(rmsd_a6)
-    rmsd_a6_uncorr = uncorr.sort(rmsd_a6, t_a6)
-
-    t_a6_bot = uncorr.ind(rmsd_a6_bot)
-    rmsd_a6_bot_uncorr = uncorr.sort(rmsd_a6_bot, t_a6_bot)
-
-    if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-        t_a7 = uncorr.ind(rmsd_a7)
-        rmsd_a7_uncorr = uncorr.sort(rmsd_a7, t_a7)
-
-    t_L11 = uncorr.ind(rmsd_L11)
-    rmsd_L11_uncorr = uncorr.sort(rmsd_L11, t_L11)
-
-    t_Q = uncorr.ind(rmsd_Q)
-    rmsd_Q_uncorr = uncorr.sort(rmsd_Q, t_Q)
-
-    t_beg = uncorr.ind(rmsd_beg)
-    rmsd_beg_uncorr = uncorr.sort(rmsd_beg, t_beg)
-
-
-    np.savetxt('rmsd_WPD_ref_' + str(ref_name) + '.txt', rmsd_WPD_uncorr)
-    np.savetxt('rmsd_WPD_a3_ref_' + str(ref_name) + '.txt', rmsd_WPD_a3_uncorr)
-    np.savetxt('rmsd_P_ref_' + str(ref_name) + '.txt', rmsd_P_uncorr)
-    np.savetxt('rmsd_CYS_ref_' + str(ref_name) + '.txt', rmsd_CYS_uncorr)
-    np.savetxt('rmsd_SBL_ref_' + str(ref_name) + '.txt', rmsd_SBL_uncorr)
-    np.savetxt('rmsd_a3_ref_' + str(ref_name) + '.txt', rmsd_a3_uncorr)
-    np.savetxt('rmsd_a3_top_ref_' + str(ref_name) + '.txt', rmsd_a3_top_uncorr)
-    np.savetxt('rmsd_a4_ref_' + str(ref_name) + '.txt', rmsd_a4_uncorr)
-    np.savetxt('rmsd_a4_P_ref_' + str(ref_name) + '.txt', rmsd_a4_P_uncorr)
-    np.savetxt('rmsd_a5_ref_' + str(ref_name) + '.txt', rmsd_a5_uncorr)
-    np.savetxt('rmsd_a6_ref_' + str(ref_name) + '.txt', rmsd_a6_uncorr)
-    np.savetxt('rmsd_a6_bot_ref_' + str(ref_name) + '.txt', rmsd_a6_bot_uncorr)
-    if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-        np.savetxt('rmsd_a7_ref_' + str(ref_name) + '.txt', rmsd_a7_uncorr)
-    np.savetxt('rmsd_L11_ref_' + str(ref_name) + '.txt', rmsd_L11_uncorr)
-    np.savetxt('rmsd_Q_ref_' + str(ref_name) + '.txt', rmsd_Q_uncorr)
-    np.savetxt('rmsd_beg_ref_' + str(ref_name) + '.txt', rmsd_beg_uncorr)
-    
-    print(len(t_full))
-    print(len(t_WPD))
     print('RMSD and RMSF Analysis Completed')
 else:
     print('RMSD and RMSF Analysis Skipped')
