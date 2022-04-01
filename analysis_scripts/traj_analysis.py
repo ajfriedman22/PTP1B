@@ -8,50 +8,13 @@ from sklearn.decomposition import PCA
 from itertools import combinations
 import argparse
 from itertools import product
-import ruptures as rpt 
 from statistics import stdev
+import sys
 
-def uncorr_ind(data):
-    #Convert data to float
-    raw = np.zeros(len(data))
-    for i in range(len(data)):
-        raw[i] = float(data[i])
-
-    #Apply ruptures to find uncorrelated samples
-    model = 'l1'
-    algo = rpt.Binseg(model=model, min_size=10, jump=10).fit(raw)
-    n = len(raw)
-    sigma = stdev(raw)
-    t_uncorr = algo.predict(epsilon=3 * n * sigma ** 2)
-
-    return t_uncorr
-
-def uncorr_sort(data, t_uncorr):
-    #Convert data to float
-    raw = np.zeros(len(data))
-    for i in range(len(data)):
-        raw[i] = float(data[i])
-
-    #Reduce to uncorrelated data
-    num=len(t_uncorr)
-    data_uncorr = np.zeros(num)
-    n = 0
-    for i in range(len(raw)):
-        if i in t_uncorr:
-            data_uncorr[n] = raw[i]
-            n += 1
-
-    return data_uncorr
-
-def uncorr_char(data, t_uncorr):
-    #Reduce to uncorrelated data
-    num=len(t_uncorr)
-    data_uncorr = []
-    for i in range(len(data)):
-        if i in t_uncorr:
-            data_uncorr.append(data[i])
-
-    return data_uncorr
+#Import custom modules
+sys.path.insert(1,'/ocean/projects/cts160011p/afriedma/code/PTP1B/util')
+import mdfunc
+import uncorr
 
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
@@ -85,13 +48,7 @@ else:
     lig_check = False
 
 #Load trajectories
-traj = md.load(File_traj, top=File_gro)
-top = traj.topology
-
-#Process Trajectory
-traj_bb = traj.atom_slice(top.select('backbone')) #Backbond atoms of PTP1B only
-traj_prot = traj.atom_slice(top.select('protein')) #Select only atoms in the protein
-traj_ns = traj.remove_solvent() #Remove solvent from the trajectory leaving only protein (and ligand if applicable)
+traj, traj_bb, traj_prot, traj_ns = mdfunc.mdtraj_load(File_traj, File_gro) 
 
 #Load reference trajectory
 if rms_chk == True: 
@@ -119,8 +76,8 @@ if rms_chk == True:
 
         #Calculate RMSD for full protein
         rmsd_full = md.rmsd(traj_bb, ref_bb, parallel=True, precentered=False)
-        t_full = uncorr_ind(rmsd_full)
-        rmsd_full_uncorr = uncorr_sort(rmsd_full, t_full)
+        t_full = uncorr.ind(rmsd_full)
+        rmsd_full_uncorr = uncorr.sort(rmsd_full, t_full)
 
         np.savetxt('rmsd_full_ref_' + str(ref_name) + '.txt', rmsd_full_uncorr)
         
@@ -267,57 +224,57 @@ if rms_chk == True:
     rmsd_beg = md.rmsd(traj_beg, ref_beg, parallel=True, precentered=False)
 
     #Seperate uncorrelated samples
-    t_WPD = uncorr_ind(rmsd_WPD)
-    rmsd_WPD_uncorr = uncorr_sort(rmsd_WPD, t_WPD)
+    t_WPD = uncorr.ind(rmsd_WPD)
+    rmsd_WPD_uncorr = uncorr.sort(rmsd_WPD, t_WPD)
 
-    t_WPD_a3 = uncorr_ind(rmsd_WPD_a3)
-    rmsd_WPD_a3_uncorr = uncorr_sort(rmsd_WPD, t_WPD_a3)
+    t_WPD_a3 = uncorr.ind(rmsd_WPD_a3)
+    rmsd_WPD_a3_uncorr = uncorr.sort(rmsd_WPD, t_WPD_a3)
 
-    t_P = uncorr_ind(rmsd_P)
-    rmsd_P_uncorr = uncorr_sort(rmsd_P, t_P)
+    t_P = uncorr.ind(rmsd_P)
+    rmsd_P_uncorr = uncorr.sort(rmsd_P, t_P)
 
-    t_CYS = uncorr_ind(rmsd_CYS)
-    rmsd_CYS_uncorr = uncorr_sort(rmsd_CYS, t_CYS)
+    t_CYS = uncorr.ind(rmsd_CYS)
+    rmsd_CYS_uncorr = uncorr.sort(rmsd_CYS, t_CYS)
 
-    t_SBL = uncorr_ind(rmsd_SBL)
-    rmsd_SBL_uncorr = uncorr_sort(rmsd_SBL, t_SBL)
+    t_SBL = uncorr.ind(rmsd_SBL)
+    rmsd_SBL_uncorr = uncorr.sort(rmsd_SBL, t_SBL)
 
-    t_a3 = uncorr_ind(rmsd_a3)
-    rmsd_a3_uncorr = uncorr_sort(rmsd_a3, t_a3)
+    t_a3 = uncorr.ind(rmsd_a3)
+    rmsd_a3_uncorr = uncorr.sort(rmsd_a3, t_a3)
 
-    t_a3 = uncorr_ind(rmsd_a3)
-    rmsd_a3_uncorr = uncorr_sort(rmsd_a3, t_a3)
+    t_a3 = uncorr.ind(rmsd_a3)
+    rmsd_a3_uncorr = uncorr.sort(rmsd_a3, t_a3)
 
-    t_a3_top = uncorr_ind(rmsd_a3_top)
-    rmsd_a3_top_uncorr = uncorr_sort(rmsd_a3_top, t_a3_top)
+    t_a3_top = uncorr.ind(rmsd_a3_top)
+    rmsd_a3_top_uncorr = uncorr.sort(rmsd_a3_top, t_a3_top)
 
-    t_a4 = uncorr_ind(rmsd_a4)
-    rmsd_a4_uncorr = uncorr_sort(rmsd_a4, t_a4)
+    t_a4 = uncorr.ind(rmsd_a4)
+    rmsd_a4_uncorr = uncorr.sort(rmsd_a4, t_a4)
 
-    t_a4_P = uncorr_ind(rmsd_a4_P)
-    rmsd_a4_P_uncorr = uncorr_sort(rmsd_a4_P, t_a4_P)
+    t_a4_P = uncorr.ind(rmsd_a4_P)
+    rmsd_a4_P_uncorr = uncorr.sort(rmsd_a4_P, t_a4_P)
 
-    t_a5 = uncorr_ind(rmsd_a5)
-    rmsd_a5_uncorr = uncorr_sort(rmsd_a5, t_a5)
+    t_a5 = uncorr.ind(rmsd_a5)
+    rmsd_a5_uncorr = uncorr.sort(rmsd_a5, t_a5)
 
-    t_a6 = uncorr_ind(rmsd_a6)
-    rmsd_a6_uncorr = uncorr_sort(rmsd_a6, t_a6)
+    t_a6 = uncorr.ind(rmsd_a6)
+    rmsd_a6_uncorr = uncorr.sort(rmsd_a6, t_a6)
 
-    t_a6_bot = uncorr_ind(rmsd_a6_bot)
-    rmsd_a6_bot_uncorr = uncorr_sort(rmsd_a6_bot, t_a6_bot)
+    t_a6_bot = uncorr.ind(rmsd_a6_bot)
+    rmsd_a6_bot_uncorr = uncorr.sort(rmsd_a6_bot, t_a6_bot)
 
     if traj_ns.n_residues > 297: #Only compute these distances if the a7 helix is present
-        t_a7 = uncorr_ind(rmsd_a7)
-        rmsd_a7_uncorr = uncorr_sort(rmsd_a7, t_a7)
+        t_a7 = uncorr.ind(rmsd_a7)
+        rmsd_a7_uncorr = uncorr.sort(rmsd_a7, t_a7)
 
-    t_L11 = uncorr_ind(rmsd_L11)
-    rmsd_L11_uncorr = uncorr_sort(rmsd_L11, t_L11)
+    t_L11 = uncorr.ind(rmsd_L11)
+    rmsd_L11_uncorr = uncorr.sort(rmsd_L11, t_L11)
 
-    t_Q = uncorr_ind(rmsd_Q)
-    rmsd_Q_uncorr = uncorr_sort(rmsd_Q, t_Q)
+    t_Q = uncorr.ind(rmsd_Q)
+    rmsd_Q_uncorr = uncorr.sort(rmsd_Q, t_Q)
 
-    t_beg = uncorr_ind(rmsd_beg)
-    rmsd_beg_uncorr = uncorr_sort(rmsd_beg, t_beg)
+    t_beg = uncorr.ind(rmsd_beg)
+    rmsd_beg_uncorr = uncorr.sort(rmsd_beg, t_beg)
 
 
     np.savetxt('rmsd_WPD_ref_' + str(ref_name) + '.txt', rmsd_WPD_uncorr)
@@ -338,6 +295,8 @@ if rms_chk == True:
     np.savetxt('rmsd_Q_ref_' + str(ref_name) + '.txt', rmsd_Q_uncorr)
     np.savetxt('rmsd_beg_ref_' + str(ref_name) + '.txt', rmsd_beg_uncorr)
     
+    print(len(t_full))
+    print(len(t_WPD))
     print('RMSD and RMSF Analysis Completed')
 else:
     print('RMSD and RMSF Analysis Skipped')
@@ -353,8 +312,8 @@ if dssp_check == True:
     phi_uncorr = np.zeros((len(t_full), angles))
     psi_uncorr = np.zeros((len(t_full), angles))
     for i in range(angles):
-        phi_uncorr[:,i] = uncorr_sort(phi_angle[:,i], t_full)
-        psi_uncorr[:,i] = uncorr_sort(psi_angle[:,i], t_full)
+        phi_uncorr[:,i] = uncorr.sort(phi_angle[:,i], t_full)
+        psi_uncorr[:,i] = uncorr.sort(psi_angle[:,i], t_full)
 
     #Compute Secondary Structure
     dssp_list = md.compute_dssp(traj_a7, simplified=False) #Compute DSSP for all residues in the a7 helix for all trajectory frames
@@ -372,7 +331,7 @@ if dssp_check == True:
                 dssp_res_mod.append('L')
             else:
                 dssp_res_mod.append(j)
-        dssp_uncorr[:,i] = uncorr_char(dssp_res_mod, t_full)
+        dssp_uncorr[:,i] = uncorr.char(dssp_res_mod, t_full)
     
     #Output DSSP to file
     for i in range(len(t_full) - 1):
@@ -549,7 +508,7 @@ if check_hel == True:
     
     #Limit to uncorrelated samples
     test_dist = dist_a3_a6_all[:,0] #Seperate a test case for determining correlated intervals
-    t_dist = uncorr_ind(test_dist) #Determine indices of uncorrelated samples
+    t_dist = uncorr.ind(test_dist) #Determine indices of uncorrelated samples
     time_uncorr = len(t_dist)
 
     #Set open arrays for all samples
@@ -570,36 +529,36 @@ if check_hel == True:
     #Set new arrays with uncorrelated samples
     for i in range(num_pairs_a3_a6):
         dist = dist_a3_a6_all[:,i]
-        dist_a3_a6[:,i] = uncorr_sort(dist, t_dist)
+        dist_a3_a6[:,i] = uncorr.sort(dist, t_dist)
     for i in range(num_pairs_a3_bend):
         dist = dist_a3_bend_all[:,i]
-        dist_a3_bend[:,i] = uncorr_sort(dist, t_dist)
+        dist_a3_bend[:,i] = uncorr.sort(dist, t_dist)
         dist = dist_ca_a3_bend_all[:,i]
-        dist_ca_a3_bend[:,i] = uncorr_sort(dist, t_dist)
+        dist_ca_a3_bend[:,i] = uncorr.sort(dist, t_dist)
     for i in range(num_pairs_a3_WPD):
         dist = dist_a3_WPD_all[:,i]
-        dist_a3_WPD[:,i] = uncorr_sort(dist, t_dist)
+        dist_a3_WPD[:,i] = uncorr.sort(dist, t_dist)
         dist = dist_ca_a3_WPD_all[:,i]
-        dist_ca_a3_WPD[:,i] = uncorr_sort(dist, t_dist)
+        dist_ca_a3_WPD[:,i] = uncorr.sort(dist, t_dist)
     for i in range(num_pairs_ca_other):
         dist = dist_ca_other_all[:,i]
-        dist_ca_other[:,i] = uncorr_sort(dist, t_dist)
+        dist_ca_other[:,i] = uncorr.sort(dist, t_dist)
     if traj_ns.n_residues > 297: #Only open these files if the a7 helix is present
         for i in range(num_pairs_a7_a3):
             dist = dist_a7_a3_all[:,i]
-            dist_a7_a3[:,i] = uncorr_sort(dist, t_dist)
+            dist_a7_a3[:,i] = uncorr.sort(dist, t_dist)
             dist = dist_ca_a7_a3_all[:,i]
-            dist_ca_a7_a3[:,i] = uncorr_sort(dist, t_dist)
+            dist_ca_a7_a3[:,i] = uncorr.sort(dist, t_dist)
         for i in range(num_pairs_a7_a6):
             dist = dist_a7_a6_all[:,i]
-            dist_a7_a6[:,i] = uncorr_sort(dist, t_dist)
+            dist_a7_a6[:,i] = uncorr.sort(dist, t_dist)
             dist = dist_ca_a7_a6_all[:,i]
-            dist_ca_a7_a6[:,i] = uncorr_sort(dist, t_dist)
+            dist_ca_a7_a6[:,i] = uncorr.sort(dist, t_dist)
         for i in range(num_pairs_a7_L11):
             dist = dist_a7_L11_all[:,i]
-            dist_a7_L11[:,i] = uncorr_sort(dist, t_dist)
+            dist_a7_L11[:,i] = uncorr.sort(dist, t_dist)
             dist = dist_ca_a7_L11_all[:,i]
-            dist_ca_a7_L11[:,i] = uncorr_sort(dist, t_dist)
+            dist_ca_a7_L11[:,i] = uncorr.sort(dist, t_dist)
 
     #Open files for the number of interactions with each protein region at each point in time
     file_200_282 = open('200_282_dist.txt', 'w') #a3 to a6
@@ -835,39 +794,39 @@ if lig_check == True:
     #Set new arrays with uncorrelated samples
     for i in range(num_pairs_a3):
         dist = dist_a3_all[:,i]
-        dist_a3[:,i] = uncorr_sort(dist, t_dist)
+        dist_a3[:,i] = uncorr.sort(dist, t_dist)
         if lig == 'both':
             dist2 = dist2_a3_all[:,i]
-            dist2_a3[:,i] = uncorr_sort(dist2, t_dist)
+            dist2_a3[:,i] = uncorr.sort(dist2, t_dist)
 
     for i in range(num_pairs_a4):
         dist = dist_a4_all[:,i]
-        dist_a4[:,i] = uncorr_sort(dist, t_dist)
+        dist_a4[:,i] = uncorr.sort(dist, t_dist)
         if lig == 'both':
             dist2 = dist2_a4_all[:,i]
-            dist2_a4[:,i] = uncorr_sort(dist2, t_dist)
+            dist2_a4[:,i] = uncorr.sort(dist2, t_dist)
 
     for i in range(num_pairs_a5):
         dist = dist_a5_all[:,i]
-        dist_a5[:,i] = uncorr_sort(dist, t_dist)
+        dist_a5[:,i] = uncorr.sort(dist, t_dist)
         if lig == 'both':
             dist2 = dist2_a5_all[:,i]
-            dist2_a5[:,i] = uncorr_sort(dist2, t_dist)
+            dist2_a5[:,i] = uncorr.sort(dist2, t_dist)
 
     for i in range(num_pairs_a6):
         dist = dist_a6_all[:,i]
-        dist_a6[:,i] = uncorr_sort(dist, t_dist)
+        dist_a6[:,i] = uncorr.sort(dist, t_dist)
         if lig == 'both':
             dist2 = dist2_a6_all[:,i]
-            dist2_a6[:,i] = uncorr_sort(dist2, t_dist)
+            dist2_a6[:,i] = uncorr.sort(dist2, t_dist)
 
     if traj_ns.n_residues > 297:
         for i in range(num_pairs_a7):
             dist = dist_a7_all[:,i]
-            dist_a7[:,i] = uncorr_sort(dist, t_dist)
+            dist_a7[:,i] = uncorr.sort(dist, t_dist)
             if lig == 'both':
                 dist2 = dist2_a7_all[:,i]
-                dist2_a7[:,i] = uncorr_sort(dist2, t_dist)
+                dist2_a7[:,i] = uncorr.sort(dist2, t_dist)
 
     #Set array for the crystal structure binding location and two alternatives
     contact_loc1, contact_loc2, contact_loc3, contact_loc4, contact_unb = [],[],[],[],[]
@@ -925,7 +884,7 @@ if lig_check == True:
                 check_a5 += 1
             if lig == 'both' and dist2_a5[i][l] <= 0.5:
                 check2_a5 += 1
-       for m in range(num_pairs_a6):  #Determine # of contacts with a6 helix
+        for m in range(num_pairs_a6):  #Determine # of contacts with a6 helix
             if dist_a6[i][m] <= 0.5:
                 check_a6 += 1
                 lig_tot_cont[bond] += 1
