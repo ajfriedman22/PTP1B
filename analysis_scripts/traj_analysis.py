@@ -260,7 +260,7 @@ else:
 if check_hel == True:
     #Set Residue Pairs
     if lig != 'none':
-        if lig == 'both'
+        if lig == 'both':
             group_WPD, group_3, group_4, group_6, group_7, group_L11, pair_other, group_l, group_l2 = set_sect(miss_first, lig)
         else:
             group_WPD, group_3, group_4, group_6, group_7, group_L11, pair_other, group_l, = set_sect(miss_first, lig)
@@ -882,18 +882,18 @@ if lig_check == True:
 
     simul_contacts = np.zeros([pairs, pairs])
 
-    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist_a3, dist_B = dist_a6, dist_C = dist_a7, 0, simul_contacts)
-    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist_a6, dist_B = dist_a3, dist_C = dist_a7, num1, simul_contacts)
-    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr, dist_A = dist_a7, dist_B = dist_a6, dist_C = dist_a3, num1, simul_contacts)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist_a3, dist_B = dist_a6, dist_C = dist_a7, num1 = 0, simul_contacts = simul_contacts)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist_a6, dist_B = dist_a3, dist_C = dist_a7, num1 = num1, simul_contacts = simul_contacts)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr = time_uncorr, dist_A = dist_a7, dist_B = dist_a6, dist_C = dist_a3, num1 = num1, simul_contacts = simul_contacts)
     
     #Save array to test file
     np.savetxt('simul_lig_contact_' + File_base + '.txt', simul_contacts)
 
     if lig == 'both':
         simul_contacts2 = np.zeros([pairs, pairs])
-        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist2_a3, dist_B = dist2_a6, dist_C = dist2_a7, 0, simul_contacts2)
-        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist2_a6, dist_B = dist2_a3, dist_C = dist2_a7, num1, simul_contacts2)
-        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr, dist_A = dist2_a7, dist_B = dist2_a6, dist_C = dist2_a3, num1, simul_contacts2)
+        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist2_a3, dist_B = dist2_a6, dist_C = dist2_a7, num1 = 0, simul_contacts = simul_contacts2)
+        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist2_a6, dist_B = dist2_a3, dist_C = dist2_a7, num1 = num1, simul_contacts = simul_contacts2)
+        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr = time_uncorr, dist_A = dist2_a7, dist_B = dist2_a6, dist_C = dist2_a3, num1 = num1, simul_contacts = simul_contacts2)
         
         #Save array to text file
         np.savetxt('simul_lig2_contact_' + File_base + '.txt', simul_contacts2)
