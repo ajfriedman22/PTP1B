@@ -62,50 +62,6 @@ def write_lig_bind(lig_frac, Loc_frac):
     Loc_frac.write('Other Bound: ' + str(100 * lig_frac[5]))
     Loc_frac.close() #Close file
 
-#Function computes the % of time there are simultaneous contacts between the ligand and residues in pairs A with those in pairs A, B, and C 
-def simul_comtacts(pairs_A, pairs_B, pairs_C = [], time_uncorr, dist_A, dist_B, dist_C = [], num_1, simul_contacts):
-    for i in range(pairs_A):
-        count = 0
-        count2 = 0
-        num_2 = 0
-        for j in range(pairs_A):
-            for t in range(time_uncorr):
-                if dist_A[t][i] <= 0.5 and dist_A[t][j] <= 0.5:
-                    count += 1
-            simul_contacts[num_1][num_2] = count/time_uncorr
-
-            count = 0
-            count2 = 0
-            num_2 += 1
-        for k in range(pairs_B):
-            for t in range(time_uncorr):
-                if dist_A[t][i] <= 0.5 and dist_B[t][k] <= 0.5:
-                    count += 1
-            simul_contacts[num_1][num_2] = count/time_uncorr
-
-            count = 0
-            count2 = 0
-            num_2 += 1
-        if a7 == True:
-            for l in range(pairs_C):
-                for t in range(time_uncorr):
-                    if dist_A[t][i] <= 0.5 and dist_C[t][l] <= 0.5:
-                        count += 1
-                simul_contacts[num_1][num_2] = count/time_uncorr
-
-                count = 0
-                count2 = 0
-                num_2 += 1
-        num_1 += 1
-    return simul_contacts, num1
-
-def sect_contact(dist, t, low, high):
-    dist_sect = dist[t][low:high]
-    if min(dist_sect) <= 0.5:
-        sect_check = 1
-    else:
-        sect_check = 0
-
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
@@ -926,18 +882,18 @@ if lig_check == True:
 
     simul_contacts = np.zeros([pairs, pairs])
 
-    simul_contacts, num1 = simul_comtacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist_a3, dist_B = dist_a6, dist_C = dist_a7, 0, simul_contacts)
-    simul_contacts, num1 = simul_comtacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist_a6, dist_B = dist_a3, dist_C = dist_a7, num1, simul_contacts)
-    simul_contacts, num1 = simul_comtacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr, dist_A = dist_a7, dist_B = dist_a6, dist_C = dist_a3, num1, simul_contacts)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist_a3, dist_B = dist_a6, dist_C = dist_a7, 0, simul_contacts)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist_a6, dist_B = dist_a3, dist_C = dist_a7, num1, simul_contacts)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr, dist_A = dist_a7, dist_B = dist_a6, dist_C = dist_a3, num1, simul_contacts)
     
     #Save array to test file
     np.savetxt('simul_lig_contact_' + File_base + '.txt', simul_contacts)
 
     if lig == 'both':
         simul_contacts2 = np.zeros([pairs, pairs])
-        simul_contacts2, num1 = compute_simul_contacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist2_a3, dist_B = dist2_a6, dist_C = dist2_a7, 0, simul_contacts2)
-        simul_contacts2, num1 = compute_simul_contacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist2_a6, dist_B = dist2_a3, dist_C = dist2_a7, num1, simul_contacts2)
-        simul_contacts2, num1 = compute_simul_contacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr, dist_A = dist2_a7, dist_B = dist2_a6, dist_C = dist2_a3, num1, simul_contacts2)
+        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist2_a3, dist_B = dist2_a6, dist_C = dist2_a7, 0, simul_contacts2)
+        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr, dist_A = dist2_a6, dist_B = dist2_a3, dist_C = dist2_a7, num1, simul_contacts2)
+        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr, dist_A = dist2_a7, dist_B = dist2_a6, dist_C = dist2_a3, num1, simul_contacts2)
         
         #Save array to text file
         np.savetxt('simul_lig2_contact_' + File_base + '.txt', simul_contacts2)
@@ -955,25 +911,25 @@ if lig_check == True:
     #Loop through all time points
     for t in range(time_uncorr):
         #Residue 186 to 192
-        lig_contacts[0] = sect_contact(dist_a3, t, 0, 6)
+        lig_contacts[0] = mdfunc.sect_contact(dist_a3, t, 0, 6)
         #Residue 193 to 196
-        lig_contacts[1] = sect_contact(dist_a3, t, 7, 10)
+        lig_contacts[1] = mdfunc.sect_contact(dist_a3, t, 7, 10)
         #Residue 197 to 200
-        lig_contacts[2] = sect_contact(dist_a3, t, 11, 14)
+        lig_contacts[2] = mdfunc.sect_contact(dist_a3, t, 11, 14)
         #Residue 264 to 270
-        lig_contacts[3] = sect_contact(dist_a6, t, 0, 6)
+        lig_contacts[3] = mdfunc.sect_contact(dist_a6, t, 0, 6)
         #Residue 193 to 196
-        lig_contacts[4] = sect_contact(dist_a6, t, 7, 11)
+        lig_contacts[4] = mdfunc.sect_contact(dist_a6, t, 7, 11)
         #Residue 197 to 200
-        lig_contacts[5] = sect_contact(dist_a6, t, 12, 16)
+        lig_contacts[5] = mdfunc.sect_contact(dist_a6, t, 12, 16)
         
         if traj_prot.n_residues > 297:
             #Residue 287 to 290
-            lig_contacts[6] = sect_contact(dist_a7, t, 0, 3)
+            lig_contacts[6] = mdfunc.sect_contact(dist_a7, t, 0, 3)
             #Residue 291 to 294
-            lig_contacts[7] = sect_contact(dist_a7, t, 4, 7)
+            lig_contacts[7] = mdfunc.sect_contact(dist_a7, t, 4, 7)
             #Residue 295 to 298
-            lig_contacts[8] = sect_contact(dist_a7, t, 8, 11)
+            lig_contacts[8] = mdfunc.sect_contact(dist_a7, t, 8, 11)
         
         #Make matrix for simultaneous contacts
         for i in range(len(lig_contcts)):
@@ -984,25 +940,25 @@ if lig_check == True:
 
         if lig == 'both':
             #Residue 186 to 192
-            lig_contacts[0] = sect_contact(dist_a3, t, 0, 6)
+            lig_contacts[0] = mdfunc.sect_contact(dist_a3, t, 0, 6)
             #Residue 193 to 196
-            lig_contacts[1] = sect_contact(dist_a3, t, 7, 10)
+            lig_contacts[1] = mdfunc.sect_contact(dist_a3, t, 7, 10)
             #Residue 197 to 200
-            lig_contacts[2] = sect_contact(dist_a3, t, 11, 14)
+            lig_contacts[2] = mdfunc.sect_contact(dist_a3, t, 11, 14)
             #Residue 264 to 270
-            lig_contacts[3] = sect_contact(dist_a6, t, 0, 6)
+            lig_contacts[3] = mdfunc.sect_contact(dist_a6, t, 0, 6)
             #Residue 193 to 196
-            lig_contacts[4] = sect_contact(dist_a6, t, 7, 11)
+            lig_contacts[4] = mdfunc.sect_contact(dist_a6, t, 7, 11)
             #Residue 197 to 200
-            lig_contacts[5] = sect_contact(dist_a6, t, 12, 16)
+            lig_contacts[5] = mdfunc.sect_contact(dist_a6, t, 12, 16)
         
             if traj_prot.n_residues > 297:
                 #Residue 287 to 290
-                lig_contacts[6] = sect_contact(dist_a7, t, 0, 3)
+                lig_contacts[6] = mdfunc.sect_contact(dist_a7, t, 0, 3)
                 #Residue 291 to 294
-                lig_contacts[7] = sect_contact(dist_a7, t, 4, 7)
+                lig_contacts[7] = mdfunc.sect_contact(dist_a7, t, 4, 7)
                 #Residue 295 to 298
-                lig_contacts[8] = sect_contact(dist_a7, t, 8, 11)
+                lig_contacts[8] = mdfunc.sect_contact(dist_a7, t, 8, 11)
         
             #Make matrix for simultaneous contacts
             for i in range(len(lig_contcts)):
