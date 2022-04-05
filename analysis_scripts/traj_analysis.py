@@ -144,6 +144,9 @@ if rms_chk == True:
     #Compute RMSD for all sections of interest and save to text file
     for i in range(len(sect_names)):
         compute_save_rmsd_sect(ref_bb, top_ref_bb, traj_bb, top_bb, sect_res[1,:], ref_type, sect_names[i], ref_name, miss_first)
+    
+    #Delete unneeded arrays to save memory
+    del rmsf_data; del rmsd_full_uncorr
 
     print('RMSD and RMSF Analysis Completed')
 
@@ -190,8 +193,11 @@ if dssp_check == True:
     file_dssp.close() #close file
     
     #Save psi and phi angles to files and overwrite if file is present
-    np.savetxt('phi_' + File_base + '.txt', phi_angle)
-    np.savetxt('psi_' + File_base + '.txt', psi_angle)
+    np.savetxt('phi_' + File_base + '.txt', phi_uncorr)
+    np.savetxt('psi_' + File_base + '.txt', psi_uncorr)
+    
+    #Delete arrays to save memory
+    del phi_angle; del psi_angle; del phi_uncorr; del psi_uncorr; del dssp_list; del dssp_uncorr; del dssp_res_mod
 
     #Print to screen to notify that DSSP analysis is finished
     print('DSSP File Written')
@@ -227,6 +233,9 @@ if hbond_check == True:
         per.append(100*count/num_t) #Percentage of time each h-bond is present in trajectory
     np.savetxt('Hbonds_per_' + File_base + '.txt',per)
 
+    #Delete unneededarrays to save memory
+    del hbonds; del label; del per; del da_distances; del da_angles
+
     #If ligand analysis is requested determine h-bonds between ligand and PTP1B residues
     if lig_check == True:
         file_lig = open('Hbonds_lig_' +  File_base + '.txt', 'w') #Create file for list of h-bonds determined to be present more than 10% of the trajectory
@@ -240,24 +249,29 @@ if hbond_check == True:
         label = lambda hbond : '%s -- %s' % (traj.topology.atom(hbond[0]), traj.topology.atom(hbond[2])) #Seperate the names of the h-bonds based on topology nomenclature
         if lig == 'both':
             file_lig.write('AD:\n')
-            for hbond in hbonds: #search all h-bonds
-                if (hbond[0] in ligand) and (hbond[2] in protein) or (hbond[2] in ligand) and (hbond[0] in protein): #seperate only those h-bonds which form between the ligand and the protein
-                    file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
-                    file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
+        for hbond in hbonds: #search all h-bonds
+            if (hbond[0] in ligand) and (hbond[2] in protein) or (hbond[2] in ligand) and (hbond[0] in protein): #seperate only those h-bonds which form between the ligand and the protein
+                file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
+                file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
+        if lig == 'both':
             file_lig.write('BBR:\n')
             for hbond in hbonds: #search all h-bonds
                 if (hbond[0] in ligand2) and (hbond[2] in protein) or (hbond[2] in ligand2) and (hbond[0] in protein): #seperate only those h-bonds which form between the ligand and the protein
                     file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
                     file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
-            file_lig.close() #close file
+        file_lig.close() #close file
+        #Delete arrays to save memory
+        del protein; del ligand; del hbonds; del label
+        if lig == both:
+            del ligand2
+    #Write to screen when code section is completed
     print('Hbond Analysis Written')
 
 #Skip Hbond analysis if desired
 else:
     print('Hbond Analysis Skipped')
 
-#Compute Interactions between the a3, a6, and a7 helices
-if check_hel == True:
+if check_hel == True or lig_check == True:
     #Set Residue Pairs
     if lig != 'none':
         if lig == 'both':
@@ -267,6 +281,8 @@ if check_hel == True:
     else:
         group_WPD, group_3, group_4, group_6, group_7, group_L11, pair_other = set_sect(miss_first, lig)
 
+#Compute Interactions between the a3, a6, and a7 helices
+if check_hel == True:
     #Set pairs to compute distances
     pair_a3_a6 = list(product(group_3, group_6))
     pair_a3_WPD = list(product(group_3, group_WPD))
@@ -510,6 +526,15 @@ if check_hel == True:
         file_189_295.close()
         file_280_287.close()
         file_152_297.close()
+    
+    #Delete unneeded arrays
+    del pair_a3_a6; del pair_a3_WPD; del pair_a3_bend; del dist_a3_a6_all; del a3_bend_all; del dist_ca_a3_WPD_all; del dist_ca_a3_bend_all; del dist_ca_other_all
+    del dist_a3_a6; del a3_bend; del dist_ca_a3_WPD; del dist_ca_a3_bend; del dist_ca_other; del dist; del a3_a6_all
+    if traj_prot.n_residues > 297:
+        del a3_a7_pt1_ind; del a3_a7_pt2_ind; del a6_a7_pt1_ind; del a6_a7_pt2_ind; del a6_a7_pt3_ind; del pair_a7_a3; del pair_a7_a6; del pair_a7_L11
+        del dist_a7_a3_all; del dist_a7_a6_all; del dist_a7_L11_all; del dist_ca_a7_a3_all; del dist_ca_a7_a6_all; del dist_ca_a7_L11_all
+        del dist_a7_a3; del dist_a7_a6; del dist_a7_L11; del dist_ca_a7_a3; del dist_ca_a7_a6; del dist_ca_a7_L11; del dist
+        del a3_a7_all; del a6_a7_all; del a7_L11_all; del a3_a7_pt1; del a3_a7_pt2; del a6_a7_pt1; del a6_a7_pt2; del a6_a7_pt3; del inter_a3_a7; del inter_a6_a7
 
     print('Helix Interaction Analysis Completed')
 else:
@@ -974,6 +999,25 @@ if lig_check == True:
     if lig == 'both':
         lig2_cont_sect_per = 100 * (lig2_cont_sect/time_uncorr)
         np.savetxt('simul_lig2_contact_sect' + File_base + '.txt', lig2_cont_sect_per)
+    
+    #Delete unneeded arrays
+    del pair_a3; del pair_a4; del pair_a5; del pair_a6; del pair_bend; del lig_tot_cont; 
+    del dist_a3_all; del dist_a4_all; del dist_a5_all; del dist_a6_all; del dist_bend_all
+    del dist_a3; del dist_a4; del dist_a5; del dist_a6; del dist_bend; del dist
+    del contact_loc1; del contact_loc2; del contact_loc3; del contact_loc4; del contacts
+    del simul_contacts; del lig_contacts; del lig_contact_sect
+
+    if traj_prot.n_residues > 297:
+        del pair_a7; del dist_a7_all; del dist_a7; 
+    
+    if lig == 'both':
+        del dist2_a3_all; del dist2_a4_all; del dist2_a5_all; del dist2_a6_all; del dist2_bend_all
+        del dist2_a3; del dist2_a4; del dist2_a5; del dist2_a6; del dist2_bend; del dist2
+        del contact2_loc1; del contact2_loc2; del contact2_loc3; del contact2_loc4
+        del simul_contacts2; del lig2_contacts; del lig2_contact_sect
+
+        if traj_prot.n_residues > 297:
+            del dist2_a7_all; del dist2_a7; 
 
     print('Ligand Interaction Analysis Complete')
 else:
