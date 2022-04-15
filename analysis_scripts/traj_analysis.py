@@ -54,10 +54,10 @@ def compute_save_rmsd_sect(ref, ref_top, traj, top, sect, ref_type, name, ref_na
     np.savetxt('rmsd_' + name + '_ref_' + str(ref_name) + '.txt', rmsd_sect_uncorr)
 
 def write_lig_bind(lig_frac, Loc_frac):
-    Loc_frac.write('Binding location 1: ' + str(100 * lig_frac[0]) + '\n')
-    Loc_frac.write('Binding location 2: ' + str(100 * lig_frac[1]) + '\n')
-    Loc_frac.write('Binding location 3: ' + str(100 * lig_frac[2]) + '\n')
-    Loc_frac.write('Binding location 4: ' + str(100 * lig_frac[3]) + '\n')
+    Loc_frac.write('Binding location 1(crystal): ' + str(100 * lig_frac[0]) + '\n')
+    Loc_frac.write('Binding location 2(alt 1): ' + str(100 * lig_frac[1]) + '\n')
+    Loc_frac.write('Binding location 3(alt 2): ' + str(100 * lig_frac[2]) + '\n')
+    Loc_frac.write('Binding location 4(alt 3): ' + str(100 * lig_frac[3]) + '\n')
     Loc_frac.write('Unbound: ' + str(100 * lig_frac[4]) + '\n')
     Loc_frac.write('Other Bound: ' + str(100 * lig_frac[5]))
     Loc_frac.close() #Close file
@@ -96,6 +96,11 @@ else:
 #Load trajectories
 traj, traj_bb, traj_prot, traj_ns, traj_a7, miss_first = mdfunc.mdtraj_load(File_traj, File_gro) 
 
+if traj_prot.n_residues > 297:
+    a7_present = True
+else:
+    a7_present = False
+
 #Load reference trajectory if RMSD analysis is requested
 if rms_chk == True: 
     if ref_type == 'Apo_open':
@@ -115,7 +120,7 @@ if rms_chk == True:
 print('Topology Loaded')
 
 if rms_chk == True:
-    if ref_type == 'Apo_open' or ref_name == 'self':
+    if (ref_type == 'Apo_open' and a7_present == True and miss_first == False) or ref_name == 'self':
         #Calculate RMSF from reference structure
         rmsf_data = md.rmsf(traj_bb, ref_bb, parallel=True, precentered=False)
 
@@ -126,12 +131,15 @@ if rms_chk == True:
 
         np.savetxt('rmsd_full_ref_' + str(ref_name) + '.txt', rmsd_full_uncorr) #save to text file
         
+        #Delete unneeded arrays to save memory
+        del rmsf_data; del rmsd_full_uncorr
+       
     #Set Topology for the backbone atoms only of the trajectory and reference structure
     top_bb = traj_bb.topology
     top_ref_bb = ref_bb.topology
     
     #Set sections of interest
-    if traj_prot.n_residues > 297: #Only compute these distances if the a7 helix is presenty
+    if a7_present == True: #Only compute these distances if the a7 helix is presenty
         sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'a7', 'L11', 'Q', 'beg'] #Section names
         sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
                 [274, 280], [286, 294], [150, 153], [258, 262], [26, 35]])#Section start and end points
@@ -145,9 +153,6 @@ if rms_chk == True:
     for i in range(len(sect_names)):
         compute_save_rmsd_sect(ref_bb, top_ref_bb, traj_bb, top_bb, sect_res[1,:], ref_type, sect_names[i], ref_name, miss_first)
     
-    #Delete unneeded arrays to save memory
-    del rmsf_data; del rmsd_full_uncorr
-
     print('RMSD and RMSF Analysis Completed')
 
 #Skip RMSD and RMSF analysis if input option not selected
@@ -262,7 +267,7 @@ if hbond_check == True:
         file_lig.close() #close file
         #Delete arrays to save memory
         del protein; del ligand; del hbonds; del label
-        if lig == both:
+        if lig == 'both':
             del ligand2
     #Write to screen when code section is completed
     print('Hbond Analysis Written')
@@ -275,11 +280,11 @@ if check_hel == True or lig_check == True:
     #Set Residue Pairs
     if lig != 'none':
         if lig == 'both':
-            group_WPD, group_3, group_4, group_6, group_7, group_L11, pair_other, group_l, group_l2 = set_sect(miss_first, lig)
+            group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other, group_l, group_l2 = mdfunc.set_sect(miss_first, lig, a7_present)
         else:
-            group_WPD, group_3, group_4, group_6, group_7, group_L11, pair_other, group_l, = set_sect(miss_first, lig)
+            group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other, group_l, = mdfunc.set_sect(miss_first, lig, a7_present)
     else:
-        group_WPD, group_3, group_4, group_6, group_7, group_L11, pair_other = set_sect(miss_first, lig)
+        group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other = mdfunc.set_sect(miss_first, lig, a7_present)
 
 #Compute Interactions between the a3, a6, and a7 helices
 if check_hel == True:
@@ -308,7 +313,7 @@ if check_hel == True:
     [dist_a3_a6_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a3_a6, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
     [dist_a3_bend_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a3_bend, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
     [dist_a3_WPD_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a3_WPD, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
-    if traj_prot.n_residues > 297: #Only compute these distances if the a7 helix is present
+    if a7_present == True: #Only compute these distances if the a7 helix is present
         [dist_a7_a3_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a7_a3, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
         [dist_a7_a6_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a7_a6, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
         [dist_a7_L11_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a7_L11, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
@@ -316,7 +321,7 @@ if check_hel == True:
     [dist_ca_a3_WPD_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a3_WPD, scheme='ca', ignore_nonprotein = False, periodic=True, soft_min = False)
     [dist_ca_a3_bend_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a3_bend, scheme='ca', ignore_nonprotein = False, periodic=True, soft_min = False)
     [dist_ca_other_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_other, scheme='ca', ignore_nonprotein = False, periodic=True, soft_min = False)
-    if traj_prot.n_residues > 297: #Only compute these distances if the a7 helix is present
+    if a7_present == True: #Only compute these distances if the a7 helix is present
         [dist_ca_a7_a3_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a7_a3, scheme='ca', ignore_nonprotein = False, periodic=True, soft_min = False)
         [dist_ca_a7_a6_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a7_a6, scheme='ca', ignore_nonprotein = False, periodic=True, soft_min = False)
         [dist_ca_a7_L11_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a7_L11, scheme='ca', ignore_nonprotein = False, periodic=True, soft_min = False)
@@ -326,7 +331,7 @@ if check_hel == True:
     time, num_pairs_a3_bend = np.shape(dist_a3_bend_all)
     time, num_pairs_a3_WPD = np.shape(dist_a3_WPD_all)
     time, num_pairs_ca_other = np.shape(dist_ca_other_all)
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         time, num_pairs_a7_a3 = np.shape(dist_a7_a3_all)
         time, num_pairs_a7_a6 = np.shape(dist_a7_a6_all)
         time, num_pairs_a7_L11 = np.shape(dist_a7_L11_all)
@@ -342,7 +347,7 @@ if check_hel == True:
     dist_a3_WPD = np.zeros((time_uncorr, num_pairs_a3_WPD))
     dist_ca_a3_WPD = np.zeros((time_uncorr, num_pairs_a3_WPD))
     dist_ca_other = np.zeros((time_uncorr, num_pairs_ca_other))
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         dist_a7_a3 = np.zeros((time_uncorr, num_pairs_a7_a3))
         dist_ca_a7_a3 = np.zeros((time_uncorr, num_pairs_a7_a3))
         dist_a7_a6 = np.zeros((time_uncorr, num_pairs_a7_a6))
@@ -367,7 +372,7 @@ if check_hel == True:
     for i in range(num_pairs_ca_other):
         dist = dist_ca_other_all[:,i]
         dist_ca_other[:,i] = uncorr.sort(dist, t_dist)
-    if traj_prot.n_residues > 297: #Only open these files if the a7 helix is present
+    if a7_present == True: #Only open these files if the a7 helix is present
         for i in range(num_pairs_a7_a3):
             dist = dist_a7_a3_all[:,i]
             dist_a7_a3[:,i] = uncorr.sort(dist, t_dist)
@@ -400,7 +405,7 @@ if check_hel == True:
     file_178_190 = open('178_190_dist.txt', 'w') #Start of WPD loop to side of a3
     file_152_177 = open('152_177_dist.txt', 'w') #Start of WPD loop to L11 loop
     file_mean = open('inter_mean.txt', 'w') #File for the mean number of interactions between any two given residues
-    if traj_prot.n_residues > 297: #Only open these files if the a7 helix is present
+    if a7_present == True: #Only open these files if the a7 helix is present
         file_200_287 = open('200_287_dist.txt', 'w') #a3 to a7 (bottom)
         file_276_292 = open('276_292_dist.txt', 'w') #a6 to a7 (middle)
         file_189_295 = open('189_295_dist.txt', 'w') #a3 to a7 (top)
@@ -410,7 +415,7 @@ if check_hel == True:
     #Declare arrays to keep track of all contacts
     a3_a6_all, a3_a7_all, a6_a7_all, a7_L11_all = [],[],[],[] #Arrays for the total contacts made b/w helices
     a3_a7_pt1, a3_a7_pt2, a6_a7_pt1, a6_a7_pt2, a6_a7_pt3 = [],[],[],[],[] #Arrays for the total contacts made b/w sections of helices
-    if traj_prot.n_residues > 297: #Only create these arrays if the a7 helix is present
+    if a7_present == True: #Only create these arrays if the a7 helix is present
         inter_a3_a7 = np.zeros([num_pairs_a7_a3, time_uncorr]) #Array for the running total of interactions over time between each residue pair for tha a3 and a7 helices
         inter_a6_a7 = np.zeros([num_pairs_a7_a6, time_uncorr]) #Array for the running total of interactions over time between each residue pair for tha a3 and a7 helices
     
@@ -443,7 +448,7 @@ if check_hel == True:
         file_178_190.write(str(dist_ca_other[i][9]) + '\n')
         file_152_177.write(str(dist_ca_other[i][10]) + '\n')
 
-        if traj_prot.n_residues > 297: #Only save these distances if the a7 helix is present
+        if a7_present == True: #Only save these distances if the a7 helix is present
             file_200_287.write(str(dist_ca_a7_a3[i][168]) + '\n')
             file_189_295.write(str(dist_ca_a7_a3[i][44]) + '\n')
             file_276_292.write(str(dist_ca_a7_a6[i][149]) + '\n')
@@ -455,7 +460,7 @@ if check_hel == True:
             if dist_a3_a6[i][j] <= 0.5: #Count the contact if the residue distance is less than 0.5 nm
                 check_a3_a6 += 1
         a3_a6_all.append(check_a3_a6) #Save the total number of residue contacts b/w the a3 and a6 helices to array
-        if traj_prot.n_residues > 297: #Only calculate these interactions if the a7 helix is present
+        if a7_present == True: #Only calculate these interactions if the a7 helix is present
             for k in range(num_pairs_a7_a3): #Determine # of contacts b/w the a3 and a7 helices
                 if dist_a7_a3[i][k] <= 0.5:
                     check_a7_a3 += 1
@@ -489,7 +494,7 @@ if check_hel == True:
             a7_L11_all.append(check_a7_L11)
     
     np.savetxt('a3_a6_inter.txt', np.asarray(a3_a6_all))
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         #Save interactions for 2 part helix interactions
         np.savetxt('a3_a7_pt1_tot_inter.txt', np.asarray(a3_a7_pt1))
         np.savetxt('a6_a7_pt1_tot_inter.txt', np.asarray(a6_a7_pt1))
@@ -520,7 +525,7 @@ if check_hel == True:
     file_264_185.close()
     file_178_150.close()
     file_mean.close()
-    if traj_prot.n_residues > 297: #Only close files that were opened
+    if a7_present == True: #Only close files that were opened
         file_200_287.close()
         file_276_292.close()
         file_189_295.close()
@@ -528,12 +533,12 @@ if check_hel == True:
         file_152_297.close()
     
     #Delete unneeded arrays
-    del pair_a3_a6; del pair_a3_WPD; del pair_a3_bend; del dist_a3_a6_all; del a3_bend_all; del dist_ca_a3_WPD_all; del dist_ca_a3_bend_all; del dist_ca_other_all
-    del dist_a3_a6; del a3_bend; del dist_ca_a3_WPD; del dist_ca_a3_bend; del dist_ca_other; del dist; del a3_a6_all
-    if traj_prot.n_residues > 297:
+    del pair_a3_a6; del pair_a3_WPD; del pair_a3_bend; del dist_a3_a6_all; del dist_a3_bend_all; del dist_ca_a3_WPD_all; del dist_ca_a3_bend_all; del dist_ca_other_all
+    del dist_a3_a6; del dist_a3_bend; del dist_ca_a3_WPD; del dist_ca_a3_bend; del dist_ca_other; del dist; del a3_a6_all
+    if a7_present == True:
         del a3_a7_pt1_ind; del a3_a7_pt2_ind; del a6_a7_pt1_ind; del a6_a7_pt2_ind; del a6_a7_pt3_ind; del pair_a7_a3; del pair_a7_a6; del pair_a7_L11
         del dist_a7_a3_all; del dist_a7_a6_all; del dist_a7_L11_all; del dist_ca_a7_a3_all; del dist_ca_a7_a6_all; del dist_ca_a7_L11_all
-        del dist_a7_a3; del dist_a7_a6; del dist_a7_L11; del dist_ca_a7_a3; del dist_ca_a7_a6; del dist_ca_a7_L11; del dist
+        del dist_a7_a3; del dist_a7_a6; del dist_a7_L11; del dist_ca_a7_a3; del dist_ca_a7_a6; del dist_ca_a7_L11
         del a3_a7_all; del a6_a7_all; del a7_L11_all; del a3_a7_pt1; del a3_a7_pt2; del a6_a7_pt1; del a6_a7_pt2; del a6_a7_pt3; del inter_a3_a7; del inter_a6_a7
 
     print('Helix Interaction Analysis Completed')
@@ -555,7 +560,7 @@ if lig_check == True:
         pair2_a6 = list(product(group_l2, group_6))
         pair2_bend = list(product(group_l2, group_bend))
 
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         pair_a7 = list(product(group_l, group_7))
         if lig == 'both':
             pair2_a7 = list(product(group_l2, group_7))
@@ -582,7 +587,7 @@ if lig_check == True:
     [dist_a5_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a5, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
     [dist_a6_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a6, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
     [dist_bend_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_bend, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         [dist_a7_all, pairs] = md.compute_contacts(traj_ns, contacts=pair_a7, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
     if lig == 'both':
         [dist2_a3_all, pairs] = md.compute_contacts(traj_ns, contacts=pair2_a3, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
@@ -590,7 +595,7 @@ if lig_check == True:
         [dist2_a5_all, pairs] = md.compute_contacts(traj_ns, contacts=pair2_a5, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
         [dist2_a6_all, pairs] = md.compute_contacts(traj_ns, contacts=pair2_a6, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
         [dist2_bend_all, pairs] = md.compute_contacts(traj_ns, contacts=pair2_bend, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
-        if traj_prot.n_residues > 297:
+        if a7_present == True:
             [dist2_a7_all, pairs] = md.compute_contacts(traj_ns, contacts=pair2_a7, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
 
     #Compute time points in which the distance to any residue is less than
@@ -599,7 +604,7 @@ if lig_check == True:
     time, num_pairs_a5 = np.shape(dist_a5_all)
     time, num_pairs_a6 = np.shape(dist_a6_all)
     time, num_pairs_bend = np.shape(dist_bend_all)
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         time, num_pairs_a7 = np.shape(dist_a7_all)
 
     #Limit to uncorrelated samples
@@ -612,7 +617,7 @@ if lig_check == True:
     dist_a4 = np.zeros((time_uncorr, num_pairs_a4))
     dist_a5 = np.zeros((time_uncorr, num_pairs_a5))
     dist_a6 = np.zeros((time_uncorr, num_pairs_a6))
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         dist_a7 = np.zeros((time_uncorr, num_pairs_a7))
     if lig == 'both':
         dist2_a3 = np.zeros((time_uncorr, num_pairs_a3))
@@ -620,7 +625,7 @@ if lig_check == True:
         dist2_a4 = np.zeros((time_uncorr, num_pairs_a4))
         dist2_a5 = np.zeros((time_uncorr, num_pairs_a5))
         dist2_a6 = np.zeros((time_uncorr, num_pairs_a6))
-        if traj_prot.n_residues > 297:
+        if a7_present == True:
             dist2_a7 = np.zeros((time_uncorr, num_pairs_a7))
 
     #Set new arrays with uncorrelated samples
@@ -680,14 +685,18 @@ if lig_check == True:
             file2_a7 = open('a7_lig2_inter.txt', 'w')
 
     #Loop through all frames
+    print(time_uncorr)
     for i in range(time_uncorr):
         #At each time point reset counters for helix interactions
         check_a3 = 0
+        check_a3_top = 0
         check_a4 = 0
         check_a5 = 0
         check_a6 = 0
+        check_a6_mid = 0
         check_bend = 0
         check_a7 = 0
+        check_a7_top = 0
         if lig == 'both':
             check2_a3 = 0
             check2_a4 = 0
@@ -701,6 +710,8 @@ if lig_check == True:
         for j in range(num_pairs_a3): #Determine # of contacts with a3 helix
             if dist_a3[i][j] <= 0.5:
                 check_a3 += 1
+                if j < 7:
+                    check_a3_top += 1
                 lig_tot_cont[bond] += 1
             if lig == 'both' and dist2_a3[i][j] <= 0.5:
                 check2_a3 += 1
@@ -719,6 +730,8 @@ if lig_check == True:
         for m in range(num_pairs_a6):  #Determine # of contacts with a6 helix
             if dist_a6[i][m] <= 0.5:
                 check_a6 += 1
+                if m < 8:
+                    check_a6_mid += 1
                 lig_tot_cont[bond] += 1
             if lig == 'both' and dist2_a6[i][m] <= 0.5:
                 check2_a6 += 1
@@ -749,6 +762,8 @@ if lig_check == True:
             for n in range(num_pairs_a7):#Determine # of contacts with the a7 helix pt1
                 if dist_a7[i][n] <= 0.5:
                     check_a7 += 1
+                    if n > 8:
+                        check_a7_top += 1
                     lig_tot_cont[bond] += 1
                 if lig == 'both' and dist2_a7[i][n] <= 0.5:
                     check2_a7 += 1
@@ -761,34 +776,38 @@ if lig_check == True:
             
             #Determine ligand binding Location
             #Sum total interactions for each binding location
-            total_contact_loc1 = check_a3 + check_a6 + check_a7 #Crystal structure binding location
-            total_contact_loc2 = check_a6 + check_bend + check_a7
-            total_contact_loc3 = check_a4 + check_a5 + check_a6 
-            total_contact_loc4 = check_a3 + check_a4 + check_a6
+            total_contact_loc1 = check_a3 + check_a7 #Crystal structure binding location
+            total_contact_loc2 = check_a6 + check_bend + check_a7i #Alt loc 1
+            total_contact_loc3 = check_a4 + check_a5 + check_a6 #alt loc 2
+            total_contact_loc4 = check_a3 + check_a4 + check_a6 #Alt loc 3
             if lig == 'both':
-                total2_contact_loc1 = check2_a3 + check2_a6 + check2_a7 #Crystal structure binding location
+                total2_contact_loc1 = check2_a3 + check2_a7 #Crystal structure binding location
                 total2_contact_loc2 = check2_a6 + check2_bend + check2_a7
                 total2_contact_loc3 = check2_a4 + check2_a5 + check2_a6 
                 total2_contact_loc4 = check2_a3 + check2_a4 + check2_a6
            
             #Binding location 1
-            if check_a3 >= 1 and check_a6 >= 1 and check_a7 >= 1 and total_contact_loc1 >= 4 and check_a5 == 0:
+            if check_a3 >= 1 and check_a7 >= 1 and total_contact_loc1 >= 4 and check_a6_mid == 0 and check_a4 == 0 and check_a5 == 0:
                 contact_loc1.append(1)
+                loc1 = True
             else:
                 contact_loc1.append(0)
+                loc1 = False
             if lig == 'both':
-                if check2_a3 >= 1 and check2_a7 >= 1 and total2_contact_loc1 >= 4 and check2_a5 == 0 and check2_a4 == 0:
+                if check2_a3 >= 1 and check2_a7 >= 1 and total2_contact_loc1 >= 4 and check2_a6_mid == 0 and check2_a5 == 0 and check2_a4 == 0:
                     contact2_loc1.append(1)
+                    loc1_2 = True
                 else:
                     contact2_loc1.append(0)
+                    loc1_2 = False
 
             #Binding Location 2
-            if check_bend >= 1 and check_a6 >= 1 and check_a7 >= 1 and total_contact_loc2 >= 4 and check_a4 == 0 and check_a5 == 0 and check_a3 == 0:
+            if check_a6 >= 1 and check_a7 >= 1 and check_bend >= 1 and total_contact_loc2 >= 3 and check_a4 == 0 and check_a5 == 0 and check_a3 < 2 and loc1 == False:
                 contact_loc2.append(1)
             else:
                 contact_loc2.append(0)
             if lig == 'both':
-                if check2_bend >= 1 and check2_a6 >= 1 and check2_a7 >= 1 and total2_contact_loc2 >= 4 and check2_a4 == 0 and check2_a5 == 0 and check2_a3 == 0:
+                if check2_bend >= 1 and check2_a6 >= 1 and check2_a7 >= 1 and total2_contact_loc2 >= 4 and check2_a4 == 0 and check2_a5 == 0 and check2_a3 > 2 and loc1_2 == False:
                     contact2_loc2.append(1)
                 else:
                     contact2_loc2.append(0)
@@ -806,55 +825,59 @@ if lig_check == True:
                 total2_contact_loc4 = check2_a3 + check2_a4 + check2_a6
 
             #Binding Location 1 w/o a7
-            if check_a3 >= 1 and total_contact_loc1 >= 5 and check_a5 == 0 and check_a4 == 0:
+            if check_a3 >= 1 and total_contact_loc1 >= 5 and check_a6_mid == 0 and check_a5 == 0 and check_a4 == 0:
                 contact_loc1.append(1)
+                loc1 = True
             else:
                 contact_loc1.append(0)
+                loc1 = False
             if lig == 'both':
-                if check2_a3 >= 1 and total2_contact_loc1 >= 5 and check2_a5 == 0 and check2_bend == 0 and check2_a4 == 0:
+                if check2_a3 >= 1 and total2_contact_loc1 >= 5 and check2_a6_mid == 0 and check2_a5 == 0 and check2_a4 == 0:
                     contact2_loc1.append(1)
+                    loc1_2 = True
                 else:
                     contact2_loc1.append(0)
+                    loc1_2 = False
 
             #Binding location 2 w/o a7
-            if check_bend >= 1 and check_a6 >= 1 and total_contact_loc2 >= 5 and check_a4 == 0 and check_a5 == 0:
+            if check_bend >= 1 and check_a6 >= 1 and total_contact_loc2 >= 5 and check_a4 == 0 and check_a5 == 0 and loc1 == False:
                 contact_loc2.append(1)
             else:
                 contact_loc2.append(0)
             if lig == 'both':
-                if check2_bend >= 1 and check2_a6 >= 1 and total2_contact_loc2 >= 5 and check2_a4 == 0 and check2_a5 == 0:
+                if check2_bend >= 1 and check2_a6 >= 1 and total2_contact_loc2 >= 5 and check2_a4 == 0 and check2_a5 == 0 and loc1_2 == False:
                     contact2_loc2.append(1)
                 else:
                     contact2_loc2.append(0)
 
         #Binding Location 3
-        if check_a4 >= 1 and check_a6 >= 1 and total_contact_loc3 >= 5 and check_a3 == 0 and check_a7 == 0:
+        if check_a4 >= 1 and check_a6 >= 1 and check_a3 >= 1 and total_contact_loc3 >= 5 and check_a7 == 0:
             contact_loc3.append(1)
         else:
             contact_loc3.append(0)
         if lig == 'both':
-            if check2_a4 >= 1 and check2_a6 >= 1 and total2_contact_loc3 >= 5 and check2_a3 == 0 and check2_a7 == 0:
+            if check2_a4 >= 1 and check2_a6 >= 1 and check_a3 >= 1 and total2_contact_loc3 >= 5 and check2_a7 == 0:
                 contact2_loc3.append(1)
             else:
                 contact2_loc3.append(0)
 
         #Binding Location 4
-        if check_a3 >= 1 and check_a4 >= 1 and check_a6 >= 1 and total_contact_loc4 >= 5 and check_a5 == 0 and check_a7 == 0:
+        if check_a4 >= 1 and check_a6 >= 1 and total_contact_loc4 >= 5 and check_a3 == 0 and check_a7 == 0:
             contact_loc4.append(1)
         else:
             contact_loc4.append(0)
         if lig == 'both':
-            if check2_a3 >= 1 and check2_a4 >= 1 and check2_a6 >= 1 and total2_contact_loc4 >= 5 and check2_a5 == 0 and check2_a7 == 0:
+            if check2_a4 >= 1 and check2_a6 >= 1 and total2_contact_loc4 >= 5 and check2_a3 == 0 and check2_a7 == 0:
                 contact2_loc4.append(1)
             else:
                 contact2_loc4.append(0)
 
-        if check_a3 == 0 and check_a6 == 0 and check_a7 == 0:
+        if check_a3 == 0 and check_a6 == 0 and check_a7 == 0 and check_a4 == 0:
             contact_unb.append(1)
         else:
             contact_unb.append(0)
         if lig == 'both':
-            if check2_a3 == 0 and check2_a6 == 0 and check2_a7 == 0:
+            if check2_a3 == 0 and check2_a6 == 0 and check2_a7 == 0 and check2_a4 == 0:
                 contact2_unb.append(1)
             else:
                 contact2_unb.append(0)
@@ -881,7 +904,7 @@ if lig_check == True:
     lig_frac = np.array([sum(contact_loc1)/len(contact_loc1), sum(contact_loc2)/len(contact_loc2), sum(contact_loc3)/len(contact_loc3), sum(contact_loc4)/len(contact_loc4), 
         sum(contact_unb)/len(contact_unb)])
     lig_other = 1 - sum(lig_frac)
-    lig_frac.append(lig_other)
+    lig_frac = np.append(lig_frac, lig_other)
 
     if lig == 'both':
         lig2_frac = np.array([sum(contact2_loc1)/len(contact2_loc1), sum(contact2_loc2)/len(contact2_loc2), sum(contact2_loc3)/len(contact2_loc3), sum(contact2_loc4)/len(contact2_loc4), 
@@ -895,9 +918,28 @@ if lig_check == True:
         Loc_frac = open('Lig2_bind_frac' + File_base + '.txt', 'w')
         write_lig_bind(lig2_frac, Loc_frac)
 
+    #Determine transitions between loc1 and loc2
+    if sum(contact_loc1) != 0:
+        trans_1_2, trans_2_1 = [],[] #Empty array for indices of transitions
+        for i in range(1, len(contact_loc1)):
+            if contact_loc1[i-1] == 1 and contact_loc2[i] == 1: #transition from loc1 to loc2
+                trans_1_2.append(i)
+            if contact_loc2[i-1] == 1 and contact_loc1[i] == 1: #transition from loc2 to loc1
+                trans_2_1.append(i)
+    
+        #Determine time between transitions
+        trans_time = np.zeros(len(trans_1_2))
+        for i in range(len(trans_1_2)):
+            trans_time[i] = abs(trans_1_2[i] - trans_2_1[i])
+
+        #Save transition times to file
+        np.savetxt('AD_trans_time.txt', trans_time)
+
+        #Delete unnedded arrays
+        del trans_1_2; del trans_2_1; del trans_time
 
     #Compute Simultaneous Ligand Contacts
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         pairs = num_pairs_a3 + num_pairs_a6 + num_pairs_a7
 
     else:
@@ -907,18 +949,18 @@ if lig_check == True:
 
     simul_contacts = np.zeros([pairs, pairs])
 
-    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist_a3, dist_B = dist_a6, dist_C = dist_a7, num1 = 0, simul_contacts = simul_contacts)
-    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist_a6, dist_B = dist_a3, dist_C = dist_a7, num1 = num1, simul_contacts = simul_contacts)
-    simul_contacts, num1 = mdfunc.compute_simul_comtacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr = time_uncorr, dist_A = dist_a7, dist_B = dist_a6, dist_C = dist_a3, num1 = num1, simul_contacts = simul_contacts)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(num_pairs_a3, num_pairs_a6, num_pairs_a7, time_uncorr, dist_a3, dist_a6, dist_a7, 0, simul_contacts, a7_present)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(num_pairs_a6, num_pairs_a3, num_pairs_a7, time_uncorr, dist_a6, dist_a3, dist_a7, num1, simul_contacts, a7_present)
+    simul_contacts, num1 = mdfunc.compute_simul_comtacts(num_pairs_a7, num_pairs_a6, num_pairs_a3, time_uncorr, dist_a7, dist_a6, dist_a3, num1, simul_contacts, a7_present)
     
     #Save array to test file
     np.savetxt('simul_lig_contact_' + File_base + '.txt', simul_contacts)
 
     if lig == 'both':
         simul_contacts2 = np.zeros([pairs, pairs])
-        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a3, pairs_B = num_pairs_a6, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist2_a3, dist_B = dist2_a6, dist_C = dist2_a7, num1 = 0, simul_contacts = simul_contacts2)
-        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a6, pairs_B = num_pairs_a3, pairs_C = num_pairs_a7, time_uncorr = time_uncorr, dist_A = dist2_a6, dist_B = dist2_a3, dist_C = dist2_a7, num1 = num1, simul_contacts = simul_contacts2)
-        simul_contacts2, num1 = mdfunc.compute_simul_contacts(pairs_A = num_pairs_a7, pairs_B = num_pairs_a6, pairs_C = num_pairs_a3, time_uncorr = time_uncorr, dist_A = dist2_a7, dist_B = dist2_a6, dist_C = dist2_a3, num1 = num1, simul_contacts = simul_contacts2)
+        simul_contacts2, num1 = mdfunc.compute_simul_comtacts(num_pairs_a3, num_pairs_a6, num_pairs_a7, time_uncorr, dist2_a3, dist2_a6, dist2_a7, 0, simul_contacts2, a7_present)
+        simul_contacts2, num1 = mdfunc.compute_simul_comtacts(num_pairs_a6, num_pairs_a3, num_pairs_a7, time_uncorr, dist2_a6, dist2_a3, dist2_a7, num1, simul_contacts2, a7_present)
+        simul_contacts2, num1 = mdfunc.compute_simul_comtacts(num_pairs_a7, num_pairs_a6, num_pairs_a3, time_uncorr, dist2_a7, dist2_a6, dist2_a3, num1, simul_contacts2, a7_present)
         
         #Save array to text file
         np.savetxt('simul_lig2_contact_' + File_base + '.txt', simul_contacts2)
@@ -948,7 +990,7 @@ if lig_check == True:
         #Residue 197 to 200
         lig_contacts[5] = mdfunc.sect_contact(dist_a6, t, 12, 16)
         
-        if traj_prot.n_residues > 297:
+        if a7_present == True:
             #Residue 287 to 290
             lig_contacts[6] = mdfunc.sect_contact(dist_a7, t, 0, 3)
             #Residue 291 to 294
@@ -957,7 +999,7 @@ if lig_check == True:
             lig_contacts[8] = mdfunc.sect_contact(dist_a7, t, 8, 11)
         
         #Make matrix for simultaneous contacts
-        for i in range(len(lig_contcts)):
+        for i in range(len(lig_contacts)):
             for j in range(len(lig_contacts)):
                 if lig_contacts[i] == 1 and lig_contacts[j] == 1:
                     lig_cont_sect[i][j] += 1
@@ -977,7 +1019,7 @@ if lig_check == True:
             #Residue 197 to 200
             lig_contacts[5] = mdfunc.sect_contact(dist_a6, t, 12, 16)
         
-            if traj_prot.n_residues > 297:
+            if a7_present == True:
                 #Residue 287 to 290
                 lig_contacts[6] = mdfunc.sect_contact(dist_a7, t, 0, 3)
                 #Residue 291 to 294
@@ -1005,9 +1047,9 @@ if lig_check == True:
     del dist_a3_all; del dist_a4_all; del dist_a5_all; del dist_a6_all; del dist_bend_all
     del dist_a3; del dist_a4; del dist_a5; del dist_a6; del dist_bend; del dist
     del contact_loc1; del contact_loc2; del contact_loc3; del contact_loc4; del contacts
-    del simul_contacts; del lig_contacts; del lig_contact_sect
+    del simul_contacts; del lig_contacts; del lig_cont_sect
 
-    if traj_prot.n_residues > 297:
+    if a7_present == True:
         del pair_a7; del dist_a7_all; del dist_a7; 
     
     if lig == 'both':
@@ -1016,7 +1058,7 @@ if lig_check == True:
         del contact2_loc1; del contact2_loc2; del contact2_loc3; del contact2_loc4
         del simul_contacts2; del lig2_contacts; del lig2_contact_sect
 
-        if traj_prot.n_residues > 297:
+        if a7_present == True:
             del dist2_a7_all; del dist2_a7; 
 
     print('Ligand Interaction Analysis Complete')
