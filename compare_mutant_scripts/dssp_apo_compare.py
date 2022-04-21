@@ -134,11 +134,15 @@ mut = ['WT Open', 'WT Close', 'F196A', 'L192F', 'L195F', 'F280Y', 'E276F', 'V287
 num = [0, 1, 2, 3, 4, 5, 6, 7]
 mean_alpha_hel, err_alpha_hel = [],[]
 mean_alpha_sect, err_alpha_sect = [],[]
+mean_mut_alpha_sect, err_mut_alpha_sect = [],[]
 for i in range(len(num)):
     mean_alpha_hel.append(np.mean(per_alpha_helix[i][:]))
     err_alpha_hel.append(stats.sem(per_alpha_helix[i][:]))
     mean_alpha_sect.append(np.mean(per_alpha_sect[i][:]))
     err_alpha_sect.append(stats.sem(per_alpha_sect[i][:]))
+    if i > 1:
+        mean_mut_alpha_sect.append(np.mean(per_alpha_sect[i][:]))
+        err_mut_alpha_sect.append(stats.sem(per_alpha_sect[i][:]))
 
 #Set Colors
 colors = ['blue', 'red']
@@ -153,7 +157,6 @@ for i in range(6):
         colors.append('green')
     else:
         colors.append('gray')
-
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -177,7 +180,6 @@ for i in range(6):
     else:
         colors.append('gray')
 
-
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 ax1.set_title('Comparison of Helicity in the alpha-7 Helix Middle Section')    
@@ -186,6 +188,32 @@ ax1.bar(num, mean_alpha_sect, color=colors, width=0.9)
 plt.errorbar(num, mean_alpha_sect, yerr= err_alpha_sect, fmt='o', color='black')
 plt.xticks(num, mut, fontsize=8)
 fig.savefig('Mean_helicity_sect_Apo.png')
+plt.close(fig)
+
+#Plot DSSP against relative inhibition
+F_BBR = [-0.259789014, -0.303991355, -0.488133372, -0.447825789, -0.243071805, 0.164257023]
+F_BBR_se = [0.001039749, 0.001238509, 0.001227868, 0.001397659, 0.001188003, 0.000777901]
+F_AD = [-0.204972546, -0.035556769, -0.2663284, -0.286222165, -0.331721332, 0.131296446]
+F_AD_se = [0.000911951, 0.001351002, 0.000930425, 0.001033858, 0.001059996, 0.000928346]
+
+#Gaussian Fit
+mean, std = norm.fit(F_AD)
+mean2, std2 = norm.fit(F_BBR)
+x = np.linspace(0, 100, num=1000)
+
+#Make plot
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.set_title(r'Comparison of Helicity in the $\alpha$-7 Helix Middle Section')    
+ax1.set_xlabel('Mean Precent Helicity')
+ax1.set_ylabel('Relative Inhibition (F)')
+ax1.scatter(mean_mut_alpha_sect, F_AD, label = 'AD', color = 'blue')
+plt.errorbar(mean_mut_alpha_sect, F_AD, xerr= err_mut_alpha_sect, yerr = F_AD, fmt='o', color='blue')
+plt.plot(x, norm.pdf(x, mean, std))
+ax1.scatter(mean_mut_alpha_sect, F_BBR, label = 'BBR', color = 'purple')
+plt.errorbar(mean_mut_alpha_sect, F_BBR, xerr= err_mut_alpha_sect, yerr = F_BBR, fmt='o', color='purple')
+plt.plot(x, norm.pdf(x, mean2, std2))
+fig.savefig('helicity_v_F.png')
 plt.close(fig)
 
 
