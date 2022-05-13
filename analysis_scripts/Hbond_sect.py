@@ -1,5 +1,4 @@
 #!/ usr / bin / env python
-
 import mdtraj as md
 import numpy as np
 from sklearn.decomposition import PCA
@@ -14,7 +13,6 @@ parser.add_argument('-g', required=True, help= 'File name for input topology (gr
 parser.add_argument('-A', required=True, help= 'Residue range for section A (input format:# #)')
 parser.add_argument('-B', required=True, help= 'Residue range for section B (input format:# #)')
 parser.add_argument('-f', required=True, help= 'File output identifier')
-
 
 #Import Arguments
 args = parser.parse_args()
