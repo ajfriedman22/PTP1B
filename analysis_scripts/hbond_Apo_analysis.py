@@ -2,7 +2,7 @@ import mdtraj as md
 import numpy as np
 import argparse
 
-parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
+parser = argparse.ArgumentParser(description = 'Determination of percent each h-bond within a list was formed for GROMACS Trajectory')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
 parser.add_argument('-g', required=True, help= 'File name for input topology (gro format)')
 parser.add_argument('-f', required=True, help= 'Distinction for group of hbonds of interest')
