@@ -13,7 +13,7 @@ import sys
 from mpl_toolkits import mplot3d
 
 #Declare arguments
-parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
+parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, protein and ligand RMSD, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
 parser.add_argument('-g', required=True, help= 'File name for input topology (gro format)')
 parser.add_argument('-e', required=False, default=True, type=bool, help= 'Is the input an equilibrated trajectory?')
@@ -56,7 +56,7 @@ import uncorr
 import plot
 
 #Load trajectories
-traj, traj_bb, traj_prot, traj_ns, traj_a7, miss_first = mdfunc.mdtraj_load(File_traj, File_gro, [287, 295]) 
+traj_bb, traj_prot, traj_ns, traj_a7, miss_first = mdfunc.mdtraj_load(File_traj, File_gro, [287, 295]) 
 
 #Determine if the full a7 helix is present (residues 287 to 295)
 if traj_prot.n_residues > 295:
