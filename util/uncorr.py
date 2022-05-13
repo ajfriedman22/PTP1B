@@ -1,5 +1,8 @@
 #!/ usr / bin / env python
 
+#Determine the indices for uncorrelated data
+#Input: data = input data
+#Output: t_uncorr = indices of the uncorrelated data
 def ind(data):
     #Import packages
     import ruptures as rpt 
@@ -20,6 +23,9 @@ def ind(data):
 
     return t_uncorr
 
+#Sort data to remove correlated samples
+#Input: data = full data array, t_uncorr = indices of uncorrelated data
+#Output: data_uncorr = data array with correlated samples removed
 def sort(data, t_uncorr):
     #import packages
     import numpy as np
@@ -40,6 +46,9 @@ def sort(data, t_uncorr):
 
     return data_uncorr
 
+#Sort data to remove correlated samples for non-interger data arrays
+#Input: data = full data array, t_uncorr = indices of uncorrelated data
+#Output: data_uncorr = data array with correlated samples removed
 def char(data, t_uncorr):
     #Reduce to uncorrelated data
     num=len(t_uncorr)
