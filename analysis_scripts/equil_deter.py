@@ -4,21 +4,23 @@ import argparse
 import sys
 import numpy as np
 
-#Import custom modules
-sys.path.insert(1,'/ocean/projects/cts160011p/afriedma/code/PTP1B/util')
-import plot
-
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of Equilibration Time from RMSD')
 parser.add_argument('-n', required=True, help='File name for BB RMSD (xvg)')
 parser.add_argument('-d', required=True, help='File Directory for RMSD')
 parser.add_argument('-t', required=True, type = int, help='Total time for trajectory (ns)')
+parser.add_argument('-df', required=True, type=str, help='Directory Path for Functions')
 
 #Import Arguments
 args = parser.parse_args()
 file_name = args.n
 file_dir = args.d
+dir_util = args.df
 t_max = args.t
+
+#Import custom modules
+sys.path.insert(1,dir_util + 'util')
+import plot
 
 #Load data
 t, rmsd = plot.col2_load_data(file_dir, file_name, False)
