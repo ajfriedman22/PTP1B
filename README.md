@@ -4,6 +4,7 @@ This repository contains the MDP files with all settings used to run the simulat
 
 ## Analysis Scripts
 All analysis used for this paper can be regenerated using the files containded within the analysis_scripts directory. A guide to the files found within this direcory can be found below:
+
 traj_analysis.py: This is the primary analysis script used to generate a majority of the data presented within the paper. This script takes a GROMACS trajectory and gro file as well as options specifying the analysis which should be done. The "-h" flag can be used when running the script for syntax and input options. This script will compute RMSD and RMSF from a specified reference for the full protein and important sections for PTP1B, utilize DSSP to identify the secondary structure of all residues within the $\alpha$7 helix of PTP1B, Identify all h-bonds formed between residues in the protein for over 60% of the trajectory, identify all h-bonds formed between the protein and a specificed ligand over 10% of the trajectory, identify residue contacts fromed by a ligand with a protein, identify binding conformation for AD, compute the COM RMSD for the ligand, identify interactions between the residues within the helical triad of the protein, and run PCA.
 
 equil_deter.py: Equilibration determination for a GROMACS trajectory based on stabilization of protein backbone RMSD.
