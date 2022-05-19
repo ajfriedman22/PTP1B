@@ -1,4 +1,4 @@
-#Import Necessary Packages
+#Import Necessary Pacjages
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
@@ -19,238 +19,60 @@ def set_axis_style(ax, labels):
     ax.set_xlim(0.25, len(labels) + 0.75)
     ax.set_xlabel('Sample name')
 
-#Make open arrays for residues and rmsf values
-t_a7, t_a7_AD, t_Apo, t_AD, t_1sug, t_1sug_AD, t_1sug_na7, t_1sug_na7_AD = [],[],[],[],[],[],[],[] #time
-t_dis7, t_dis9, t_dis11, t_dis7_AD, t_dis9_AD, t_dis11_AD = [],[],[],[],[],[]
-t_1sug_dis7, t_1sug_dis9, t_1sug_dis11, t_1sug_dis7_AD, t_1sug_dis9_AD, t_1sug_dis11_AD, t_1sug_dis11_2AD, t_1sug_dis_alt_AD, t_1sug_dis_alt2_AD = [],[],[],[],[],[],[],[],[]
-t_BBR_a7, t_BBR_1sug, t_BBR_dis7, t_BBR_dis9, t_BBR_dis11, t_BBR_1sug_dis7, t_BBR_1sug_dis11 = [],[],[],[],[],[],[]
-r_a7, r_a7_AD, r_Apo, r_AD, r_1sug, r_1sug_AD, r_1sug_na7, r_1sug_na7_AD = [],[],[],[],[],[],[],[] #rmsf for trajectory residues
-r_dis7, r_dis9, r_dis11, r_dis7_AD, r_dis9_AD, r_dis11_AD = [],[],[],[],[],[]
-r_1sug_dis7, r_1sug_dis9, r_1sug_dis11, r_1sug_dis7_AD, r_1sug_dis9_AD, r_1sug_dis11_AD, r_1sug_dis11_2AD, r_1sug_dis_alt_AD, r_1sug_dis_alt2_AD = [],[],[],[],[],[],[],[],[]
-r_BBR_a7, r_BBR_1sug, r_BBR_dis7, r_BBR_dis9, r_BBR_dis11, r_BBR_1sug_dis7, r_BBR_1sug_dis11 = [],[],[],[],[],[],[]
+def load_txt(folder_path, file_name):
+    t,r = [],[]
+    with open('../../' + folder_path + '/rmsf_' + file_name + '_equil.xvg') as f:
+        for _ in range(17):
+            next(f)
+        for line in f:
+            cols = line.split()
+            if len(cols) == 2:
+                t.append(float(cols[0]))
+                r.append(float(cols[1])*10) #Convert to angstrom
+    return t, r
 
 #Input Files
-with open("../../rebuild_a7/analysis/rmsf_a7_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_a7.append(float(cols[0]))
-            r_a7.append(float(cols[1])*10)
-with open("../../AD_rebuild_a7/analysis/rmsf_a7_AD_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_a7_AD.append(float(cols[0]))
-            r_a7_AD.append(float(cols[1])*10)
-with open("../../rebuild_a7_high/config7/analysis/rmsf_Apo_dis7_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_dis7.append(float(cols[0]))
-            r_dis7.append(float(cols[1])*10)
-with open("../../AD_dis/analysis/config7/rmsf_AD_dis7_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_dis7_AD.append(float(cols[0]))
-            r_dis7_AD.append(float(cols[1])*10)
-with open("../../rebuild_a7_high/config9/analysis/rmsf_Apo_dis9_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_dis9.append(float(cols[0]))
-            r_dis9.append(float(cols[1])*10)
-with open("../../AD_dis/analysis/config9/rmsf_AD_dis9_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_dis9_AD.append(float(cols[0]))
-            r_dis9_AD.append(float(cols[1])*10)
-with open("../../rebuild_a7_high/config11/analysis/rmsf_Apo_dis11_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_dis11.append(float(cols[0]))
-            r_dis11.append(float(cols[1])*10)
-with open("../../AD_dis/analysis/config11/rmsf_AD_dis11_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_dis11_AD.append(float(cols[0]))
-            r_dis11_AD.append(float(cols[1])*10)
-with open("../../Apo_1SUG/analysis/1sug/rmsf_1sug_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug.append(float(cols[0]))
-            r_1sug.append(float(cols[1])*10)
-with open("../../1sug_AD/analysis/rmsf_1sug_AD_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_AD.append(float(cols[0]))
-            r_1sug_AD.append(float(cols[1])*10)
-with open("../../1sug_dis/analysis/config7/rmsf_1sug_dis7_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis7.append(float(cols[0]))
-            r_1sug_dis7.append(float(cols[1])*10)
-with open("../../1sug_dis_AD/analysis/config7/rmsf_1sug_dis7_AD_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis7_AD.append(float(cols[0]))
-            r_1sug_dis7_AD.append(float(cols[1])*10)
-with open("../../1sug_dis/analysis/config9/rmsf_1sug_dis9_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis9.append(float(cols[0]))
-            r_1sug_dis9.append(float(cols[1])*10)
-with open("../../1sug_dis_AD/analysis/config9/rmsf_1sug_dis9_AD_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis9_AD.append(float(cols[0]))
-            r_1sug_dis9_AD.append(float(cols[1])*10)
-with open("../../1sug_dis/analysis/config11/rmsf_1sug_dis11_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis11.append(float(cols[0]))
-            r_1sug_dis11.append(float(cols[1])*10)
-with open("../../1sug_dis_AD/analysis/config11/rmsf_1sug_dis11_AD_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis11_AD.append(float(cols[0]))
-            r_1sug_dis11_AD.append(float(cols[1])*10)
-with open("../../1sug_dis_AD/analysis/config11_2/rmsf_1sug_dis11_2_AD_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis11_2AD.append(float(cols[0]))
-            r_1sug_dis11_2AD.append(float(cols[1])*10)
-with open("../../1sug_dis_AD/analysis/config_alt/rmsf_1sug_dis_alt_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis_alt_AD.append(float(cols[0]))
-            r_1sug_dis_alt_AD.append(float(cols[1])*10)
-with open("../../1sug_dis_AD/analysis/config_alt2/rmsf_1sug_dis_alt2_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_1sug_dis_alt2_AD.append(float(cols[0]))
-            r_1sug_dis_alt2_AD.append(float(cols[1])*10)
-with open("../../BBR_a7/analysis/rmsf_BBR_a7_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_BBR_a7.append(float(cols[0]))
-            r_BBR_a7.append(float(cols[1])*10)
-with open("../../BBR_1sug/analysis/rmsf_BBR_1sug_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_BBR_1sug.append(float(cols[0]))
-            r_BBR_1sug.append(float(cols[1])*10)
-with open("../../BBR_dis/analysis/config7/rmsf_BBR_dis7_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_BBR_dis7.append(float(cols[0]))
-            r_BBR_dis7.append(float(cols[1])*10)
-with open("../../BBR_dis/analysis/config9/rmsf_BBR_dis9_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_BBR_dis9.append(float(cols[0]))
-            r_BBR_dis9.append(float(cols[1])*10)
-with open("../../BBR_dis/analysis/config11/rmsf_BBR_dis11_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_BBR_dis11.append(float(cols[0]))
-            r_BBR_dis11.append(float(cols[1])*10)
-with open("../../BBR_1sug_dis/analysis/config7/rmsf_BBR_1sug_dis7_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_BBR_1sug_dis7.append(float(cols[0]))
-            r_BBR_1sug_dis7.append(float(cols[1])*10)
-with open("../../BBR_1sug_dis/analysis/config11/rmsf_BBR_1sug_dis11_equil.xvg") as f:
-    for _ in range(17):
-        next(f)
-    for line in f:
-        cols = line.split()
-        if len(cols) == 2:
-            t_BBR_1sug_dis11.append(float(cols[0]))
-            r_BBR_1sug_dis11.append(float(cols[1])*10)
+t_a7, r_a7 = load_txt('rebuild_a7/analysis', 'a7')
+t_a7_AD, r_a7_AD = load_txt('AD_rebuild_a7/analysis', 'a7_AD')
+t_dis7, r_dis7 = load_txt('rebuild_a7_high/config7/analysis', 'Apo_dis7')
+t_dis9, r_dis9 = load_txt('rebuild_a7_high/config9/analysis', 'Apo_dis9')
+t_dis11, r_dis11 = load_txt('rebuild_a7_high/config11/analysis', 'Apo_dis11')
+t_dis_alt, r_dis_alt = load_txt('Apo_dis/analysis', 'Apo_dis')
+t_dis7_AD, r_dis7_AD = load_txt('AD_dis/analysis/config7', 'AD_dis7')
+t_dis9_AD, r_dis9_AD = load_txt('AD_dis/analysis/config9', 'AD_dis9')
+t_dis11_AD, r_dis11_AD = load_txt('AD_dis/analysis/config11', 'AD_dis11')
+t_1sug, r_1sug = load_txt('Apo_1SUG/analysis/1sug', '1sug')
+t_1sug_AD, r_1sug_AD = load_txt('1sug_AD/analysis', '1sug_AD')
+t_1sug_dis7, r_1sug_dis7 = load_txt('1sug_dis/analysis/config7', '1sug_dis7')
+t_1sug_dis9, r_1sug_dis9 = load_txt('1sug_dis/analysis/config9', '1sug_dis9')
+t_1sug_dis11, r_1sug_dis11 = load_txt('1sug_dis/analysis/config11', '1sug_dis11')
+t_1sug_dis7_AD, r_1sug_dis7_AD = load_txt('1sug_dis_AD/analysis/config7', '1sug_dis7_AD')
+t_1sug_dis9_AD, r_1sug_dis9_AD = load_txt('1sug_dis_AD/analysis/config9', '1sug_dis9_AD')
+t_1sug_dis11_AD, r_1sug_dis11_AD = load_txt('1sug_dis_AD/analysis/config11', '1sug_dis11_AD')
+t_1sug_dis11_2AD, r_1sug_dis11_2AD = load_txt('1sug_dis_AD/analysis/config11_2', '1sug_dis11_2_AD')
+t_1sug_dis_alt_AD, r_1sug_dis_alt_AD = load_txt('1sug_dis_AD/analysis/config_alt', '1sug_dis_alt')
+t_1sug_dis_alt2_AD, r_1sug_dis_alt2_AD = load_txt('1sug_dis_AD/analysis/config_alt2', '1sug_dis_alt2')
+t_BBR_a7, r_BBR_a7 = load_txt('BBR_a7/analysis', 'BBR_a7')
+t_BBR_1sug, r_BBR_1sug = load_txt('BBR_1sug/analysis', 'BBR_1sug')
+t_BBR_dis7, r_BBR_dis7 = load_txt('BBR_dis/analysis/config7', 'BBR_dis7')
+t_BBR_dis9, r_BBR_dis9 = load_txt('BBR_dis/analysis/config9', 'BBR_dis9')
+t_BBR_dis11, r_BBR_dis11 = load_txt('BBR_dis/analysis/config11', 'BBR_dis11')
+t_BBR_1sug_dis7, r_BBR_1sug_dis7 = load_txt('BBR_1sug_dis/analysis/config7', 'BBR_1sug_dis7')
+t_BBR_1sug_dis11, r_BBR_1sug_dis11 = load_txt('BBR_1sug_dis/analysis/config11', 'BBR_1sug_dis11')
+t_AD_BBR, r_AD_BBR = load_txt('AD_BBR/analysis', 'AD_BBR')
 
+print(len(r_a7))
 #WPD RMSF
 res_w = np.array([177, 178, 179, 180, 181, 182, 183, 184, 185]) #Residues in WPD loop
 w_Apo_open, w_Apo_close, w_AD_open, w_AD_close, w_BBR_open, w_BBR_close = [],[],[],[],[],[] #Empty array for RMSF of WPD residues
 for i in res_w:
     j = i-1
-    k = i-2
-    w_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[k], r_dis9[j], r_1sug_dis9[k]]))
-    w_Apo_close.append(np.mean([r_1sug[k], r_dis11[j], r_1sug_dis11[k]]))
-    w_AD_open.append(np.mean([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k]]))
+    w_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    w_Apo_close.append(np.mean([r_1sug[j], r_dis11[j], r_1sug_dis11[j]]))
+    w_AD_open.append(np.mean([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j]]))
     w_AD_close.append(np.mean([r_dis11_AD[j]]))
     w_BBR_open.append(np.mean([r_BBR_a7[j], r_BBR_dis9[j]]))
-    w_BBR_close.append(np.mean([r_BBR_1sug[k], r_BBR_1sug_dis7[k]]))
+    w_BBR_close.append(np.mean([r_BBR_1sug[j], r_BBR_1sug_dis7[j]]))
 
 #Plot WPD RMSF
 fig = plt.figure()
@@ -298,25 +120,24 @@ name = ['Apo Open', 'Apo Closed', 'AD Open', 'AD Closed', 'BBR Open', 'BBR Close
 num = np.array([1, 2, 3, 4, 5, 6])
 fig4 = plt.figure()
 ax1 = fig4.add_subplot(111)
-ax1.set_title("Comparison of WPD RMSF Peak")
+ax1.set_title("Comparison of WPD RMSF Peaj")
 ax1.set_ylabel(r'RMSF($\AA$)')
 ax1.bar(num, max_wpd)
 plt.xticks(num, name)
 leg = ax1.legend()
-fig4.savefig('WPD_peak_compare.png')
+fig4.savefig('WPD_peaj_compare.png')
 
 #Substrate Binding loop
 res_rl = np.array([112, 113, 114, 115, 116, 117])
 rl_Apo_open, rl_Apo_close, rl_AD_open, rl_AD_close, rl_BBR_open, rl_BBR_close = [],[],[],[],[],[] #Empty array for RMSF of WPD residues
 for i in res_rl:
     j = i-1
-    k = i-2
-    rl_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[k], r_dis9[j], r_1sug_dis9[k]]))
-    rl_Apo_close.append(np.mean([r_1sug[k], r_dis11[j], r_1sug_dis11[k]]))
-    rl_AD_open.append(np.mean([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k]]))
+    rl_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    rl_Apo_close.append(np.mean([r_1sug[j], r_dis11[j], r_1sug_dis11[j]]))
+    rl_AD_open.append(np.mean([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j]]))
     rl_AD_close.append(np.mean([r_dis11_AD[j]]))
     rl_BBR_open.append(np.mean([r_BBR_a7[j], r_BBR_dis9[j]]))
-    rl_BBR_close.append(np.mean([r_BBR_1sug[k], r_BBR_1sug_dis7[k]]))
+    rl_BBR_close.append(np.mean([r_BBR_1sug[j], r_BBR_1sug_dis7[j]]))
 res_rl = np.array([113, 114, 115, 116, 117, 118])
 
 #Plot substrate binding loop RMSF
@@ -340,13 +161,12 @@ res_a3 = np.array([186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 1
 a3_Apo_open, a3_Apo_close, a3_AD_open, a3_AD_close, a3_BBR_open, a3_BBR_close = [],[],[],[],[],[] #Empty array for RMSF of WPD residues
 for i in res_a3:
     j = i-1
-    k = i-2
-    a3_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[k], r_dis9[j], r_1sug_dis9[k]]))
-    a3_Apo_close.append(np.mean([r_1sug[k], r_dis11[j], r_1sug_dis11[k]]))
-    a3_AD_open.append(np.mean([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k]]))
+    a3_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    a3_Apo_close.append(np.mean([r_1sug[j], r_dis11[j], r_1sug_dis11[j]]))
+    a3_AD_open.append(np.mean([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j]]))
     a3_AD_close.append(np.mean([r_dis11_AD[j]]))
     a3_BBR_open.append(np.mean([r_BBR_a7[j], r_BBR_dis9[j]]))
-    a3_BBR_close.append(np.mean([r_BBR_1sug[k], r_BBR_1sug_dis7[k]]))
+    a3_BBR_close.append(np.mean([r_BBR_1sug[j], r_BBR_1sug_dis7[j]]))
 
 #Plot a3 RMSF
 fig2 = plt.figure()
@@ -368,13 +188,12 @@ res_a6 = np.array([264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 2
 a6_Apo_open, a6_Apo_close, a6_AD_open, a6_AD_close, a6_BBR_open, a6_BBR_close = [],[],[],[],[],[] #Empty array for RMSF of WPD residues
 for i in res_a6:
     j = i-1
-    k = i-2
-    a6_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[k], r_dis9[j], r_1sug_dis9[k]]))
-    a6_Apo_close.append(np.mean([r_1sug[k], r_dis11[j], r_1sug_dis11[k]]))
-    a6_AD_open.append(np.mean([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k]]))
+    a6_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    a6_Apo_close.append(np.mean([r_1sug[j], r_dis11[j], r_1sug_dis11[j]]))
+    a6_AD_open.append(np.mean([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j]]))
     a6_AD_close.append(np.mean([r_dis11_AD[j]]))
     a6_BBR_open.append(np.mean([r_BBR_a7[j], r_BBR_dis9[j]]))
-    a6_BBR_close.append(np.mean([r_BBR_1sug[k], r_BBR_1sug_dis7[k]]))
+    a6_BBR_close.append(np.mean([r_BBR_1sug[j], r_BBR_1sug_dis7[j]]))
 
 #Plot a6 RMSF
 fig3 = plt.figure()
@@ -397,45 +216,51 @@ a7_Apo_open, a7_Apo_close, a7_AD_open, a7_AD_close, a7_AD_unb, a7_BBR_open, a7_B
 a7_Apo_open_sem, a7_Apo_close_sem, a7_AD_open_sem, a7_AD_close_sem, a7_AD_unb_sem, a7_BBR_open_sem, a7_BBR_close_sem, a7_BBR_unb_sem = [],[],[],[],[],[],[],[] #Empty array for Error for RMSF of WPD residues
 a7_unb1, a7_unb2, a7_unb3, a7_unb4, a7_unb5, a7_unb6, a7_unb7 = [],[],[],[],[],[],[]
 a7_dis7, a7_dis9, a7_dis11, a7_dis_unb, a7_ord = [],[],[],[],[]
-a7_lig_open, a7_lig_open_sem = [],[]
+a7_lig_open, a7_lig_open_sem, a7_dis11_sem, a7_dis_unb_sem = [],[],[],[]
 a7_lig_unb, a7_lig_unb_sem = [],[]
+a7_lig_bound, a7_lig_bound_sem = [],[]
+a7_AD_BBR = []
 for i in res_a7:
     j = i-1
-    k = i-2
-    a7_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[k], r_dis9[j], r_1sug_dis9[k]]))
-    a7_Apo_close.append(np.mean([r_1sug[k], r_dis11[j], r_1sug_dis11[k]]))
-    a7_AD_open.append(np.mean([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k]]))
+    a7_Apo_open.append(np.mean([r_a7[j], r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    a7_Apo_close.append(np.mean([r_1sug[j], r_dis11[j], r_1sug_dis11[j]]))
+    a7_AD_open.append(np.mean([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j]]))
     a7_AD_close.append(np.mean([r_dis11_AD[j]]))
-    a7_AD_unb.append(np.mean([r_dis7_AD[j], r_1sug_dis7_AD[k], r_1sug_dis9_AD[k], r_1sug_dis11_2AD[k]]))
+    a7_AD_unb.append(np.mean([r_dis7_AD[j], r_1sug_dis7_AD[j], r_1sug_dis9_AD[j], r_1sug_dis11_2AD[j]]))
     a7_BBR_open.append(np.mean([r_BBR_a7[j], r_BBR_dis9[j]]))
-    a7_BBR_close.append(np.mean([r_BBR_1sug[k], r_BBR_1sug_dis7[k]]))
-    a7_BBR_unb.append(np.mean([r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[k]]))
-    a7_lig_open.append(np.mean([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k], r_BBR_a7[j], r_BBR_dis9[j]]))
-    a7_lig_unb.append(np.mean([r_dis7_AD[j], r_1sug_dis7_AD[k], r_1sug_dis9_AD[k], r_1sug_dis11_2AD[k], r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[k]]))
+    a7_BBR_close.append(np.mean([r_BBR_1sug[j], r_BBR_1sug_dis7[j]]))
+    a7_BBR_unb.append(np.mean([r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[j]]))
+    a7_lig_open.append(np.mean([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j], r_BBR_a7[j], r_BBR_dis9[j]]))
+    a7_lig_unb.append(np.mean([r_dis7_AD[j], r_1sug_dis7_AD[j], r_1sug_dis9_AD[j], r_1sug_dis11_2AD[j], r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[j]]))
+    a7_lig_bound.append(np.mean([r_1sug_dis11[j], r_dis11[j], r_dis_alt[j]]))
+    a7_AD_BBR.append(r_AD_BBR[j])
 
     a7_unb1.append(r_dis7_AD[j])
-    a7_unb2.append(r_1sug_dis7_AD[k])
-    a7_unb3.append(r_1sug_dis9_AD[k])
-    a7_unb4.append(r_1sug_dis11_2AD[k])
+    a7_unb2.append(r_1sug_dis7_AD[j])
+    a7_unb3.append(r_1sug_dis9_AD[j])
+    a7_unb4.append(r_1sug_dis11_2AD[j])
     a7_unb5.append(r_BBR_dis7[j])
     a7_unb6.append(r_BBR_dis11[j])
-    a7_unb7.append(r_BBR_1sug_dis11[k])
-    a7_dis7.append(np.mean([r_dis7[j], r_1sug_dis7[k]]))
-    a7_dis9.append(np.mean([r_dis9[j], r_1sug_dis9[k]]))
-    a7_dis_unb.append(np.mean([r_dis7[j], r_1sug_dis7[k], r_dis9[j], r_1sug_dis9[k]]))
-    a7_dis11.append(np.mean([r_dis11[j], r_1sug_dis11[k]]))
-    a7_ord.append(np.mean([r_a7[j], r_1sug[k]]))
+    a7_unb7.append(r_BBR_1sug_dis11[j])
+    a7_dis7.append(np.mean([r_dis7[j], r_1sug_dis7[j]]))
+    a7_dis9.append(np.mean([r_dis9[j], r_1sug_dis9[j]]))
+    a7_dis_unb.append(np.mean([r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    a7_dis11.append(np.mean([r_dis11[j], r_1sug_dis11[j]]))
+    a7_ord.append(np.mean([r_a7[j], r_1sug[j]]))
 
-    a7_Apo_open_sem.append(stats.sem([r_a7[j], r_dis7[j], r_1sug_dis7[k], r_dis9[j], r_1sug_dis9[k]]))
-    a7_Apo_close_sem.append(stats.sem([r_1sug[k], r_dis11[j], r_1sug_dis11[k]]))
-    a7_AD_open_sem.append(stats.sem([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k]]))
+    a7_Apo_open_sem.append(stats.sem([r_a7[j], r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    a7_Apo_close_sem.append(stats.sem([r_1sug[j], r_dis11[j], r_1sug_dis11[j]]))
+    a7_AD_open_sem.append(stats.sem([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j]]))
     a7_AD_close_sem.append(0)
-    a7_AD_unb_sem.append(stats.sem([r_dis7_AD[j], r_1sug_dis7_AD[k], r_1sug_dis9_AD[k], r_1sug_dis11_2AD[k]]))
+    a7_AD_unb_sem.append(stats.sem([r_dis7_AD[j], r_1sug_dis7_AD[j], r_1sug_dis9_AD[j], r_1sug_dis11_2AD[j]]))
     a7_BBR_open_sem.append(stats.sem([r_BBR_a7[j], r_BBR_dis9[j]]))
-    a7_BBR_close_sem.append(stats.sem([r_BBR_1sug[k], r_BBR_1sug_dis7[k]]))
-    a7_BBR_unb_sem.append(stats.sem([r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[k]]))
-    a7_lig_open_sem.append(stats.sem([r_1sug_dis11_AD[k], r_1sug_dis_alt_AD[k], r_1sug_dis_alt2_AD[k], r_BBR_a7[j], r_BBR_dis9[j]]))
-    a7_lig_unb_sem.append(stats.sem([r_dis7_AD[j], r_1sug_dis7_AD[k], r_1sug_dis9_AD[k], r_1sug_dis11_2AD[k], r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[k]]))
+    a7_BBR_close_sem.append(stats.sem([r_BBR_1sug[j], r_BBR_1sug_dis7[j]]))
+    a7_BBR_unb_sem.append(stats.sem([r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[j]]))
+    a7_lig_open_sem.append(stats.sem([r_1sug_dis11_AD[j], r_1sug_dis_alt_AD[j], r_1sug_dis_alt2_AD[j], r_BBR_a7[j], r_BBR_dis9[j]]))
+    a7_lig_unb_sem.append(stats.sem([r_dis7_AD[j], r_1sug_dis7_AD[j], r_1sug_dis9_AD[j], r_1sug_dis11_2AD[j], r_BBR_dis7[j], r_BBR_dis11[j], r_BBR_1sug_dis11[j]]))
+    a7_dis11_sem.append(stats.sem([r_dis11[j], r_1sug_dis11[j]]))
+    a7_dis_unb_sem.append(stats.sem([r_dis7[j], r_1sug_dis7[j], r_dis9[j], r_1sug_dis9[j]]))
+    a7_lig_bound_sem.append(stats.sem([r_1sug_dis11[j], r_dis11[j], r_dis_alt[j]]))
 
 #Plot a7 RMSF
 fig4 = plt.figure()
@@ -488,6 +313,26 @@ ax1.plot(res_a7, a7_Apo_close, label='Apo Closed', color = 'red')
 ax1.legend(loc='best')
 fig.savefig('a7_RMSF_compare.png') 
 
+#convert to numpy array
+a7_AD_open = np.array(a7_AD_open)
+a7_BBR_open = np.array(a7_BBR_open)
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.set_title(r'Comparison of $\alpha$-7 helix RMSF', fontsize=15)
+ax1.set_xlabel('Residue ID', fontsize=13)
+ax1.set_ylabel(r'RMSF($\AA$)', fontsize=13)
+ax1.plot(res_a7, a7_AD_open, label='AD', color = 'blue', linestyle = 'dashed')
+ax1.fill_between(res_a7, a7_AD_open-a7_AD_open_sem, a7_AD_open+a7_AD_open_sem, alpha=0.1, facecolor = 'blue', edgecolor = 'blue')
+ax1.plot(res_a7, a7_BBR_open, label='BBR', color = 'purple', linestyle = 'dotted')
+ax1.fill_between(res_a7, a7_BBR_open-a7_BBR_open_sem, a7_BBR_open+a7_BBR_open_sem, alpha=0.1, facecolor = 'purple', edgecolor = 'purple')
+ax1.plot(res_a7, a7_AD_BBR, label='AD BBR Combo', color = 'green', linestyle = 'dashed')
+ax1.axvspan(290, 295, alpha = 0.2, color = 'gray')
+plt.xticks(fontsize=11)
+plt.yticks(fontsize=11)
+ax1.legend(loc='best', fontsize=12)
+fig.savefig('a7_RMSF_combo_compare.png') 
+
 a7_Apo_open = np.array(a7_Apo_open)
 a7_Apo_open_sem = np.array(a7_Apo_open_sem)
 a7_AD_open = np.array(a7_AD_open)
@@ -499,18 +344,20 @@ a7_Apo_close_sem = np.array(a7_Apo_close_sem)
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
-ax1.set_title(r'Comparison of $\alpha$-7 helix RMSF')    
-ax1.set_xlabel('Residue ID')
-ax1.set_ylabel(r'RMSF($\AA$)')
+ax1.set_title(r'Comparison of $\alpha$-7 helix RMSF', fontsize=15)
+ax1.set_xlabel('Residue ID', fontsize=13)
+ax1.set_ylabel(r'RMSF($\AA$)', fontsize=13)
 ax1.plot(res_a7, a7_Apo_open, label='Apo Open', color = 'blue')
-ax1.fill_between(res_a7, a7_Apo_open-a7_Apo_open_sem, a7_Apo_open+a7_Apo_open_sem, alpha=0.3, facecolor = 'blue', edgecolor = 'blue')
+ax1.fill_between(res_a7, a7_Apo_open-a7_Apo_open_sem, a7_Apo_open+a7_Apo_open_sem, alpha=0.2, facecolor = 'blue', edgecolor = 'blue')
 ax1.plot(res_a7, a7_AD_open, label='AD', color = 'blue', linestyle = 'dashed')
-ax1.fill_between(res_a7, a7_AD_open-a7_AD_open_sem, a7_AD_open+a7_AD_open_sem, alpha=0.25, facecolor = 'blue', edgecolor = 'blue')
+ax1.fill_between(res_a7, a7_AD_open-a7_AD_open_sem, a7_AD_open+a7_AD_open_sem, alpha=0.15, facecolor = 'blue', edgecolor = 'blue')
 ax1.plot(res_a7, a7_BBR_open, label='BBR', color = 'blue', linestyle = 'dotted')
-ax1.fill_between(res_a7, a7_BBR_open-a7_BBR_open_sem, a7_BBR_open+a7_BBR_open_sem, alpha=0.2, facecolor = 'blue', edgecolor = 'blue')
+ax1.fill_between(res_a7, a7_BBR_open-a7_BBR_open_sem, a7_BBR_open+a7_BBR_open_sem, alpha=0.1, facecolor = 'blue', edgecolor = 'blue')
 ax1.plot(res_a7, a7_Apo_close, label='Apo Closed', color = 'red')
-ax1.fill_between(res_a7, a7_Apo_close-a7_Apo_close_sem, a7_Apo_close+a7_Apo_close_sem, alpha=0.3, facecolor = 'red', edgecolor = 'red')
-ax1.legend(loc='best')
+ax1.fill_between(res_a7, a7_Apo_close-a7_Apo_close_sem, a7_Apo_close+a7_Apo_close_sem, alpha=0.2, facecolor = 'red', edgecolor = 'red')
+plt.xticks(fontsize=11)
+plt.yticks(fontsize=11)
+ax1.legend(loc='best', fontsize=12)
 fig.savefig('a7_RMSF_compare_err.png') 
 
 #Plot a7 Unbound RMSF
@@ -556,15 +403,15 @@ for pc in parts['bodies']:
     pc.set_alpha(1)
 
 quartile1, medians, quartile3 = np.percentile(a7_dis, [25, 50, 75], axis=1)
-whiskers = np.array([
+whisjers = np.array([
     adjacent_values(sorted_array, q1, q3)
     for sorted_array, q1, q3 in zip(a7_dis, quartile1, quartile3)])
-whiskers_min, whiskers_max = whiskers[:, 0], whiskers[:, 1]
+whisjers_min, whisjers_max = whisjers[:, 0], whisjers[:, 1]
 
 inds = np.arange(1, len(medians) + 1)
 ax2.scatter(inds, medians, marker='o', color='white', s=30, zorder=3)
 ax2.vlines(inds, quartile1, quartile3, color='k', linestyle='-', lw=5)
-ax2.vlines(inds, whiskers_min, whiskers_max, color='k', linestyle='-', lw=1)
+ax2.vlines(inds, whisjers_min, whisjers_max, color='k', linestyle='-', lw=1)
 
 # set style for the axes
 labels = ['AD Binds', 'AD Does Not Bind', 'BBR Binds', 'BBR Does Not Bind']
@@ -588,14 +435,22 @@ leg = ax1.legend(loc='upper right')
 fig3.savefig('a7_RMSF_unbound_all_compare.png') 
 
 #All unbound structures
+a7_dis_unb = np.array(a7_dis_unb)
+a7_dis_unb_sem = np.array(a7_dis_unb_sem)
+a7_dis_bound = np.array(a7_lig_bound)
+a7_dis_bound_sem = np.array(a7_lig_bound_sem)
+
 fig3 = plt.figure()
 ax1 = fig3.add_subplot(111)
-ax1.set_title(r"Comparison of $\alpha$-7 helix RMSF for Apo Structures")    
-ax1.set_xlabel('Residue ID')
-ax1.set_ylabel(r'RMSF($\AA$)')
-ax1.plot(res_a7,a7_dis_unb, label='Ligand Does not Bind')
-ax1.plot(res_a7,a7_dis11, label='Ligand Binds')
-ax1.plot(res_a7,a7_ord, label='Ligand Binds Alternative Location')
-leg = ax1.legend(loc='upper right')
+ax1.set_title(r"Comparison of $\alpha$-7 helix RMSF for Apo Structures", fontsize=15) 
+ax1.set_xlabel('Residue ID', fontsize=13)
+ax1.set_ylabel(r'RMSF($\AA$)', fontsize=13)
+ax1.plot(res_a7,a7_dis_unb, label='Ligand Does not Bind', color = 'red')
+ax1.plot(res_a7,a7_dis_bound, label='Ligand Binds', color = 'blue')
+ax1.fill_between(res_a7, a7_dis_unb-a7_dis_unb_sem, a7_dis_unb+a7_dis_unb_sem, alpha=0.3, facecolor = 'red', edgecolor = 'red')
+ax1.fill_between(res_a7, a7_dis_bound-a7_dis_bound_sem, a7_dis_bound+a7_dis_bound_sem, alpha=0.3, facecolor = 'blue', edgecolor = 'blue')
+plt.xticks(fontsize=11)
+plt.yticks(fontsize=12)
+leg = ax1.legend(loc='upper left', fontsize=12)
 fig3.savefig('a7_RMSF_Apo_dis_compare.png') 
 
