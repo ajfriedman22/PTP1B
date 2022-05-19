@@ -4,82 +4,13 @@
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy import stats
+from scipy.stats import norm
+from scipy.optimize import curve_fit
+import sys
 
-#Function for determining helix orientation
-def determine_helix(list_dssp):
-    num_struct = np.zeros(10)
-    num_alpha_helix = np.zeros(10)
-    per_struct = np.zeros(8)
-    per = np.zeros(8)
-    per_sect = np.zeros(4)
-    list_len = 0
-    for char in list_dssp:
-        if char[2]=='H':
-            num_alpha_helix[0] +=1
-        if char[2] == 'T' or char[0] == 'G' or char[0] == 'I':
-            num_struct[0] += 1
-        if char[4]=='H':
-            num_alpha_helix[1] +=1
-        if char[4] == 'T' or char[2] == 'G' or char[2] == 'I':
-            num_struct[1] += 1
-        if char[6]=='H':
-            num_alpha_helix[2] += 1
-        if char[6] == 'T' or char[4] == 'G' or char[4] == 'I':
-            num_struct[2] += 1
-        if char[8]=='H':
-            num_alpha_helix[3] +=1
-        if char[8] == 'T' or char[6] == 'G' or char[6] == 'I':
-            num_struct[3] += 1
-        if char[10]=='H':
-            num_alpha_helix[4] += 1
-        if char[10] == 'T' or char[8] == 'G' or char[8] == 'I':
-            num_struct[4] += 1
-        if char[12]=='H':
-            num_alpha_helix[5] += 1
-        if char[12] == 'T' or char[10] == 'G' or char[10] == 'I':
-            num_struct[5] += 1
-        if char[14]=='H':
-            num_alpha_helix[6] += 1
-        if char[14] == 'T' or char[12] == 'G' or char[12] == 'I':
-            num_struct[6] += 1
-        if char[16]=='H':
-            num_alpha_helix[7] +=1
-        if char[16] == 'T' or char[14] == 'G' or char[14] == 'I':
-            num_struct[7] += 1
-        if char[18]=='H':
-            num_alpha_helix[8] +=1
-        if char[18] == 'T' or char[16] == 'G' or char[16] == 'I':
-            num_struct[8] += 1
-        if char[20]=='H':
-            num_alpha_helix[9] +=1
-        if char[20] == 'T' or char[18] == 'G' or char[18] == 'I':
-            num_struct[9] += 1
-        list_len += 1
-    print(list_len)
-
-    per[0] = round(100*num_alpha_helix[2]/list_len)
-    per[1] = round(100*num_alpha_helix[3]/list_len)
-    per[2] = round(100*num_alpha_helix[4]/list_len) 
-    per[3] = round(100*num_alpha_helix[5]/list_len) 
-    per[4] = round(100*num_alpha_helix[6]/list_len) 
-    per[5] = round(100*num_alpha_helix[7]/list_len) 
-    per[6] = round(100*num_alpha_helix[8]/list_len) 
-    per[7] = round(100*num_alpha_helix[9]/list_len)
-
-    per_sect[0] = per[3]
-    per_sect[1] = per[4]
-    per_sect[2] = per[5]
-    per_sect[3] = per[6]
-
-    per_struct[0] = round(100*num_struct[2]/list_len)
-    per_struct[1] = round(100*num_struct[3]/list_len)
-    per_struct[2] = round(100*num_struct[4]/list_len) 
-    per_struct[3] = round(100*num_struct[5]/list_len) 
-    per_struct[4] = round(100*num_struct[6]/list_len) 
-    per_struct[5] = round(100*num_struct[7]/list_len) 
-    per_struct[6] = round(100*num_struct[8]/list_len) 
-    per_struct[7] = round(100*num_struct[9]/list_len)
-    return num_alpha_helix, num_struct, per_struct, per, per_sect
+#Import custom modules
+sys.path.insert(1,'/ocean/projects/cts160011p/afriedma/code/MD-Analysis/util')
+import mdfunc
 
 #Read in data from input files
 WT = open('../../../Apo_dis/analysis/DSSP_alt_Apo.txt', 'r').readlines()
@@ -99,14 +30,14 @@ per_alpha_helix = np.zeros([8, 8])
 per_alpha_sect = np.zeros([8, 4])
 
 #Seperate Characters in the string and record number that are in an alpha helix
-num_alpha_helix[0][:], num_struct[0][:], per_struct[0][:], per_alpha_helix[0][:], per_alpha_sect[0][:] = determine_helix(WT)
-num_alpha_helix[1][:], num_struct[1][:], per_struct[1][:], per_alpha_helix[1][:], per_alpha_sect[1][:]= determine_helix(WT_close)
-num_alpha_helix[2][:], num_struct[2][:], per_struct[2][:], per_alpha_helix[2][:], per_alpha_sect[2][:] = determine_helix(F196A)
-num_alpha_helix[3][:], num_struct[3][:], per_struct[3][:], per_alpha_helix[3][:], per_alpha_sect[3][:] = determine_helix(L192F)
-num_alpha_helix[4][:], num_struct[4][:], per_struct[4][:], per_alpha_helix[4][:], per_alpha_sect[4][:] = determine_helix(L195F)
-num_alpha_helix[5][:], num_struct[5][:], per_struct[5][:], per_alpha_helix[5][:], per_alpha_sect[5][:] = determine_helix(F280Y)
-num_alpha_helix[6][:], num_struct[6][:], per_struct[6][:], per_alpha_helix[6][:], per_alpha_sect[6][:] = determine_helix(E276F)
-num_alpha_helix[7][:], num_struct[7][:], per_struct[7][:], per_alpha_helix[7][:], per_alpha_sect[7][:] = determine_helix(V287T)
+num_alpha_helix[0][:], num_struct[0][:], per_struct[0][:], per_alpha_helix[0][:], per_alpha_sect[0][:] = mdfunc.determine_helix(WT)
+num_alpha_helix[1][:], num_struct[1][:], per_struct[1][:], per_alpha_helix[1][:], per_alpha_sect[1][:]= mdfunc.determine_helix(WT_close)
+num_alpha_helix[2][:], num_struct[2][:], per_struct[2][:], per_alpha_helix[2][:], per_alpha_sect[2][:] = mdfunc.determine_helix(F196A)
+num_alpha_helix[3][:], num_struct[3][:], per_struct[3][:], per_alpha_helix[3][:], per_alpha_sect[3][:] = mdfunc.determine_helix(L192F)
+num_alpha_helix[4][:], num_struct[4][:], per_struct[4][:], per_alpha_helix[4][:], per_alpha_sect[4][:] = mdfunc.determine_helix(L195F)
+num_alpha_helix[5][:], num_struct[5][:], per_struct[5][:], per_alpha_helix[5][:], per_alpha_sect[5][:] = mdfunc.determine_helix(F280Y)
+num_alpha_helix[6][:], num_struct[6][:], per_struct[6][:], per_alpha_helix[6][:], per_alpha_sect[6][:] = mdfunc.determine_helix(E276F)
+num_alpha_helix[7][:], num_struct[7][:], per_struct[7][:], per_alpha_helix[7][:], per_alpha_sect[7][:] = mdfunc.determine_helix(V287T)
 
 #Compare Ligand Bound Disordered Structures
 num = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -134,15 +65,30 @@ mut = ['WT Open', 'WT Close', 'F196A', 'L192F', 'L195F', 'F280Y', 'E276F', 'V287
 num = [0, 1, 2, 3, 4, 5, 6, 7]
 mean_alpha_hel, err_alpha_hel = [],[]
 mean_alpha_sect, err_alpha_sect = [],[]
-mean_mut_alpha_sect, err_mut_alpha_sect = [],[]
+mean_mut_alpha, err_mut_alpha = [],[]
+mean_struct, err_struct = [],[]
+mean_mut_struct, err_mut_struct = [],[]
+mean_mut_struct_lim, err_mut_struct_lim = [],[]
+output = open('DSSP_alpha_apo.txt', 'w')#Output file
+output2 = open('DSSP_struct_apo.txt', 'w')#Output file
 for i in range(len(num)):
     mean_alpha_hel.append(np.mean(per_alpha_helix[i][:]))
     err_alpha_hel.append(stats.sem(per_alpha_helix[i][:]))
     mean_alpha_sect.append(np.mean(per_alpha_sect[i][:]))
     err_alpha_sect.append(stats.sem(per_alpha_sect[i][:]))
-    if i > 1:
-        mean_mut_alpha_sect.append(np.mean(per_alpha_sect[i][:]))
-        err_mut_alpha_sect.append(stats.sem(per_alpha_sect[i][:]))
+    mean_struct.append(np.mean(per_struct[i][:]))
+    err_struct.append(stats.sem(per_struct[i][:]))
+    output.write(mut[i] + ': ' + str(mean_alpha_hel[i]) + ' +/- ' + str(err_alpha_hel[i]) + '\n')
+    output2.write(mut[i] + ': ' + str(mean_struct[i]) + ' +/- ' + str(err_struct[i]) + '\n')
+    if i != 1:
+        mean_mut_alpha.append(np.mean(per_alpha_helix[i][:]))
+        err_mut_alpha.append(stats.sem(per_alpha_helix[i][:]))
+        mean_mut_struct.append(np.mean(per_struct[i][:]))
+        err_mut_struct.append(stats.sem(per_struct[i][:]))
+        if i != 6:
+            mean_mut_struct_lim.append(np.mean(per_struct[i][:]))
+            err_mut_struct_lim.append(stats.sem(per_struct[i][:]))
+
 
 #Set Colors
 colors = ['blue', 'red']
@@ -191,29 +137,96 @@ fig.savefig('Mean_helicity_sect_Apo.png')
 plt.close(fig)
 
 #Plot DSSP against relative inhibition
-F_BBR = [-0.259789014, -0.303991355, -0.488133372, -0.447825789, -0.243071805, 0.164257023]
-F_BBR_se = [0.001039749, 0.001238509, 0.001227868, 0.001397659, 0.001188003, 0.000777901]
-F_AD = [-0.204972546, -0.035556769, -0.2663284, -0.286222165, -0.331721332, 0.131296446]
-F_AD_se = [0.000911951, 0.001351002, 0.000930425, 0.001033858, 0.001059996, 0.000928346]
-
-#Gaussian Fit
-mean, std = norm.fit(F_AD)
-mean2, std2 = norm.fit(F_BBR)
-x = np.linspace(0, 100, num=1000)
+F_BBR = [0.00, -0.259789014, -0.303991355, -0.488133372, 0.164257, -0.447825789, -0.243071805]
+F_BBR_se = [0.00, 0.001039749, 0.001238509, 0.001227868, 0.000777901, 0.001397659, 0.001188003]
+F_AD = [0.00, -0.204972546, -0.035556769, -0.2663284, 0.131296446, -0.286222165, -0.331721332]
+F_AD_se = [0.00, 0.000911951, 0.001351002, 0.000930425, 0.000928346, 0.001033858, 0.001059996]
 
 #Make plot
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
-ax1.set_title(r'Comparison of Helicity in the $\alpha$-7 Helix Middle Section')    
-ax1.set_xlabel('Mean Precent Helicity')
+ax1.set_title(r'Comparison of Helicity in the $\alpha$-7 Helix')   
+ax1.set_xlabel(r'Mean Precent $\alpha$ Helicity')
 ax1.set_ylabel('Relative Inhibition (F)')
-ax1.scatter(mean_mut_alpha_sect, F_AD, label = 'AD', color = 'blue')
-plt.errorbar(mean_mut_alpha_sect, F_AD, xerr= err_mut_alpha_sect, yerr = F_AD, fmt='o', color='blue')
-plt.plot(x, norm.pdf(x, mean, std))
-ax1.scatter(mean_mut_alpha_sect, F_BBR, label = 'BBR', color = 'purple')
-plt.errorbar(mean_mut_alpha_sect, F_BBR, xerr= err_mut_alpha_sect, yerr = F_BBR, fmt='o', color='purple')
-plt.plot(x, norm.pdf(x, mean2, std2))
+ax1.scatter(mean_mut_alpha, F_AD, label = 'AD', color = 'blue')
+plt.errorbar(mean_mut_alpha, F_AD, xerr= err_mut_alpha, yerr = F_AD_se, fmt='o', color='blue')
 fig.savefig('helicity_v_F.png')
 plt.close(fig)
 
+# Define the Gaussian function
+def Gauss(x, a, x0, sigma, b):
+    return a*np.exp(-(x-x0)**2/(2*sigma**2)) + b
+parameters, covariance = curve_fit(Gauss, mean_mut_struct, F_AD, p0 = [0.2, 35, 10, -0.25])
+  
+[fit_A, fit_B, fit_C, fit_D] = parameters
+
+x = np.linspace(0, 75, num=1000)
+Label = ['WT', 'F196A', 'L192F', 'L195F', 'F280Y', 'E276F', 'V287T']
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.set_title(r'Comparison of Helicity in the $\alpha$-7 Helix')    
+ax1.set_xlabel('Mean Precent Helicity')
+ax1.set_ylabel('Relative Inhibition (F)')
+ax1.scatter(mean_mut_struct, F_AD, label = 'AD', color = 'blue')
+plt.errorbar(mean_mut_struct, F_AD, xerr= err_mut_struct, yerr = F_AD_se, fmt='o', color='blue')
+# Loop for annotation of all points
+for i in range(len(Label)):
+    plt.annotate(Label[i], (mean_mut_struct[i], F_AD[i] + 0.05))
+ax1.fill_between([0, 70], -0.1, 0.1, color = 'gray', alpha=0.5)
+ax1.fill_between([0, 70], -0.5, -0.1, color = 'red', alpha=0.5)
+ax1.fill_between([0, 70], 0.1, 0.3, color = 'green', alpha=0.5)
+#plt.plot(x, Gauss(x, fit_A, fit_B, fit_C, fit_D), label = 'Gaussian Fit')
+fig.savefig('helicity_v_F_struct.png')
+plt.close(fig)
+
+#Plot helicity vs dG for AD
+dG = [0.00, 0.437, -0.375, -0.044, 0.634, -1.526, 0.056]
+dG_MBAR = [0.00, 0.381, -0.297, -0.019, 0.236, -0.373, -0.026]
+dG_MBAR_err = [0.00, 0.109, 0.095, 0.074, 0.072, 0.694, 0.106]
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.set_title(r'Comparison of Helicity in the $\alpha$-7 Helix')
+ax1.set_xlabel(r'$\delta\delta$G from WT')
+ax1.set_ylabel(r'Mean Percent $\alpha$ Helicity')
+ax1.scatter(mean_mut_alpha, dG_MBAR, label = 'AD', color = 'blue')
+plt.errorbar(mean_mut_alpha, dG_MBAR, xerr= err_mut_alpha, yerr = dG_MBAR_err, fmt='o', color='blue')
+fig.savefig('helicity_v_dG.png')
+plt.close(fig)
+
+#Plot ddG vs F
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.set_title(r'Free Energy Difference of Mutation vs Relative Inhibition') 
+ax1.set_ylabel(r'$\Delta\Delta$G from WT(kcal/mol)')
+ax1.set_xlabel('Relative Inhibition(F)')
+ax1.scatter(F_AD, dG_MBAR, label = 'AD', color = 'blue')
+plt.errorbar(F_AD, dG_MBAR, xerr= F_AD_se, yerr = dG_MBAR_err, fmt='o', color='blue')
+ax1.fill_between([-0.4, 0.15], -0.1, 0.1, color = 'gray', alpha=0.5)
+ax1.fill_between([-0.4, 0.15], -1.0, -0.1, color = 'green', alpha=0.5)
+ax1.fill_between([-0.4, 0.15], 0.1, 0.5, color = 'red', alpha=0.5)
+fig.savefig('F_v_dG.png')
+plt.close(fig)
+
+dG = [0.00, 0.437, -0.375, -0.044, 0.634, 0.056]
+dG_MBAR = [0.00, 0.381, -0.297, -0.019, 0.236, -0.026]
+dG_MBAR_err = [0.00, 0.109, 0.095, 0.074, 0.072, 0.106]
+Label_lim = ['WT', 'F196A', 'L192F', 'L195F', 'F280Y', 'V287T']
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.set_title(r'Comparison of Helicity in the $\alpha$-7 Helix')    
+ax1.set_ylabel(r'$\Delta\Delta$G from WT (kcal/mol)')
+ax1.set_xlabel('Mean Percent Helicity')
+ax1.scatter(mean_mut_struct_lim, dG_MBAR, label = 'AD', color = 'blue')
+plt.errorbar(mean_mut_struct_lim, dG_MBAR, xerr= err_mut_struct_lim, yerr = dG_MBAR_err, fmt='o', color='blue')
+# Loop for annotation of all points
+for i in range(len(Label_lim)):
+    plt.annotate(Label_lim[i], (mean_mut_struct_lim[i], dG_MBAR[i] + 0.05))
+ax1.fill_between([0, 70], -0.1, 0.1, color = 'gray', alpha=0.5)
+ax1.fill_between([0, 70], -0.5, -0.1, color = 'green', alpha=0.5)
+ax1.fill_between([0, 70], 0.1, 0.5, color = 'red', alpha=0.5)
+fig.savefig('helicity_v_dG_struct.png')
+plt.close(fig)
 
