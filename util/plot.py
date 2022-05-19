@@ -38,8 +38,8 @@ def plot_apo_lig_box(d_Apo_open, d_Apo_close, d_AD, d_BBR, inter1, inter2, p, p1
 
     ax = sns.stripplot(data = df, dodge=True, alpha=0.05, zorder=1, palette='bright')
     ax = sns.pointplot(data = df, join=False, scale=0.75, palette='dark')
-    error_bar(0, 2, mean[0], mean[2], p, 1, 'b'):
-    error_bar(0, 3, mean[0], mean[3], p1, 1, 'b'):
+    error_bar(0, 2, mean[0], mean[2], p, 1, 'b')
+    error_bar(0, 3, mean[0], mean[3], p1, 1, 'b')
     ax.set_ylim(0,ylim)
     if inter2 == 'L11':
         plt.title(r'Helical Interactions b/w $\alpha$-' + inter1 + ' and ' + inter2)
@@ -78,7 +78,7 @@ def plot_gen_box(d_1, d_2, name1, name2, p, ylim, x_name, y_name, Title_name, Fi
     ax = sns.stripplot(data = df, dodge=True, alpha=0.5, zorder=1, palette = 'bright')
     ax = sns.pointplot(data = df, join=False, scale=1.0, palette = 'dark')
     
-    error_bar(0, 1, mean[0], mean[1], p, 0.5, 'k'):
+    error_bar(0, 1, mean[0], mean[1], p, 0.5, 'k')
     if ylim != -1:
         ax.set_ylim(0, ylim)
     if x_name != '':
@@ -118,6 +118,7 @@ def write_lig_bind(lig_frac, Loc_frac, lig):
 #col = color for the error bar
 #Output: None but add error bar to plot
 def error_bar(x1, x2, y1, y2, p, h, col):
+    import matplotlib.pyplot as plt
     y = max([y1, y2])
     if p < 0.05 and p > 0.01:
         plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
