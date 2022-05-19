@@ -6,6 +6,11 @@ from itertools import product
 import seaborn as sns
 import pandas as pd
 import random
+import sys
+
+#Import custom modules
+sys.path.insert(1,'/ocean/projects/cts160011p/afriedma/code/PTP1B/util')
+import plot
 
 def plot_mean(inter, err, hel1, hel2, p, p1, p2):
     num = [5, 10, 15, 20]
@@ -17,51 +22,10 @@ def plot_mean(inter, err, hel1, hel2, p, p1, p2):
     ax1.bar(num, inter, color = ['black', 'gray', 'blue', 'red'], width=4.5)
     plt.errorbar(num, inter, yerr= err, fmt='o', color='black')
     plt.xticks(num, Method, fontsize=14)
-    if p < 0.05 and p > 0.01:
-        x1, x2 = 5, 15 #Columns for Apo and AD
-        y, h, col = (1.1*inter[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p < 0.01 and p > 0.001:
-        x1, x2 = 5, 15 #Columns for Apo and AD
-        y, h, col = (1.1*inter[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p < 0.001:
-        x1, x2 = 5, 15 #Columns for Apo and AD
-        y, h, col = (1.1*inter[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
-    if p1 < 0.05 and p1 > 0.01:
-        x1, x2 = 5, 20 #Columns for Apo and BBR
-        y, h, col = (1.1*inter[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p1 < 0.01 and p1 > 0.001:
-        x1, x2 = 5, 20 #Columns for Apo and BBR
-        y, h, col = (1.1*inter[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p1 < 0.001:
-        x1, x2 = 5, 20 #Columns for Apo and BBR
-        y, h, col = (1.1*inter[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
-    if p2 < 0.05 and p2 > 0.01:
-        x1, x2 = 5, 10 #Columns for Apo and AD
-        y, h, col = (1.1*inter[[0, 1]].max()), 1, 'k'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p2 < 0.01 and p2 > 0.001:
-        x1, x2 = 5, 10 #Columns for Apo and AD
-        y, h, col = (1.1*inter[[0, 1]].max()), 1, 'k'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p2 < 0.001:
-        x1, x2 = 5, 10 #Columns for Apo and AD
-        y, h, col = (1.1*inter[[0, 1]].max()), 1, 'k'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
+
+    plot.error_bar(5, 15, inter[0], inter[2], p, 1, 'k')
+    plot.error_bar(5, 20, inter[0], inter[3], p1, 1, 'k')
+    plot.error_bar(5, 10, inter[0], inter[1], p2, 1, 'k')
     fig.savefig(hel1 + '_' + hel2 + '_inter.png')
     plt.close(fig)
 
@@ -77,43 +41,18 @@ def plot_box(d_Apo_open, d_Apo_close, d_AD, d_BBR, inter1, inter2, p, p1, ylim):
     ax = sns.stripplot(data = df, dodge=True, alpha=0.05, zorder=1, palette='bright')
     ax = sns.pointplot(data = df, join=False, scale=0.75, palette='dark')
     
-    if p < 0.05 and p > 0.01:
-        x1, x2 = 0, 2 #Columns for Apo and AD
-        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p < 0.01 and p > 0.001:
-        x1, x2 = 0, 2 #Columns for Apo and AD
-        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p < 0.001:
-        x1, x2 = 0, 2 #Columns for Apo and AD
-        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
-    if p1 < 0.05 and p1 > 0.01:
-        x1, x2 = 0, 3 #Columns for Apo and BBR
-        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p1 < 0.01 and p1 > 0.001:
-        x1, x2 = 0, 3 #Columns for Apo and BBR
-        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p1 < 0.001:
-        x1, x2 = 0, 3 #Columns for Apo and BBR
-        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
+    plot.error_bar(0, 2, mean[0], mean[2], p, 1, 'k')
+    plot.error_bar(0, 3, mean[0], mean[3], p1, 1, 'k')
 
+    plt.ylabel('Mean # of Interactions', fontsize = 14)
+    plt.xticks(fontsize = 12)
+    plt.yticks(fontsize = 12)
     ax.set_ylim(0,ylim)
     if inter2 == 'L11':
-        plt.title(r'Helical Interactions b/w $\alpha$-' + inter1 + ' and ' + inter2)
+        plt.title(r'Helical Interactions b/w $\alpha$-' + inter1 + ' and ' + inter2, fontsize = 18)
         plt.savefig('Hel_inter_a' + inter1 + '_' + inter2 + '_box.png')
     else:
-        plt.title(r'Helical Interactions b/w $\alpha$-' + inter1 + r' and $\alpha$-' + inter2)
+        plt.title(r'Helical Interactions b/w $\alpha$-' + inter1 + r' and $\alpha$-' + inter2, fontsize = 18)
         plt.savefig('Hel_inter_a' + inter1 + '_a' + inter2 + '_box.png')
     plt.close()
 
@@ -269,16 +208,30 @@ output4.write('AD:' + str(dL11_a7[2]) + '+/-' + str(dL11_a7_err[2]) + '\n')
 output4.write('BBR:' + str(dL11_a7[3]) + '+/-' + str(dL11_a7_err[3]) + '\n')
 
 #Compute percentage difference from mean number of interactions for all three helices relative to the Apo closed State
+output = open('Per_diff_open.txt', 'w')
 label = ['Apo Open', 'AD', 'BBR']
+label_open = ['Apo Closed', 'AD', 'BBR']
 helices = ['a3 and a6', 'a3 and a7', 'a6 and a7', 'L-11 and a7']
 per_diff_all = np.zeros((len(helices), len(label)))
 index = [0, 2, 3]
+index_open = [1, 2, 3]
 for i in range(len(index)):
     n = index[i]
     per_diff_all[0][i] = ((da3_a6[n] - da3_a6[1]) / ((da3_a6[n] + da3_a6[1])/2)) * 100
     per_diff_all[1][i] = ((da3_a7[n] - da3_a7[1]) / ((da3_a7[n] + da3_a7[1])/2)) * 100
     per_diff_all[2][i] = ((da6_a7[n] - da6_a7[1]) / ((da6_a7[n] + da6_a7[1])/2)) * 100
     per_diff_all[3][i] = ((dL11_a7[n] - dL11_a7[1]) / ((dL11_a7[n] + dL11_a7[1])/2)) * 100
+    m = index_open[i]
+    output.write(label_open[i] + '\n')
+    per_diff_open = ((da3_a6[m] - da3_a6[0]) / ((da3_a6[m] + da3_a6[0])/2)) * 100
+    output.write('a3 and a6: ' + str(per_diff_open) + '\n')
+    per_diff_open = ((da3_a7[m] - da3_a7[0]) / ((da3_a7[m] + da3_a7[0])/2)) * 100
+    output.write('a3 and a7: ' + str(per_diff_open) + '\n')
+    per_diff_open = ((da6_a7[m] - da6_a7[0]) / ((da6_a7[m] + da6_a7[0])/2)) * 100
+    output.write('a6 and a7: ' + str(per_diff_open) + '\n')
+    per_diff_open = ((dL11_a7[m] - dL11_a7[0]) / ((dL11_a7[m] + dL11_a7[0])/2)) * 100
+    output.write('a7 and L11: ' + str(per_diff_open) + '\n')
+print(per_diff_all)
 
 #Make heatmap to show the changes in helical interactions relative to the Apo Closed State
 ax = plt.figure(figsize=(8, 10), frameon=True) # no visible frame
@@ -287,4 +240,5 @@ ax = sns.heatmap(per_diff_all, annot=False, cmap = 'PuBu_r', cbar = True, vmin =
 plt.title('Helical Interactions Compared to Apo Closed WPD Loop')
 plt.savefig('Hel_inter_cmpr.png')
 plt.close()
+
 
