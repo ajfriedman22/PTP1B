@@ -192,7 +192,7 @@ for i in list_a7:
         uncomm.append(i)
         File_atom_uncomm.write(list_atom_a7[num])
         atoms = list_atom_a7[num].split()
-        File_atom_uncomm_1sug.write(str(float(atoms[0])-17) + ' ' + str(float(atoms[1])-17) + ' ' + str(float(atoms[2])-17) + '\n')
+        File_atom_uncomm_1sug.write(str(float(atoms[0])-17) + ' ' + str(float(atoms[1])-17) + ' ' + str(float(atoms[2])-17) + '\n') #Change atom index for when the first residues is missing
         output_uncomm.write(i)
     num += 1
 num = 0
