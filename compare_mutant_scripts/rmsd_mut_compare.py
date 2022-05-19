@@ -7,7 +7,7 @@ import ruptures as rpt
 from statistics import stdev
 import pandas as pd
 
-def load_rmsf(path, sect, ref):
+def load_rms(path, sect, ref):
     raw_string = open('../../' + path + '/rmsd_' + sect + '_ref_' + ref + '.txt').readlines()
     #Convert data to fload
     raw = np.zeros(len(raw_string))
@@ -45,7 +45,30 @@ def plot_kernel_cmpr_lig(apo_df, AD_df, BBR_df, mut, sect, n):
     plt.savefig('mutate_RMSD_' + sect + '_' + mut + '.png')
     plt.close()
 
+def rmsd_sect(sect, file_path_close, file_path_close_AD, file_path_close_BBR, ref, n):
+    rmsd_1sug = load_rms(file_path_close[0], sect, ref[n])
+    rmsd_apo = load_rms(file_path_close[1], sect, ref[n])
+    rmsd_L192F = load_rms(file_path_close[2], sect, ref[n])
+    rmsd_E276F = load_rms(file_path_close[3], sect, ref[n])
+    rmsd_F280Y = load_rms(file_path_close[4], sect, ref[n])
+    rmsd_L195F = load_rms(file_path_close[5], sect, ref[n])
+    rmsd_F196A = load_rms(file_path_close[6], sect, ref[n])
+    rmsd_V287T = load_rms(file_path_close[7], sect, ref[n])
 
+    rmsd_L192F_AD = load_rms(file_path_close_AD[0], sect, ref[n])
+    rmsd_L192F_BBR = load_rms(file_path_close_BBR[0], sect, ref[n])
+    rmsd_E276F_AD = load_rms(file_path_close_AD[1], sect, ref[n])
+    rmsd_E276F_BBR = load_rms(file_path_close_BBR[1], sect, ref[n])
+    rmsd_F280Y_AD = load_rms(file_path_close_AD[2], sect, ref[n])
+    rmsd_F280Y_BBR = load_rms(file_path_close_BBR[2], sect, ref[n])
+    rmsd_L195F_AD = load_rms(file_path_close_AD[3], sect, ref[n])
+    rmsd_L195F_BBR = load_rms(file_path_close_BBR[3], sect, ref[n])
+    rmsd_F196A_AD = load_rms(file_path_close_AD[4], sect, ref[n])
+    rmsd_F196A_BBR = load_rms(file_path_close_BBR[4], sect, ref[n])
+    rmsd_V287T_AD = load_rms(file_path_close_AD[4], sect, ref[n])
+    rmsd_V287T_BBR = load_rms(file_path_close_BBR[4], sect, ref[n])
+    
+    return rmsd_1sug, rmsd_apo, rmsd_L192F, rmsd_E276F, rmsd_F280Y, rmsd_L195F, rmsd_F196A, rmsd_V287T, rmsd_L192F_AD, rmsd_E276F_AD, rmsd_F280Y_AD, rmsd_L195F_AD, rmsd_F196A_AD, rmsd_V287T_AD, rmsd_L192F_BBR, rmsd_E276F_BBR, rmsd_F280Y_BBR, rmsd_L195F_BBR, rmsd_F196A_BBR, rmsd_V287T_BBR
 
 #File paths for all input files
 file_path = ['../Apo_dis/analysis', 'L192F/Apo/analysis', 'E276F/Apo/analysis', 'F280Y/Apo/analysis', 'L195F/Apo/analysis', 'F196A/Apo/analysis', 'V287T/Apo/analysis'] #Indices to rank in order of closest activity to WT to Furthest
@@ -68,166 +91,45 @@ RMSD_mean_close_BBR = np.zeros((len(file_path_close_BBR), len(sections))) #Mean 
 RMSD_err_close_BBR = np.zeros((len(file_path_close_BBR), len(sections))) #SEM for reference closed
 
 #Save all rmsd values for a3_top, a4_top, and a6 helix
+rmsd_a3_1sug, rmsd_a3_apo, rmsd_a3_L192F, rmsd_a3_E276F, rmsd_a3_F280Y, rmsd_a3_L195F, rmsd_a3_F196A, rmsd_a3_V287T, rmsd_a3_L192F_AD, rmsd_a3_E276F_AD, rmsd_a3_F280Y_AD, rmsd_a3_L195F_AD, rmsd_a3_F196A_AD, rmsd_a3_V287T_AD, rmsd_a3_L192F_BBR, rmsd_a3_E276F_BBR, rmsd_a3_F280Y_BBR, rmsd_a3_L195F_BBR, rmsd_a3_F196A_BBR, rmsd_a3_V287T_BBR = rmsd_sect('a3', file_path_close, file_path_close_AD, file_path_close_BBR, ref, 1)
+
+rmsd_a3_top_1sug, rmsd_a3_top_apo, rmsd_a3_top_L192F, rmsd_a3_top_E276F, rmsd_a3_top_F280Y, rmsd_a3_top_L195F, rmsd_a3_top_F196A, rmsd_a3_top_V287T, rmsd_a3_top_L192F_AD, rmsd_a3_top_E276F_AD, rmsd_a3_top_F280Y_AD, rmsd_a3_top_L195F_AD, rmsd_a3_top_F196A_AD, rmsd_a3_top_V287T_AD, rmsd_a3_top_L192F_BBR, rmsd_a3_top_E276F_BBR, rmsd_a3_top_F280Y_BBR, rmsd_a3_top_L195F_BBR, rmsd_a3_top_F196A_BBR, rmsd_a3_top_V287T_BBR = rmsd_sect('a3_top', file_path_close, file_path_close_AD, file_path_close_BBR, ref, 1)
+
+rmsd_a4_1sug, rmsd_a4_apo, rmsd_a4_L192F, rmsd_a4_E276F, rmsd_a4_F280Y, rmsd_a4_L195F, rmsd_a4_F196A, rmsd_a4_V287T, rmsd_a4_L192F_AD, rmsd_a4_E276F_AD, rmsd_a4_F280Y_AD, rmsd_a4_L195F_AD, rmsd_a4_F196A_AD, rmsd_a4_V287T_AD, rmsd_a4_L192F_BBR, rmsd_a4_E276F_BBR, rmsd_a4_F280Y_BBR, rmsd_a4_L195F_BBR, rmsd_a4_F196A_BBR, rmsd_a4_V287T_BBR = rmsd_sect('a4', file_path_close, file_path_close_AD, file_path_close_BBR, ref, 1)
+
+rmsd_a6_1sug, rmsd_a6_apo, rmsd_a6_L192F, rmsd_a6_E276F, rmsd_a6_F280Y, rmsd_a6_L195F, rmsd_a6_F196A, rmsd_a6_V287T, rmsd_a6_L192F_AD, rmsd_a6_E276F_AD, rmsd_a6_F280Y_AD, rmsd_a6_L195F_AD, rmsd_a6_F196A_AD, rmsd_a6_V287T_AD, rmsd_a6_L192F_BBR, rmsd_a6_E276F_BBR, rmsd_a6_F280Y_BBR, rmsd_a6_L195F_BBR, rmsd_a6_F196A_BBR, rmsd_a6_V287T_BBR = rmsd_sect('a6', file_path_close, file_path_close_AD, file_path_close_BBR, ref, 1)
+
+rmsd_a6_bot_1sug, rmsd_a6_bot_apo, rmsd_a6_bot_L192F, rmsd_a6_bot_E276F, rmsd_a6_bot_F280Y, rmsd_a6_bot_L195F, rmsd_a6_bot_F196A, rmsd_a6_bot_V287T, rmsd_a6_bot_L192F_AD, rmsd_a6_bot_E276F_AD, rmsd_a6_bot_F280Y_AD, rmsd_a6_bot_L195F_AD, rmsd_a6_bot_F196A_AD, rmsd_a6_bot_V287T_AD, rmsd_a6_bot_L192F_BBR, rmsd_a6_bot_E276F_BBR, rmsd_a6_bot_F280Y_BBR, rmsd_a6_bot_L195F_BBR, rmsd_a6_bot_F196A_BBR, rmsd_a6_bot_V287T_BBR = rmsd_sect('a6_bot', file_path_close, file_path_close_AD, file_path_close_BBR, ref, 1)
+
+rmsd_CYS_1sug, rmsd_CYS_apo, rmsd_CYS_L192F, rmsd_CYS_E276F, rmsd_CYS_F280Y, rmsd_CYS_L195F, rmsd_CYS_F196A, rmsd_CYS_V287T, rmsd_CYS_L192F_AD, rmsd_CYS_E276F_AD, rmsd_CYS_F280Y_AD, rmsd_CYS_L195F_AD, rmsd_CYS_F196A_AD, rmsd_CYS_V287T_AD, rmsd_CYS_L192F_BBR, rmsd_CYS_E276F_BBR, rmsd_CYS_F280Y_BBR, rmsd_CYS_L195F_BBR, rmsd_CYS_F196A_BBR, rmsd_CYS_V287T_BBR = rmsd_sect('CYS', file_path_close, file_path_close_AD, file_path_close_BBR, ref, 1)
+
+rmsd_beg_1sug, rmsd_beg_apo, rmsd_beg_L192F, rmsd_beg_E276F, rmsd_beg_F280Y, rmsd_beg_L195F, rmsd_beg_F196A, rmsd_beg_V287T, rmsd_beg_L192F_AD, rmsd_beg_E276F_AD, rmsd_beg_F280Y_AD, rmsd_beg_L195F_AD, rmsd_beg_F196A_AD, rmsd_beg_V287T_AD, rmsd_beg_L192F_BBR, rmsd_beg_E276F_BBR, rmsd_beg_F280Y_BBR, rmsd_beg_L195F_BBR, rmsd_beg_F196A_BBR, rmsd_beg_V287T_BBR = rmsd_sect('beg', file_path_close, file_path_close_AD, file_path_close_BBR, ref, 1)
 
 for i in range(len(file_path_close)):
     for j in range(len(sections)):
-        if i < len(file_path):
-            #Load Data for reference open
-            rmsd = load_rmsf(file_path[i], sections[j], ref[0])
-            #Mean and SEM for each trajectory
-            RMSD_mean[i][j] = np.mean(rmsd)
-            RMSD_err[i][j] = stats.sem(rmsd)
-
         #Load Data for reference open
-        rmsd_Apo = load_rmsf(file_path_close[i], sections[j], ref[1])
-        rmsd_Apo_rapo = load_rmsf(file_path_close[i], sections[j], ref[3])
+        rmsd_Apo = load_rms(file_path_close[i], sections[j], ref[1])
 
         #Mean and SEM for each trajectory
-        RMSD_mean_close[i][j] = np.mean(rmsd)
-        RMSD_err_close[i][j] = stats.sem(rmsd)
-        if i < len(file_path_close_AD):#Mean and RMSD for AD and BBR bound mutants
-            #Load Data for reference open
-            rmsd_AD_rapo = load_rmsf(file_path_close_AD[i], sections[j], ref[3])
-            rmsd_AD = load_rmsf(file_path_close_AD[i], sections[j], ref[1])
-            RMSD_mean_close_AD[i][j] = np.mean(rmsd_AD)
-            RMSD_err_close_AD[i][j] = stats.sem(rmsd_AD)
+        RMSD_mean_close[i][j] = np.mean(rmsd_Apo)
+        RMSD_err_close[i][j] = stats.sem(rmsd_Apo)
 
-            rmsd_BBR_rapo = load_rmsf(file_path_close_BBR[i], sections[j], ref[3])
-            rmsd_BBR = load_rmsf(file_path_close_BBR[i], sections[j], ref[1])
-            RMSD_mean_close_BBR[i][j] = np.mean(rmsd_BBR)
-            RMSD_err_close_BBR[i][j] = stats.sem(rmsd_BBR)
+for i in range(len(file_path)):
+    #Load Data for reference open
+    rmsd = load_rms(file_path[i], sections[j], ref[0])
+    #Mean and SEM for each trajectory
+    RMSD_mean[i][j] = np.mean(rmsd)
+    RMSD_err[i][j] = stats.sem(rmsd)
 
-        if sections[j] == 'a3_top':
-            if i == 0:
-                rmsd_a3_top_1sug = rmsd_Apo
-                rmsd_a3_top_L192F_AD = rmsd_AD
-                rmsd_a3_top_L192F_BBR = rmsd_BBR
-            if i == 1:
-                rmsd_a3_top_apo = rmsd_Apo
-                rmsd_a3_top_E276F_AD = rmsd_AD
-                rmsd_a3_top_E276F_BBR = rmsd_BBR
-            if i == 2:
-                rmsd_a3_top_L192F = rmsd_Apo
-                rmsd_a3_top_F280Y_AD = rmsd_AD
-                rmsd_a3_top_F280Y_BBR = rmsd_BBR
-            if i == 3:
-                rmsd_a3_top_E276F = rmsd_Apo
-                rmsd_a3_top_L195F_AD = rmsd_AD
-                rmsd_a3_top_L195F_BBR = rmsd_BBR
-            if i == 4:
-                rmsd_a3_top_F280Y = rmsd_Apo
-                rmsd_a3_top_F196A_AD = rmsd_AD
-                rmsd_a3_top_F196A_BBR = rmsd_BBR
-            if i == 5:
-                rmsd_a3_top_L195F = rmsd_Apo
-                rmsd_a3_top_V287T_AD = rmsd_AD
-                rmsd_a3_top_V287T_BBR = rmsd_BBR
-            if i == 6:
-                rmsd_a3_top_F196A = rmsd_Apo
-            if i == 7:
-                rmsd_a3_top_V287T = rmsd_Apo
+for i in range(len(file_path_close_AD)):
+    #Load Data for reference open
+    rmsd_AD = load_rms(file_path_close_AD[i], sections[j], ref[1])
+    RMSD_mean_close_AD[i][j] = np.mean(rmsd_AD)
+    RMSD_err_close_AD[i][j] = stats.sem(rmsd_AD)
 
-        if sections[j] == 'a4':
-            if i == 0:
-                rmsd_a4_1sug = rmsd_Apo
-                rmsd_a4_1sug_rapo = rmsd_Apo_rapo
-                rmsd_a4_L192F_AD = rmsd_AD
-                rmsd_a4_L192F_BBR = rmsd_BBR
-            if i == 1:
-                rmsd_a4_apo = rmsd_Apo
-                rmsd_a4_apo_rapo = rmsd_Apo_rapo
-                rmsd_a4_E276F_AD = rmsd_AD
-                rmsd_a4_E276F_BBR = rmsd_BBR
-            if i == 2:
-                rmsd_a4_L192F = rmsd_Apo
-                rmsd_a4_F280Y_AD = rmsd_AD
-                rmsd_a4_F280Y_BBR = rmsd_BBR
-            if i == 3:
-                rmsd_a4_E276F = rmsd_Apo
-                rmsd_a4_L195F_AD = rmsd_AD
-                rmsd_a4_L195F_BBR = rmsd_BBR
-            if i == 4:
-                rmsd_a4_F280Y = rmsd_Apo
-                rmsd_a4_F196A_AD = rmsd_AD
-                rmsd_a4_F196A_BBR = rmsd_BBR
-                rmsd_a4_F196A_AD_rapo = rmsd_AD_rapo
-                rmsd_a4_F196A_BBR_rapo = rmsd_BBR_rapo
-
-            if i == 5:
-                rmsd_a4_L195F = rmsd_Apo
-                rmsd_a4_V287T_AD = rmsd_AD
-                rmsd_a4_V287T_BBR = rmsd_BBR
-            if i == 6:
-                rmsd_a4_F196A = rmsd_Apo
-                rmsd_a4_F196A_rapo = rmsd_Apo_rapo
-            if i == 7:
-                rmsd_a4_V287T = rmsd_Apo
-
-        if sections[j] == 'a6_bot':
-            if i == 0:
-                rmsd_a6_bot_1sug = rmsd
-            if i == 1:
-                rmsd_a6_bot_apo = rmsd
-            if i == 2:
-                rmsd_a6_bot_L192F = rmsd
-            if i == 3:
-                rmsd_a6_bot_E276F = rmsd
-            if i == 4:
-                rmsd_a6_bot_F280Y = rmsd
-            if i == 5:
-                rmsd_a6_bot_L195F = rmsd
-            if i == 6:
-                rmsd_a6_bot_F196A = rmsd
-            if i == 7:
-                rmsd_a6_bot_V287T = rmsd
-
-        if sections[j] == 'a6':
-            if i == 0:
-                rmsd_a6_1sug = rmsd
-                rmsd_a6_L192F_AD = rmsd_AD
-                rmsd_a6_L192F_BBR = rmsd_BBR
-            if i == 1:
-                rmsd_a6_apo = rmsd
-                rmsd_a6_E276F_AD = rmsd_AD
-                rmsd_a6_E276F_BBR = rmsd_BBR
-            if i == 2:
-                rmsd_a6_L192F = rmsd
-                rmsd_a6_F280Y_AD = rmsd_AD
-                rmsd_a6_F280Y_BBR = rmsd_BBR
-            if i == 3:
-                rmsd_a6_E276F = rmsd
-                rmsd_a6_L195F_AD = rmsd_AD
-                rmsd_a6_L195F_BBR = rmsd_BBR
-            if i == 4:
-                rmsd_a6_F280Y = rmsd
-                rmsd_a6_F196A_AD = rmsd_AD
-                rmsd_a6_F196A_BBR = rmsd_BBR
-            if i == 5:
-                rmsd_a6_L195F = rmsd
-                rmsd_a6_V287T_AD = rmsd_AD
-                rmsd_a6_V287T_BBR = rmsd_BBR
-            if i == 6:
-                rmsd_a6_F196A = rmsd
-            if i == 7:
-                rmsd_a6_V287T = rmsd
-
-        if sections[j] == 'CYS':
-            if i == 0:
-                rmsd_cys_1sug = rmsd
-            if i == 1:
-                rmsd_cys_apo = rmsd
-            if i == 2:
-                rmsd_cys_L192F = rmsd
-            if i == 3:
-                rmsd_cys_E276F = rmsd
-            if i == 4:
-                rmsd_cys_F280Y = rmsd
-            if i == 5:
-                rmsd_cys_L195F = rmsd
-            if i == 6:
-                rmsd_cys_F196A = rmsd
-            if i == 7:
-                rmsd_cys_V287T = rmsd
+    rmsd_BBR = load_rms(file_path_close_BBR[i], sections[j], ref[1])
+    RMSD_mean_close_BBR[i][j] = np.mean(rmsd_BBR)
+    RMSD_err_close_BBR[i][j] = stats.sem(rmsd_BBR)
 
 #Name Labels
 Label = ['WT', 'L192F', 'E276F', 'F280Y', 'L195F', 'F196A', 'V287T']
@@ -256,19 +158,20 @@ plt.title('Section RMSD Compared to WT')
 plt.savefig('mutate_RMSD_Apo.png')
 plt.close()
 
-RMSD_mean_mut = np.zeros((len(Labels_mut), len(sections))) #Mean for reference open
-RMSD_err_mut = np.zeros((len(Labels_mut), len(sections))) #SEM for reference open
+RMSD_mean_mut = np.zeros((len(Label_close), len(sections))) #Mean for reference open
+RMSD_err_mut = np.zeros((len(Label_close), len(sections))) #SEM for reference open
 
 #Plot self and two references
-for i in range(2, 5):
+for i in [0, 2, 3, 4]:
     for j in range(len(sections)):
         #Load Data
-        for k in range(len(Labels_mut)):
-            n = k + 1
-            rmsd = load_rmsf(file_path[n], sections[j], ref[i])
+        RMSD_mean_mut[0][j] = RMSD_mean_close[0][j]
+        RMSD_err_mut[0][j] = RMSD_err_close[0][j]
+        for k in range(1, len(Label_close)):
+            rmsd = load_rms(file_path_close[k], sections[j], ref[i])
             RMSD_mean_mut[k][j] = np.mean(rmsd)
             RMSD_err_mut[k][j] = stats.sem(rmsd)
-        plot_compare(RMSD_mean_mut, RMSD_err_mut, Labels_mut, sections, j, ref[i])
+        plot_compare(RMSD_mean_mut, RMSD_err_mut, Label_close, sections, j, ref[i])
 
 #Plot Kernel DEnsity Estimate Plot
 #Compare a3_top for L192F, E276F, L195F, V287T
@@ -295,34 +198,37 @@ a3_top_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a3_top_V287T_BBR})
 
 df = pd.concat([a3_top_Apo_open_df, a3_top_Apo_close_df, a3_top_L192F_df, a3_top_E276F_df, a3_top_V287T_df, a3_top_F196A_df, a3_top_F280Y_df, a3_top_L195F_df])
 
-ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)')
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
 plt.xlim(0, 2)
-plt.ylabel(r'Normalized Density')
-plt.title('Top of the a3 RMSD Compared to WT Closed')
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'Top of the $\alpha$3 RMSD Compared to WT Closed', fontsize = 14)
 plt.savefig('mutate_RMSD_a3_top_all.png')
 plt.close()
 
 df = pd.concat([a3_top_L192F_df, a3_top_E276F_df, a3_top_V287T_df, a3_top_F196A_df, a3_top_F280Y_df, a3_top_L195F_df])
 
 sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.axvline(x = RMSD_mean_close[0,7], color = 'r')
-plt.axvline(x = RMSD_mean_close[1,7], color = 'b')
-plt.xlabel(r'RMSD($\AA$)')
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
 plt.xlim(0, 2)
-plt.ylabel(r'Normalized Density')
-plt.title('Top of the a3 RMSD Compared to WT Closed')
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'Top of the $\alpha$3 RMSD Compared to WT Closed', fontsize = 14)
 plt.savefig('mutate_RMSD_a3_top_mut_all.png')
 plt.close()
 
 df = pd.concat([a3_top_Apo_open_df, a3_top_Apo_close_df, a3_top_V287T_df, a3_top_F280Y_df])
 
 sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)')
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
 plt.xlim(0, 2)
-plt.ylabel(r'Normalized Density')
-plt.title('Top of the a3 RMSD Compared to WT Closed')
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'Top of the $\alpha$3 RMSD Compared to WT Closed', fontsize = 14)
 plt.savefig('mutate_RMSD_a3_top_mut_extr.png')
 plt.close()
 
@@ -330,6 +236,66 @@ plot_kernel_cmpr_lig(a3_top_L192F_df, a3_top_L192F_AD_df, a3_top_L192F_BBR_df, '
 plot_kernel_cmpr_lig(a3_top_L195F_df, a3_top_L195F_AD_df, a3_top_L195F_BBR_df, 'L195F', sections[7], 7)
 plot_kernel_cmpr_lig(a3_top_E276F_df, a3_top_E276F_AD_df, a3_top_E276F_BBR_df, 'E276F', sections[7], 7)
 plot_kernel_cmpr_lig(a3_top_V287T_df, a3_top_V287T_AD_df, a3_top_V287T_BBR_df, 'V287T', sections[7], 7)
+
+#Compare a3_top for L192F, E276F, L195F, V287T
+a3_Apo_open_df = pd.DataFrame({'Apo Open':rmsd_a3_apo})
+a3_Apo_close_df = pd.DataFrame({'Apo Closed': rmsd_a3_1sug})
+a3_L192F_df = pd.DataFrame({'L192F': rmsd_a3_L192F})
+a3_L195F_df = pd.DataFrame({'L195F': rmsd_a3_L195F})
+a3_F280Y_df = pd.DataFrame({'F280Y': rmsd_a3_F280Y})
+a3_E276F_df = pd.DataFrame({'E276F': rmsd_a3_E276F})
+a3_F196A_df = pd.DataFrame({'F196A': rmsd_a3_F196A})
+a3_V287T_df = pd.DataFrame({'V287T': rmsd_a3_V287T})
+a3_L192F_AD_df = pd.DataFrame({'L192F AD': rmsd_a3_L192F_AD})
+a3_L195F_AD_df = pd.DataFrame({'L195F AD': rmsd_a3_L195F_AD})
+a3_F280Y_AD_df = pd.DataFrame({'F280Y AD': rmsd_a3_F280Y_AD})
+a3_E276F_AD_df = pd.DataFrame({'E276F AD': rmsd_a3_E276F_AD})
+a3_F196A_AD_df = pd.DataFrame({'F196A AD': rmsd_a3_F196A_AD})
+a3_V287T_AD_df = pd.DataFrame({'V287T AD': rmsd_a3_V287T_AD})
+a3_L192F_BBR_df = pd.DataFrame({'L192F BBR': rmsd_a3_L192F_BBR})
+a3_L195F_BBR_df = pd.DataFrame({'L195F BBR': rmsd_a3_L195F_BBR})
+a3_F280Y_BBR_df = pd.DataFrame({'F280Y BBR': rmsd_a3_F280Y_BBR})
+a3_E276F_BBR_df = pd.DataFrame({'E276F BBR': rmsd_a3_E276F_BBR})
+a3_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a3_F196A_BBR})
+a3_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a3_V287T_BBR})
+
+df = pd.concat([a3_Apo_open_df, a3_Apo_close_df, a3_L192F_df, a3_E276F_df, a3_V287T_df, a3_F196A_df, a3_F280Y_df, a3_L195F_df])
+
+ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)')
+plt.xlim(0, 2)
+plt.ylabel(r'Normalized Density')
+plt.title(r'$\alpha$-3 RMSD Compared to WT Closed')
+plt.savefig('mutate_RMSD_a3_all.png')
+plt.close()
+
+df = pd.concat([a3_L192F_df, a3_E276F_df, a3_V287T_df, a3_F196A_df, a3_F280Y_df, a3_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xlim(0, 2)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'$\alpha$-3 RMSD Compared to WT Closed', fontsize = 14)
+plt.savefig('mutate_RMSD_a3_mut_all.png')
+plt.close()
+
+df = pd.concat([a3_Apo_open_df, a3_Apo_close_df, a3_V287T_df, a3_F280Y_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)')
+plt.xlim(0, 2)
+plt.ylabel(r'Normalized Density')
+plt.title(r'$\alpha$-3 RMSD Compared to WT Closed')
+plt.savefig('mutate_RMSD_a3_mut_extr.png')
+plt.close()
+
+plot_kernel_cmpr_lig(a3_L192F_df, a3_L192F_AD_df, a3_L192F_BBR_df, 'L192F', sections[6], 6)
+plot_kernel_cmpr_lig(a3_L195F_df, a3_L195F_AD_df, a3_L195F_BBR_df, 'L195F', sections[6], 6)
+plot_kernel_cmpr_lig(a3_E276F_df, a3_E276F_AD_df, a3_E276F_BBR_df, 'E276F', sections[6], 6)
+plot_kernel_cmpr_lig(a3_V287T_df, a3_V287T_AD_df, a3_V287T_BBR_df, 'V287T', sections[6], 6)
 
 #Compare a4 for L192F, E276F, L195F, V287T
 a4_Apo_open_df = pd.DataFrame({'Apo Open':rmsd_a4_apo})
@@ -355,13 +321,26 @@ a4_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a4_V287T_BBR})
 
 df = pd.concat([a4_Apo_open_df, a4_Apo_close_df, a4_L192F_df, a4_E276F_df, a4_V287T_df, a4_F196A_df, a4_F280Y_df, a4_L195F_df])
 
-ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
 sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)')
-plt.xlim(0, 2)
-plt.ylabel(r'Normalized Density')
-plt.title(r'$\alpha$-4 RMSD Compared to WT Closed')
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.xlim(0, 1.5)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'$\alpha$-4 RMSD Compared to WT Closed', fontsize = 14)
 plt.savefig('mutate_RMSD_a4_all.png')
+plt.close()
+
+df = pd.concat([a4_L192F_df, a4_E276F_df, a4_V287T_df, a4_F196A_df, a4_F280Y_df, a4_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.xlim(0, 1.5)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'$\alpha$-4 RMSD Compared to WT Closed', fontsize = 14)
+plt.savefig('mutate_RMSD_a4_mut_all.png')
 plt.close()
 
 df = pd.concat([a4_Apo_open_df, a4_Apo_close_df, a4_V287T_df, a4_F196A_df, a4_F280Y_df])
@@ -369,7 +348,7 @@ df = pd.concat([a4_Apo_open_df, a4_Apo_close_df, a4_V287T_df, a4_F196A_df, a4_F2
 ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
 sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
 plt.xlabel(r'RMSD($\AA$)')
-plt.xlim(0, 2)
+plt.xlim(0, 1.5)
 plt.ylabel(r'Normalized Density')
 plt.title(r'$\alpha$-4 RMSD Compared to WT Closed')
 plt.savefig('mutate_RMSD_a4.png')
@@ -378,46 +357,164 @@ plt.close()
 plot_kernel_cmpr_lig(a4_F196A_df, a4_F196A_AD_df, a4_F196A_BBR_df, 'F196A', sections[8], 8)
 plot_kernel_cmpr_lig(a4_F280Y_df, a4_F280Y_AD_df, a4_F280Y_BBR_df, 'F280Y', sections[8], 8)
 
-a4_Apo_open_df = pd.DataFrame({'Apo Open':rmsd_a4_apo_rapo})
-a4_Apo_close_df = pd.DataFrame({'Apo Closed': rmsd_a4_1sug_rapo})
-a4_F196A_df = pd.DataFrame({'F196A': rmsd_a4_F196A_rapo})
-a4_F196A_AD_df = pd.DataFrame({'F196A AD': rmsd_a4_F196A_AD_rapo})
-a4_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a4_F196A_BBR_rapo})
+#a4_Apo_open_df = pd.DataFrame({'Apo Open':rmsd_a4_apo_rapo})
+#a4_Apo_close_df = pd.DataFrame({'Apo Closed': rmsd_a4_1sug_rapo})
+#a4_F196A_df = pd.DataFrame({'F196A': rmsd_a4_F196A_rapo})
+#a4_F196A_AD_df = pd.DataFrame({'F196A AD': rmsd_a4_F196A_AD_rapo})
+#a4_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a4_F196A_BBR_rapo})
 
-df = pd.concat([a4_Apo_open_df, a4_Apo_close_df, a4_F196A_df, a4_F196A_AD_df, a4_F196A_BBR_df])
+#df = pd.concat([a4_Apo_open_df, a4_Apo_close_df, a4_F196A_df, a4_F196A_AD_df, a4_F196A_BBR_df])
 
-ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)')
-plt.ylabel(r'Normalized Density')
-plt.title(r'$\alpha$-4 RMSD Compared to Apo F196A')
-plt.savefig('mutate_RMSD_a4_ref_F196A.png')
+#ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
+#sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
+#plt.xlabel(r'RMSD($\AA$)')
+#plt.ylabel(r'Normalized Density')
+#plt.title(r'$\alpha$-4 RMSD Compared to Apo F196A')
+#plt.savefig('mutate_RMSD_a4_ref_F196A.png')
+#plt.close()
+
+#a6 comparison
+a6_Apo_open_df = pd.DataFrame({'Apo Open':rmsd_a6_apo})
+a6_Apo_close_df = pd.DataFrame({'Apo Closed': rmsd_a6_1sug})
+a6_L192F_df = pd.DataFrame({'L192F': rmsd_a6_L192F})
+a6_L195F_df = pd.DataFrame({'L195F': rmsd_a6_L195F})
+a6_F280Y_df = pd.DataFrame({'F280Y': rmsd_a6_F280Y})
+a6_E276F_df = pd.DataFrame({'E276F': rmsd_a6_E276F})
+a6_F196A_df = pd.DataFrame({'F196A': rmsd_a6_F196A})
+a6_V287T_df = pd.DataFrame({'V287T': rmsd_a6_V287T})
+a6_L192F_AD_df = pd.DataFrame({'L192F AD': rmsd_a6_L192F_AD})
+a6_L195F_AD_df = pd.DataFrame({'L195F AD': rmsd_a6_L195F_AD})
+a6_F280Y_AD_df = pd.DataFrame({'F280Y AD': rmsd_a6_F280Y_AD})
+a6_E276F_AD_df = pd.DataFrame({'E276F AD': rmsd_a6_E276F_AD})
+a6_F196A_AD_df = pd.DataFrame({'F196A AD': rmsd_a6_F196A_AD})
+a6_V287T_AD_df = pd.DataFrame({'V287T AD': rmsd_a6_V287T_AD})
+a6_L192F_BBR_df = pd.DataFrame({'L192F BBR': rmsd_a6_L192F_BBR})
+a6_L195F_BBR_df = pd.DataFrame({'L195F BBR': rmsd_a6_L195F_BBR})
+a6_F280Y_BBR_df = pd.DataFrame({'F280Y BBR': rmsd_a6_F280Y_BBR})
+a6_E276F_BBR_df = pd.DataFrame({'E276F BBR': rmsd_a6_E276F_BBR})
+a6_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a6_F196A_BBR})
+a6_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a6_V287T_BBR})
+
+df = pd.concat([a6_Apo_open_df, a6_Apo_close_df, a6_L192F_df, a6_E276F_df, a6_V287T_df, a6_F196A_df, a6_F280Y_df, a6_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xlim(0, 2)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'$\alpha$-6 RMSD Compared to WT Closed', fontsize = 14)
+plt.savefig('mutate_RMSD_a6_all.png')
 plt.close()
 
+df = pd.concat([a6_L192F_df, a6_E276F_df, a6_V287T_df, a6_F196A_df, a6_F280Y_df, a6_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xlim(0, 2)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'$\alpha$-6 RMSD Compared to WT Closed', fontsize = 14)
+plt.savefig('mutate_RMSD_a6_mut_all.png')
+plt.close()
+
+plot_kernel_cmpr_lig(a6_L192F_df, a6_L192F_AD_df, a6_L192F_BBR_df, 'L192F', sections[11], 11)
+plot_kernel_cmpr_lig(a6_L195F_df, a6_L195F_AD_df, a6_L195F_BBR_df, 'L195F', sections[11], 11)
+plot_kernel_cmpr_lig(a6_E276F_df, a6_E276F_AD_df, a6_E276F_BBR_df, 'E276F', sections[11], 11)
+plot_kernel_cmpr_lig(a6_V287T_df, a6_V287T_AD_df, a6_V287T_BBR_df, 'V287T', sections[11], 11)
+
 #Just CYS215
-rmsd_cys = [rmsd_cys_1sug, rmsd_cys_apo, rmsd_cys_L192F, rmsd_cys_E276F, rmsd_cys_V287T, rmsd_cys_F196A, rmsd_cys_F280Y, rmsd_cys_L195F]
-ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-sns.kdeplot(data = rmsd_cys, fill=True, alpha=0.5)
-plt.title('CYS215 RMSD Compared to WT Closed')
+cys_Apo_open_df = pd.DataFrame({'Apo Open':rmsd_CYS_apo})
+cys_Apo_close_df = pd.DataFrame({'Apo Closed': rmsd_CYS_1sug})
+cys_L192F_df = pd.DataFrame({'L192F': rmsd_CYS_L192F})
+cys_L195F_df = pd.DataFrame({'L195F': rmsd_CYS_L195F})
+cys_F280Y_df = pd.DataFrame({'F280Y': rmsd_CYS_F280Y})
+cys_E276F_df = pd.DataFrame({'E276F': rmsd_CYS_E276F})
+cys_F196A_df = pd.DataFrame({'F196A': rmsd_CYS_F196A})
+cys_V287T_df = pd.DataFrame({'V287T': rmsd_CYS_V287T})
+
+df = pd.concat([cys_Apo_open_df, cys_Apo_close_df, cys_L192F_df, cys_E276F_df, cys_V287T_df, cys_F196A_df, cys_F280Y_df, cys_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xlim(0, 1)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'CYS215 RMSD Compared to WT Closed', fontsize = 14)
 plt.savefig('mutate_RMSD_cys_all.png')
 plt.close()
 
-rmsd_cys = [rmsd_cys_1sug, rmsd_cys_apo, rmsd_cys_F196A]
+df = pd.concat([cys_L192F_df, cys_E276F_df, cys_V287T_df, cys_F196A_df, cys_F280Y_df, cys_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xlim(0, 1)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'CYS215 RMSD Compared to WT Closed', fontsize = 14)
+plt.savefig('mutate_RMSD_cys_mut_all.png')
+plt.close()
+
+rmsd_cys = [rmsd_CYS_1sug, rmsd_CYS_apo, rmsd_CYS_F196A]
 ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
 sns.kdeplot(data = rmsd_cys, fill=True, alpha=0.5)
 plt.title('CYS215 RMSD Compared to WT Closed')
 plt.savefig('mutate_RMSD_cys_F196A.png')
 plt.close()
 
+#BEG loop (L1)
+beg_Apo_open_df = pd.DataFrame({'Apo Open':rmsd_beg_apo})
+beg_Apo_close_df = pd.DataFrame({'Apo Closed': rmsd_beg_1sug})
+beg_L192F_df = pd.DataFrame({'L192F': rmsd_beg_L192F})
+beg_L195F_df = pd.DataFrame({'L195F': rmsd_beg_L195F})
+beg_F280Y_df = pd.DataFrame({'F280Y': rmsd_beg_F280Y})
+beg_E276F_df = pd.DataFrame({'E276F': rmsd_beg_E276F})
+beg_F196A_df = pd.DataFrame({'F196A': rmsd_beg_F196A})
+beg_V287T_df = pd.DataFrame({'V287T': rmsd_beg_V287T})
+
+df = pd.concat([beg_Apo_open_df, beg_Apo_close_df, beg_L192F_df, beg_E276F_df, beg_V287T_df, beg_F196A_df, beg_F280Y_df, beg_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'L1 RMSD Compared to WT Closed', fontsize = 14)
+plt.savefig('mutate_RMSD_beg_all.png')
+plt.close()
+
+df = pd.concat([beg_L192F_df, beg_E276F_df, beg_V287T_df, beg_F196A_df, beg_F280Y_df, beg_L195F_df])
+
+sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
+plt.xticks(fontsize = 10)
+plt.yticks(fontsize = 10)
+plt.ylabel(r'Normalized Density', fontsize = 12)
+plt.title(r'L1 RMSD Compared to WT Closed', fontsize = 14)
+plt.savefig('mutate_RMSD_beg_mut_all.png')
+plt.close()
+
 #Determine p-values for each of the sections of focus
 file_p = open('p_values_mut.txt', 'w')
-p = np.zeros((4, 6))
+p = np.zeros((5, 7))
 st, p[0,0] = stats.ttest_ind(rmsd_a3_top_apo, rmsd_a3_top_L192F, equal_var = False) #Welch's t-test
 st, p[0,1] = stats.ttest_ind(rmsd_a3_top_apo, rmsd_a3_top_E276F, equal_var = False) #Welch's t-test
 st, p[0,2] = stats.ttest_ind(rmsd_a3_top_apo, rmsd_a3_top_F280Y, equal_var = False) #Welch's t-test
 st, p[0,3] = stats.ttest_ind(rmsd_a3_top_apo, rmsd_a3_top_L195F, equal_var = False) #Welch's t-test
 st, p[0,4] = stats.ttest_ind(rmsd_a3_top_apo, rmsd_a3_top_F196A, equal_var = False) #Welch's t-test
 st, p[0,5] = stats.ttest_ind(rmsd_a3_top_apo, rmsd_a3_top_V287T, equal_var = False) #Welch's t-test
+st, p[0,6] = stats.ttest_ind(rmsd_a3_top_apo, rmsd_a3_top_1sug, equal_var = False) #Welch's t-test
+
+st, p[1,0] = stats.ttest_ind(rmsd_a3_apo, rmsd_a3_L192F, equal_var = False) #Welch's t-test
+st, p[1,1] = stats.ttest_ind(rmsd_a3_apo, rmsd_a3_E276F, equal_var = False) #Welch's t-test
+st, p[1,2] = stats.ttest_ind(rmsd_a3_apo, rmsd_a3_F280Y, equal_var = False) #Welch's t-test
+st, p[1,3] = stats.ttest_ind(rmsd_a3_apo, rmsd_a3_L195F, equal_var = False) #Welch's t-test
+st, p[1,4] = stats.ttest_ind(rmsd_a3_apo, rmsd_a3_F196A, equal_var = False) #Welch's t-test
+st, p[1,5] = stats.ttest_ind(rmsd_a3_apo, rmsd_a3_V287T, equal_var = False) #Welch's t-test
+st, p[1,6] = stats.ttest_ind(rmsd_a3_apo, rmsd_a3_1sug, equal_var = False) #Welch's t-test
 
 st, p[1,0] = stats.ttest_ind(rmsd_a4_apo, rmsd_a4_L192F, equal_var = False) #Welch's t-test
 st, p[1,1] = stats.ttest_ind(rmsd_a4_apo, rmsd_a4_E276F, equal_var = False) #Welch's t-test
@@ -425,6 +522,7 @@ st, p[1,2] = stats.ttest_ind(rmsd_a4_apo, rmsd_a4_F280Y, equal_var = False) #Wel
 st, p[1,3] = stats.ttest_ind(rmsd_a4_apo, rmsd_a4_L195F, equal_var = False) #Welch's t-test
 st, p[1,4] = stats.ttest_ind(rmsd_a4_apo, rmsd_a4_F196A, equal_var = False) #Welch's t-test
 st, p[1,5] = stats.ttest_ind(rmsd_a4_apo, rmsd_a4_V287T, equal_var = False) #Welch's t-test
+st, p[1,6] = stats.ttest_ind(rmsd_a4_apo, rmsd_a4_1sug, equal_var = False) #Welch's t-test
 
 st, p[2,0] = stats.ttest_ind(rmsd_a6_bot_apo, rmsd_a6_bot_L192F, equal_var = False) #Welch's t-test
 st, p[2,1] = stats.ttest_ind(rmsd_a6_bot_apo, rmsd_a6_bot_E276F, equal_var = False) #Welch's t-test
@@ -432,17 +530,71 @@ st, p[2,2] = stats.ttest_ind(rmsd_a6_bot_apo, rmsd_a6_bot_F280Y, equal_var = Fal
 st, p[2,3] = stats.ttest_ind(rmsd_a6_bot_apo, rmsd_a6_bot_L195F, equal_var = False) #Welch's t-test
 st, p[2,4] = stats.ttest_ind(rmsd_a6_bot_apo, rmsd_a6_bot_F196A, equal_var = False) #Welch's t-test
 st, p[2,5] = stats.ttest_ind(rmsd_a6_bot_apo, rmsd_a6_bot_V287T, equal_var = False) #Welch's t-test
+st, p[2,6] = stats.ttest_ind(rmsd_a6_bot_apo, rmsd_a6_bot_1sug, equal_var = False) #Welch's t-test
 
-st, p[3,0] = stats.ttest_ind(rmsd_cys_apo, rmsd_cys_L192F, equal_var = False) #Welch's t-test
-st, p[3,1] = stats.ttest_ind(rmsd_cys_apo, rmsd_cys_E276F, equal_var = False) #Welch's t-test
-st, p[3,2] = stats.ttest_ind(rmsd_cys_apo, rmsd_cys_F280Y, equal_var = False) #Welch's t-test
-st, p[3,3] = stats.ttest_ind(rmsd_cys_apo, rmsd_cys_L195F, equal_var = False) #Welch's t-test
-st, p[3,4] = stats.ttest_ind(rmsd_cys_apo, rmsd_cys_F196A, equal_var = False) #Welch's t-test
-st, p[3,5] = stats.ttest_ind(rmsd_cys_apo, rmsd_cys_V287T, equal_var = False) #Welch's t-test
+st, p[3,0] = stats.ttest_ind(rmsd_CYS_apo, rmsd_CYS_L192F, equal_var = False) #Welch's t-test
+st, p[3,1] = stats.ttest_ind(rmsd_CYS_apo, rmsd_CYS_E276F, equal_var = False) #Welch's t-test
+st, p[3,2] = stats.ttest_ind(rmsd_CYS_apo, rmsd_CYS_F280Y, equal_var = False) #Welch's t-test
+st, p[3,3] = stats.ttest_ind(rmsd_CYS_apo, rmsd_CYS_L195F, equal_var = False) #Welch's t-test
+st, p[3,4] = stats.ttest_ind(rmsd_CYS_apo, rmsd_CYS_F196A, equal_var = False) #Welch's t-test
+st, p[3,5] = stats.ttest_ind(rmsd_CYS_apo, rmsd_CYS_V287T, equal_var = False) #Welch's t-test
+st, p[3,6] = stats.ttest_ind(rmsd_CYS_apo, rmsd_CYS_1sug, equal_var = False) #Welch's t-test
 
-sections_mini = ['a3_top', 'a4', 'a6_bot', 'CYS215']
+sections_mini = ['a3_top', 'a3', 'a4', 'a6_bot']
+Labels_mut = ['L192F', 'E276F', 'F280Y', 'L195F', 'F196A', 'V287T', 'Apo Closed']
+file_p.write('P values of RMSD with Apo closed reference structure Relative to Apo Open \n')
 for i in range(len(sections_mini)):
-    file_p.write(str(sections_mini[i]) + '\n')
+    file_p.write(str(sections_mini[i]) + '\n') 
     for j in range(len(Labels_mut)):
         file_p.write(Labels_mut[j] + ': ' + str(p[i,j]) + '\n')
+
+p = np.zeros((5, 12))
+st, p[0,0] = stats.ttest_ind(rmsd_a3_top_L192F, rmsd_a3_top_L192F_AD, equal_var = False) #Welch's t-test
+st, p[0,1] = stats.ttest_ind(rmsd_a3_top_E276F, rmsd_a3_top_E276F_AD, equal_var = False) #Welch's t-test
+st, p[0,2] = stats.ttest_ind(rmsd_a3_top_F280Y, rmsd_a3_top_F280Y_AD, equal_var = False) #Welch's t-test
+st, p[0,3] = stats.ttest_ind(rmsd_a3_top_L195F, rmsd_a3_top_L195F_AD, equal_var = False) #Welch's t-test
+st, p[0,4] = stats.ttest_ind(rmsd_a3_top_F196A, rmsd_a3_top_F196A_AD, equal_var = False) #Welch's t-test
+st, p[0,5] = stats.ttest_ind(rmsd_a3_top_V287T, rmsd_a3_top_V287T_AD, equal_var = False) #Welch's t-test
+st, p[0,6] = stats.ttest_ind(rmsd_a3_top_L192F, rmsd_a3_top_L192F_BBR, equal_var = False) #Welch's t-test
+st, p[0,7] = stats.ttest_ind(rmsd_a3_top_E276F, rmsd_a3_top_E276F_BBR, equal_var = False) #Welch's t-test
+st, p[0,8] = stats.ttest_ind(rmsd_a3_top_F280Y, rmsd_a3_top_F280Y_BBR, equal_var = False) #Welch's t-test
+st, p[0,9] = stats.ttest_ind(rmsd_a3_top_L195F, rmsd_a3_top_L195F_BBR, equal_var = False) #Welch's t-test
+st, p[0,10] = stats.ttest_ind(rmsd_a3_top_F196A, rmsd_a3_top_F196A_BBR, equal_var = False) #Welch's t-test
+st, p[0,11] = stats.ttest_ind(rmsd_a3_top_V287T, rmsd_a3_top_V287T_BBR, equal_var = False) #Welch's t-test
+
+st, p[1,0] = stats.ttest_ind(rmsd_a3_L192F, rmsd_a3_L192F_AD, equal_var = False) #Welch's t-test
+st, p[1,1] = stats.ttest_ind(rmsd_a3_E276F, rmsd_a3_E276F_AD, equal_var = False) #Welch's t-test
+st, p[1,2] = stats.ttest_ind(rmsd_a3_F280Y, rmsd_a3_F280Y_AD, equal_var = False) #Welch's t-test
+st, p[1,3] = stats.ttest_ind(rmsd_a3_L195F, rmsd_a3_L195F_AD, equal_var = False) #Welch's t-test
+st, p[1,4] = stats.ttest_ind(rmsd_a3_F196A, rmsd_a3_F196A_AD, equal_var = False) #Welch's t-test
+st, p[1,5] = stats.ttest_ind(rmsd_a3_V287T, rmsd_a3_V287T_AD, equal_var = False) #Welch's t-test
+st, p[1,6] = stats.ttest_ind(rmsd_a3_L192F, rmsd_a3_L192F_BBR, equal_var = False) #Welch's t-test
+st, p[1,7] = stats.ttest_ind(rmsd_a3_E276F, rmsd_a3_E276F_BBR, equal_var = False) #Welch's t-test
+st, p[1,8] = stats.ttest_ind(rmsd_a3_F280Y, rmsd_a3_F280Y_BBR, equal_var = False) #Welch's t-test
+st, p[1,9] = stats.ttest_ind(rmsd_a3_L195F, rmsd_a3_L195F_BBR, equal_var = False) #Welch's t-test
+st, p[1,10] = stats.ttest_ind(rmsd_a3_F196A, rmsd_a3_F196A_BBR, equal_var = False) #Welch's t-test
+st, p[1,11] = stats.ttest_ind(rmsd_a3_V287T, rmsd_a3_V287T_BBR, equal_var = False) #Welch's t-test
+
+st, p[2,0] = stats.ttest_ind(rmsd_a4_L192F, rmsd_a4_L192F_AD, equal_var = False) #Welch's t-test
+st, p[2,1] = stats.ttest_ind(rmsd_a4_E276F, rmsd_a4_E276F_AD, equal_var = False) #Welch's t-test
+st, p[2,2] = stats.ttest_ind(rmsd_a4_F280Y, rmsd_a4_F280Y_AD, equal_var = False) #Welch's t-test
+st, p[2,3] = stats.ttest_ind(rmsd_a4_L195F, rmsd_a4_L195F_AD, equal_var = False) #Welch's t-test
+st, p[2,4] = stats.ttest_ind(rmsd_a4_F196A, rmsd_a4_F196A_AD, equal_var = False) #Welch's t-test
+st, p[2,5] = stats.ttest_ind(rmsd_a4_V287T, rmsd_a4_V287T_AD, equal_var = False) #Welch's t-test
+st, p[2,6] = stats.ttest_ind(rmsd_a4_L192F, rmsd_a4_L192F_BBR, equal_var = False) #Welch's t-test
+st, p[2,7] = stats.ttest_ind(rmsd_a4_E276F, rmsd_a4_E276F_BBR, equal_var = False) #Welch's t-test
+st, p[2,8] = stats.ttest_ind(rmsd_a4_F280Y, rmsd_a4_F280Y_BBR, equal_var = False) #Welch's t-test
+st, p[2,9] = stats.ttest_ind(rmsd_a4_L195F, rmsd_a4_L195F_BBR, equal_var = False) #Welch's t-test
+st, p[2,10] = stats.ttest_ind(rmsd_a4_F196A, rmsd_a4_F196A_BBR, equal_var = False) #Welch's t-test
+st, p[2,11] = stats.ttest_ind(rmsd_a4_V287T, rmsd_a4_V287T_BBR, equal_var = False) #Welch's t-test
+
+sections_mini = ['a3_top', 'a3', 'a4']
+Labels_mut = ['L192F', 'E276F', 'F280Y', 'L195F', 'F196A', 'V287T']
+file_p.write('P values of RMSD with Apo closed reference structure Relative to Apo Mut \n')
+for i in range(len(sections_mini)):
+    file_p.write(str(sections_mini[i]) + '\n') 
+    for j in range(len(Labels_mut)):
+        n = j+6
+        file_p.write(Labels_mut[j] + ' AD: ' + str(p[i,j]) + '\n')
+        file_p.write(Labels_mut[j] + ' BBR: ' + str(p[i,n]) + '\n')
 
