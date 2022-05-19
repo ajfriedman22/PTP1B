@@ -153,6 +153,9 @@ def sect_contact(dist, t, low, high):
 #struct_per_sem = standard error on the mean % time each residue is in any helical confrmation
 #alpha_per_time = % alpha helicity of all residues in the a7 at each time point
 def per_helx(dssp, time):
+    import numpy as np
+    from scipy import stats
+
     char_num = np.arange(2,15,2)
     
     num = 0
@@ -216,6 +219,7 @@ def per_helx(dssp, time):
 #Input: x = dataset, w = interval by which to compute the running average
 #Output: Vector for the running average
 def moving_average(x, w):
+    import numpy as np
     return np.convolve(x, np.ones(w), 'valid') / w
 
 #Output: Uncorrelated RMSD values and array of uncorrelated frames
