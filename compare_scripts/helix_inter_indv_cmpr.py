@@ -5,6 +5,12 @@ from scipy import stats
 from itertools import product
 import seaborn as sns
 import pandas as pd
+import sys
+
+#Import custom modules
+sys.path.insert(1,'/ocean/projects/cts160011p/afriedma/code/PTP1B/util')
+import plot
+
 def load_file(file_dir, inters, num_bonds):
     inter_per = np.zeros(num_bonds)
     n = 0
@@ -28,38 +34,12 @@ def box_plot(Apo_open, Apo_close, AD, BBR, pair, output_dir, p, p1):
     ax = sns.stripplot(data = df, dodge=True, alpha=0.25, zorder=1, palette='bright')
     ax = sns.pointplot(data = df, join=False, scale=0.75, palette='dark')
     
-    if p < 0.05 and p > 0.01:
-        x1, x2 = 0, 2 #Columns for Apo and AD
-        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p < 0.01 and p > 0.001:
-        x1, x2 = 0, 2 #Columns for Apo and AD
-        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p < 0.001:
-        x1, x2 = 0, 2 #Columns for Apo and AD
-        y, h, col = (1.1*mean[[0, 2]].max()), 1, 'b'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
-    if p1 < 0.05 and p1 > 0.01:
-        x1, x2 = 0, 3 #Columns for Apo and BBR
-        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "*" , ha='center', va='bottom', color=col)
-    if p1 < 0.01 and p1 > 0.001:
-        x1, x2 = 0, 3 #Columns for Apo and BBR
-        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "**" , ha='center', va='bottom', color=col)
-    if p1 < 0.001:
-        x1, x2 = 0, 3 #Columns for Apo and BBR
-        y, h, col = (1.1*mean[[0, 3]].max()), 1, 'r'
-        plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-        plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
-
-    plt.title('Residue Interactions b/w ' + str(pair))
+    plot.error_bar(0, 2, mean[0], mean[2], p, 1, 'k')
+    plot.error_bar(0, 3, mean[0], mean[3], p1, 1, 'k')
+    plt.xticks(fontsize = 13)
+    plt.yticks(fontsize = 13)
+    plt.ylabel('% Time Interaction Formed', fontsize = 14)
+    plt.title('Residue Interactions b/w ' + str(pair), fontsize = 18)
     plt.savefig(output_dir + '/Hel_inter_' + str(pair) + '_box.png')
     plt.close()
 
