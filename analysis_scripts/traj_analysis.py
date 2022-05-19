@@ -107,6 +107,7 @@ if rms_chk == True:
         if equil_check == True:
             np.savetxt('rmsd_full_ref_' + str(ref_name) + '.txt', rmsd_full_uncorr) #save to text file
             np.savetxt('rmsf_ref_' + str(ref_name) + '.txt', rmsf_data) #save to text file
+            np.savetxt('uncorrelated_frames.txt', t_full) #Save indices for uncorrelated frames to file
 
         #Delete unneeded arrays to save memory
         del rmsf_data; del rmsd_full_uncorr
