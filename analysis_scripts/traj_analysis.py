@@ -252,6 +252,29 @@ if hbond_check == True:
         per.append(100*count/num_t) #Percentage of time each h-bond is present in trajectory
     np.savetxt('Hbonds_per_' + File_base + '.txt',per)
 
+    #Look specifically for hbonds important to the allosteric network
+    hbond_allo_name = open(directory + '/analysis_scripts/Hbond_allo.txt', r).readlines()
+    hbond_allo_atom_list = open(directory + '/analysis_scripts/Hbond_allo_atom.txt', r).readlines()
+    
+    hbond_allo_atom = np.zeros((len(hbond_allo_atom_list), 3))
+    for i in range(len(hbond_allo_atom)):
+        hbond_allo_atom[i,:] = int(hbond_allo_atom_list.split(' '))
+    per = [] #Declare empty array for percentage of time h-bond is formed
+    da_distances = md.compute_distances(traj_ns, hbond_allo_atom[:,[1,2]], periodic=False) #Compute distance between h-bond donor and acceptor
+    da_angles = md.compute_angles(traj_ns, hbond_allo_atom[:,:], periodic=False) #Compute angle between h-bond donor and acceptor
+    [num_t, num_h] = np.shape(da_distances) #save values for number of frames(num_t) and number of bonds(num_b) to caculate
+    for j in range(num_h): #Loop through all h-bonds
+        count = 0 #Initialize count
+        for i in range(num_t): #Loop through all frames
+            if da_distances[i,j] <= 0.25 and da_angles[i,j] >= 2.094: #If distance between donor and acceptor is less than 2.5A and the angle is greater than 120 degrees or ~ 2.094 radians
+                count +=1
+        per.append(100*count/num_t) #Percentage of time each h-bond is present in trajectory
+    
+    #Save hbond percentage to file
+    output = open('Hbond_allo_per.txt', 'w')
+    for i in range(len(hbond_allo_name)):
+        output.write(str(hbond_allo_name[i]) + ': ' + str(per[i]) + '\n')
+
     #Delete unneededarrays to save memory
     del hbonds; del label; del per; del da_distances; del da_angles
 
