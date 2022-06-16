@@ -27,6 +27,7 @@ parser.add_argument('-b', required=False, default=False, type=bool, help='Should
 parser.add_argument('-i', required=False, default=False, type=bool, help='Should helical interactions be measured?')
 parser.add_argument('-p', required=False, default=False, type=bool, help='Should PCA be preformed?')
 parser.add_argument('-rms', required=False, default=False, type=bool, help='Should RMSF and RMSD analysis be computed?')
+parser.add_argument('-w', required=False, default=False, type=bool, help='Should WPD loop analysis be completed?')
 parser.add_argument('-d', required=True, type=str, help='Directory Path for PTP1B repository')
 
 #Import Arguments
@@ -40,6 +41,7 @@ hbond_check = args.b
 equil_check = args.e
 check_hel = args.i
 pca_ck = args.p
+wpd_ck = args.w
 rms_chk = args.rms
 lig = args.l
 lig_ref_pdb = args.lref
@@ -120,13 +122,13 @@ if rms_chk == True:
     
         #Set sections of interest
         if a7_present == True: #Only compute these distances if the a7 helix is presenty
-            sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'a7', 'L11', 'Q', 'beg'] #Section names
-            sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
+            sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'WPD_181', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'a7', 'L11', 'Q', 'beg'] #Section names
+            sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [181, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
                 [274, 280], [286, 294], [150, 153], [258, 262], [26, 35]])#Section start and end points
 
         else: #Omit sections which include the a7 helix
-            sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'L11', 'Q', 'beg'] #Section names
-            sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
+            sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'WPD_181', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'L11', 'Q', 'beg'] #Section names
+            sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [181, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
                 [274, 280], [150, 153], [258, 262], [26, 35]])#Section start and end points
 
         #Compute RMSD for all sections of interest and save to text file
@@ -138,6 +140,30 @@ if rms_chk == True:
 #Skip RMSD and RMSF analysis if input option not selected
 else:
     print('RMSD and RMSF Analysis Skipped')
+
+#WPD Loop Analysis
+if wpd_ck == True:
+    #Determine distance between catalytic residues 181 and 215
+    if miss_first == True:
+        res = np.array([179, 213])
+    else:
+        res = np.aray([180, 214])
+    WPD_distances = md.compute_distances(traj_ns, res, periodic=False) #Compute distance between h-bond donor and acceptor
+    
+    #Remove uncorrelated samples
+    if rms_chk == False:
+        print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
+        WPD_uncorr_dist = WPD_distances
+    else:
+        WPD_uncorr_dist = uncorr.sort(WPD_distances, t_full)
+    
+    #Save to file
+    np.savetxt(WPD_uncorr_dist, 'WPD_dist.txt')
+
+    print('WPD Loop Analysis Completed')
+else:
+    print('WPD Loop Analysis Skipped')
+
 
 #Only do DSSP if input option is selected
 if dssp_check == True:
