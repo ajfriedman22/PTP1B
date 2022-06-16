@@ -10,6 +10,15 @@ from simtk.openmm.app import PDBFile
 import parmed
 from simtk import unit
 import numpy as np
+import argparse
+
+#Declare Input papramaters
+parser = argparse.ArgumentParser(description = 'Parameterize AD')
+parser.add_argument('-f', required=True, type = str, help='File name for input PDB')
+
+#Import Arguments
+args = parser.parse_args()
+File_name = args.f + '.pdb'
 
 #Select force field of choice
 parsley = ForceField('openff_unconstrained-1.3.0.offxml')
@@ -20,7 +29,7 @@ from openff.toolkit.topology import Molecule, Topology
 AD = Molecule.from_smiles('CC1CCC2C(C)CCC(C2C1)C(C)=C', allow_undefined_stereo=True)
 
 #Import PDB file <change name as necessary>
-pdbfile = PDBFile('AD_processed.pdb')
+pdbfile = PDBFile(File_name)
 
 #Generate topology
 top_ff = Topology.from_openmm(pdbfile.topology, unique_molecules=[AD])
