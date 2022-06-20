@@ -16,7 +16,7 @@ from mpl_toolkits import mplot3d
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, protein and ligand RMSD, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
 parser.add_argument('-g', required=True, help= 'File name for input topology (gro format)')
-parser.add_argument('-e', required=False, default=True, type=bool, help= 'Is the input an equilibrated trajectory?')
+parser.add_argument('-e', required=False, default=False, type=bool, help= 'Is the input an equilibrated trajectory?')
 parser.add_argument('-f', required=True, help='Base for all output file names')
 parser.add_argument('-r', required=False, help='Should the reference structure for RMSD and RMSF be Apo Open or Closed or other?')
 parser.add_argument('-rn', required=False, help='Reference name for RMSD')
@@ -29,11 +29,16 @@ parser.add_argument('-p', required=False, default=False, type=bool, help='Should
 parser.add_argument('-rms', required=False, default=False, type=bool, help='Should RMSF and RMSD analysis be computed?')
 parser.add_argument('-w', required=False, default=False, type=bool, help='Should WPD loop analysis be completed?')
 parser.add_argument('-d', required=True, type=str, help='Directory Path for PTP1B repository')
+parser.add_argument('-n', required=False, default=200, type=int, help='Total length of trajectory(ns)')
 
 #Import Arguments
 args = parser.parse_args()
-File_traj = args.t + '.xtc'
-File_gro = args.g + '.gro'
+File_traj = args.t
+if len(File_traj.split('.')) != 2: #Add file extension if not in input
+    File_traj = File_traj + '.xtc'
+File_gro = args.g
+if len(File_gro.split('.')) != 2: #Add default file extension if not in input
+    File_gro = File_gro + '.gro'
 File_base = args.f
 ref_type = args.r
 dssp_check = args.a
@@ -46,6 +51,7 @@ rms_chk = args.rms
 lig = args.l
 lig_ref_pdb = args.lref
 directory = args.d
+traj_time = args.n
 if lig != 'none':
     lig_check = True
 else:
@@ -76,7 +82,10 @@ if rms_chk == True:
         ref = directory + 'analysis_scripts/RMSD_ref/Apo_closed_bb_cluster.pdb'
         ref_name = 'closed'
     else:
-        ref = ref_type
+        if len(ref_type.split('.')) != 2: #Add default file extension if not in input
+            ref = ref_type + '.pdb'
+        else:
+            ref = ref_type
         ref_name = args.rn
     
     #Load reference PDB
@@ -105,11 +114,21 @@ if rms_chk == True:
         #Calculate RMSD for full protein relative to reference structure
         rmsd_full_uncorr, t_full = mdfunc.compute_rmsd(traj_bb, ref_bb)
         
+        #Determine time in ns for each uncorrelated frame
+        frame_per_ns = traj_bb.n_frames/traj_time
+        uncorr_time = np.zeros(len(t_full))
+        for i in range(len(t_full)):
+            uncorr_time[i] = t_full[i]/frame_per_ns
+
         #Only save RMSD and RMSF values to file for equilibrated input trajectories
         if equil_check == True:
             np.savetxt('rmsd_full_ref_' + str(ref_name) + '.txt', rmsd_full_uncorr) #save to text file
             np.savetxt('rmsf_ref_' + str(ref_name) + '.txt', rmsf_data) #save to text file
             np.savetxt('uncorrelated_frames.txt', t_full) #Save indices for uncorrelated frames to file
+            np.savetxt('uncorrelated_time.txt', uncorr_time) #Save time for uncorrelated frames to file
+        else:
+            np.savetxt('uncorrelated_frames_full.txt', t_full) #Save indices for uncorrelated frames to file
+            np.savetxt('uncorrelated_time_full.txt', uncorr_time) #Save indices for uncorrelated frames to file
 
         #Delete unneeded arrays to save memory
         del rmsf_data; del rmsd_full_uncorr
@@ -144,10 +163,11 @@ else:
 #WPD Loop Analysis
 if wpd_ck == True:
     #Determine distance between catalytic residues 181 and 215
+    res = np.zeros((1, 2))
     if miss_first == True:
-        res = np.array([179, 213])
+        res[:][0] = [179, 213]
     else:
-        res = np.aray([180, 214])
+        res[:][0] = [180, 214]
     WPD_distances = md.compute_distances(traj_ns, res, periodic=False) #Compute distance between h-bond donor and acceptor
     
     #Remove uncorrelated samples
@@ -158,7 +178,10 @@ if wpd_ck == True:
         WPD_uncorr_dist = uncorr.sort(WPD_distances, t_full)
     
     #Save to file
-    np.savetxt(WPD_uncorr_dist, 'WPD_dist.txt')
+    if equil_check == True:
+        np.savetxt('WPD_dist.txt', WPD_uncorr_dist)
+    else:
+        np.savetxt('WPD_dist_full.txt', WPD_uncorr_dist)
 
     print('WPD Loop Analysis Completed')
 else:
@@ -253,12 +276,14 @@ if hbond_check == True:
     np.savetxt('Hbonds_per_' + File_base + '.txt',per)
 
     #Look specifically for hbonds important to the allosteric network
-    hbond_allo_name = open(directory + '/analysis_scripts/Hbond_allo.txt', r).readlines()
-    hbond_allo_atom_list = open(directory + '/analysis_scripts/Hbond_allo_atom.txt', r).readlines()
-    
+    hbond_allo_name = open(directory + '/analysis_scripts/Hbond_allo.txt', 'r').readlines()
+    hbond_allo_atom_list = open(directory + '/analysis_scripts/Hbond_allo_atom.txt', 'r').readlines()
+
     hbond_allo_atom = np.zeros((len(hbond_allo_atom_list), 3))
     for i in range(len(hbond_allo_atom)):
-        hbond_allo_atom[i,:] = int(hbond_allo_atom_list.split(' '))
+        atoms = hbond_allo_atom_list[i].strip().split()
+        for j in range(len(atoms)):
+            hbond_allo_atom[i,j] = int(atoms[j])
     per = [] #Declare empty array for percentage of time h-bond is formed
     da_distances = md.compute_distances(traj_ns, hbond_allo_atom[:,[1,2]], periodic=False) #Compute distance between h-bond donor and acceptor
     da_angles = md.compute_angles(traj_ns, hbond_allo_atom[:,:], periodic=False) #Compute angle between h-bond donor and acceptor
@@ -381,7 +406,7 @@ if check_hel == True:
     else:
         #Limit to uncorrelated samples
         t_dist = t_full #Determine indices of uncorrelated samples from RMSD of full trajectory
-        time_uncorr = len(t_dist) - 1
+        time_uncorr = len(t_dist)
 
     #Set open arrays for all samples
     dist_a3_a6 = np.zeros((time_uncorr, num_pairs_a3_a6))
@@ -397,7 +422,7 @@ if check_hel == True:
         dist_ca_a7_a6 = np.zeros((time_uncorr, num_pairs_a7_a6))
         dist_a7_L11 = np.zeros((time_uncorr, num_pairs_a7_L11))
         dist_ca_a7_L11 = np.zeros((time_uncorr, num_pairs_a7_L11))
-    
+   
     #Set new arrays with uncorrelated samples
     for i in range(num_pairs_a3_a6):
         dist = dist_a3_a6_all[:,i]
