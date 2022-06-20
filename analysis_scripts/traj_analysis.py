@@ -72,6 +72,12 @@ if traj_prot.n_residues > 295:
 else:
     a7_present = False
 
+#Print to output if dealing with an equilibrated trajectory or not
+if equil_check == False:
+    print('Unequilibrated Trajectory!')
+else:
+    print('Processing equilibrated trajectory')
+
 #Load reference trajectory if RMSD analysis is requested
 if rms_chk == True:
     #Establish name of reference structure
@@ -197,8 +203,11 @@ if dssp_check == True:
     
     #Compute Secondary Structure of all Residues in the a7 helix using MDTraj function
     dssp_list = md.compute_dssp(traj_a7, simplified=False) #Compute DSSP for all residues in the a7 helix for all trajectory frames
-    file_dssp = open('DSSP_'+ File_base + '.txt','w') #Create output file for DSSP and write over if file is present
-   
+    if equil_check == True:
+        file_dssp = open('DSSP_'+ File_base + '.txt','w') #Create output file for DSSP and write over if file is present
+    else:
+        file_dssp = open('DSSP_'+ File_base + '_full.txt','w') #Change name for unequilibrated trajectories
+
     if rms_chk == False:
         print('WARNING: RMSD not calculated. Uncorrelated samples not removed!\n')
         phi_uncorr = phi_angle
@@ -235,9 +244,13 @@ if dssp_check == True:
     file_dssp.close() #close file
     
     #Save psi and phi angles to files and overwrite if file is present
-    np.savetxt('phi_' + File_base + '.txt', phi_uncorr)
-    np.savetxt('psi_' + File_base + '.txt', psi_uncorr)
-    
+    if equil_check == True: #Change output file name if trajecotry is equilibrated or not
+        np.savetxt('phi_' + File_base + '.txt', phi_uncorr)
+        np.savetxt('psi_' + File_base + '.txt', psi_uncorr)
+    else: 
+        np.savetxt('phi_' + File_base + '_full.txt', phi_uncorr)
+        np.savetxt('psi_' + File_base + '_full.txt', psi_uncorr)
+
     #Delete arrays to save memory
     del phi_angle; del psi_angle; del phi_uncorr; del psi_uncorr; del dssp_list; del dssp_uncorr; del dssp_res_mod
 
@@ -253,10 +266,17 @@ if hbond_check == True:
     #Determine list of H-bonds present in the trajectory for over 60% of the frames
     hbonds = md.baker_hubbard(traj_ns, freq=0.6, exclude_water=True, periodic=False)
     label = lambda hbond : '%s -- %s' % (traj_ns.topology.atom(hbond[0]), traj_ns.topology.atom(hbond[2])) #Extract labels for h-bonds
-    np.savetxt('Hbonds_atom_' + File_base + '.txt', hbonds) #Save all atom indicies of h-bonds to file for further analysis
-    
+    if equil_check == True: #Change output file name if trajecotry is equilibrated or not
+        np.savetxt('Hbonds_atom_' + File_base + '.txt', hbonds) #Save all atom indicies of h-bonds to file for further analysis
+    else:
+        np.savetxt('Hbonds_atom_' + File_base + '_full.txt', hbonds) #Save all atom indicies of h-bonds to file for further analysis
+
     #Write all h-bonds present for >60% of trajectory to file
-    file_object = open('Hbonds_'+ File_base +'.txt', 'w') 
+    if equil_check == True: #Change output file name if trajecotry is equilibrated or not
+        file_object = open('Hbonds_'+ File_base +'.txt', 'w') 
+    else:
+        file_object = open('Hbonds_'+ File_base +'_full.txt', 'w') 
+
     for hbond in hbonds:
         file_object.write(label(hbond)) #Maintain same order as atom indicies
         file_object.write('\n')
@@ -273,7 +293,10 @@ if hbond_check == True:
             if da_distances[i,j] <= 0.25 and da_angles[i,j] >= 2.094: #If distance between donor and acceptor is less than 2.5A and the angle is greater than 120 degrees or ~ 2.094 radians
                 count +=1
         per.append(100*count/num_t) #Percentage of time each h-bond is present in trajectory
-    np.savetxt('Hbonds_per_' + File_base + '.txt',per)
+    if equil_check == True: #Change output file name if trajecotry is equilibrated or not
+        np.savetxt('Hbonds_per_' + File_base + '.txt',per)
+    else:
+        np.savetxt('Hbonds_per_' + File_base + '_full.txt',per)
 
     #Look specifically for hbonds important to the allosteric network
     hbond_allo_name = open(directory + '/analysis_scripts/Hbond_allo.txt', 'r').readlines()
@@ -296,7 +319,10 @@ if hbond_check == True:
         per.append(100*count/num_t) #Percentage of time each h-bond is present in trajectory
     
     #Save hbond percentage to file
-    output = open('Hbond_allo_per.txt', 'w')
+    if equil_check == True: #Change output file name if trajecotry is equilibrated or not
+        output = open('Hbond_allo_per.txt', 'w')
+    else:
+        output = open('Hbond_allo_per_full.txt', 'w')
     for i in range(len(hbond_allo_name)):
         output.write(str(hbond_allo_name[i]) + ': ' + str(per[i]) + '\n')
 
@@ -305,7 +331,10 @@ if hbond_check == True:
 
     #If ligand analysis is requested determine h-bonds between ligand and PTP1B residues
     if lig_check == True:
-        file_lig = open('Hbonds_lig_' +  File_base + '.txt', 'w') #Create file for list of h-bonds determined to be present more than 10% of the trajectory
+        if equil_check == True: #Change output file name if trajecotry is equilibrated or not
+            file_lig = open('Hbonds_lig_' +  File_base + '.txt', 'w') #Create file for list of h-bonds determined to be present more than 10% of the trajectory
+        else:
+            file_lig = open('Hbonds_lig_' +  File_base + '_full.txt', 'w') #Create file for list of h-bonds determined to be present more than 10% of the trajectory
         if lig == 'both':            
             ligand = traj_ns.topology.select('resname AD') #Select the ligand by name (based on topology) from the trajectory
             ligand2 = traj_ns.topology.select('resname BBR') #Select the ligand by name (based on topology) from the trajectory
