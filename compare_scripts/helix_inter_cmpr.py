@@ -70,11 +70,10 @@ dL11_a7_AD, dL11_a7_BBR = [],[]
 dL11_a7_Apo_open, dL11_a7_Apo_close = [],[]
 
 #List of all directory paths for each group
-dir_path_Apo_open = ['rebuild_a7_high/config9/analysis', 'rebuild_a7_high/config11/analysis', 'Apo_dis/analysis']
+dir_path_Apo_open = ['rebuild_a7_high/config11/analysis', 'Apo_dis/analysis']
 dir_path_Apo_close = ['Apo_1SUG/analysis/1sug', 'Apo_1SUG/analysis/1sug2']
 dir_path_AD = ['mutate/WT/AD/analysis', '1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2']
 dir_path_BBR = ['mutate/WT/BBR/analysis', 'BBR_a7/analysis']
-
 
 #List interactions of interest
 inters = ['a3_a6', 'a7_a3', 'a7_a6', 'a7_L11']
@@ -231,7 +230,6 @@ for i in range(len(index)):
     output.write('a6 and a7: ' + str(per_diff_open) + '\n')
     per_diff_open = ((dL11_a7[m] - dL11_a7[0]) / ((dL11_a7[m] + dL11_a7[0])/2)) * 100
     output.write('a7 and L11: ' + str(per_diff_open) + '\n')
-print(per_diff_all)
 
 #Make heatmap to show the changes in helical interactions relative to the Apo Closed State
 ax = plt.figure(figsize=(8, 10), frameon=True) # no visible frame
