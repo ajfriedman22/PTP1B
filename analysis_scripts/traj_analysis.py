@@ -846,7 +846,7 @@ if lig_check == True:
         dist_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, dist2_a5_all, t_dist)
         dist_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, dist2_a6_all, t_dist)
         dist_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, dist2_bend_all, t_dist)
-        if a7_present = True:
+        if a7_present == True:
             dist_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, dist2_a7_all, t_dist)
 
     else:
@@ -855,7 +855,7 @@ if lig_check == True:
         dist_a5, dist2_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, 0, t_dist)
         dist_a6, dist2_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, 0, t_dist)
         dist_bend, dist2_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, 0, t_dist)
-        if a7_present = True:
+        if a7_present == True:
             dist_a7, dist2_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, 0, t_dist)
 
     #Set array for the crystal structure binding location and two alternatives
@@ -886,17 +886,6 @@ if lig_check == True:
 
     #Loop through all frames
     for i in range(time_uncorr):
-        #At each time point reset counters for helix interactions
-        check_a6 = 0
-        check_a6_mid = 0
-        check_bend = 0
-        check_a7 = 0
-        check_a7_top = 0
-        if lig == 'both':
-            check2_a6 = 0
-            check2_bend = 0
-            check2_a7 = 0
-
         #Index for residues interactions in a3, a6, and a7 + the bend with ligand
         bond = 0
         if lig == 'both':
@@ -925,7 +914,7 @@ if lig_check == True:
             file2_a5.write(str(check2_a5) + '\n')
             file2_a6.write(str(check2_a6) + '\n')
         
-        if traj_prot.n_residues > 297:
+        if a7_present == True:
             if lig == 'both':
                 check_a7, check2_a7, check_a7_top, lig_tot_cont, lig2_tot_cont, bond = lig_hel_inter(num_pairs_a7, dist_a7, dist2_a7, 8, lig_tot_cont, lig, lig2_tot_cont, bond)
             else:
