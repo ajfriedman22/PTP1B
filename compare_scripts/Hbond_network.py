@@ -3,6 +3,7 @@ import mdtraj as md
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
+import sys
 
 #Import custom modules
 sys.path.insert(1, '/ocean/projects/cts160011p/afriedma/code/PTP1B/util/')
@@ -115,7 +116,7 @@ for i in range(len(per_apo)):
     #seperate the open and closed trajectories
     open_na7 = [per_apo[i], per_AD[i]]
     open_a7 = [per_a7[i], per_1sug_dis7[i], per_1sug_dis9[i], per_a7_AD[i], per_1sug_AD[i], per_1sug_dis9_AD[i], per_dis9[i]]
-    open_apo_a7 = [per_a7[i], per_1sug_dis7[i], per_1sug_dis9[i], per_dis9[i]]
+    open_apo_a7 = [per_1sug_dis7[i], per_1sug_dis9[i], per_dis9[i]]
     closed_na7 = [per_1sug_na7_AD[i]]
     closed_a7 = [per_1sug[i], per_1sug_dis11[i], per_dis11[i], per_dis7_AD[i], per_dis9_AD[i], per_dis11_AD[i]]
     closed_apo_a7 = [per_1sug[i], per_1sug_dis11[i], per_dis11[i]]
@@ -169,10 +170,10 @@ for i in range(len(per_apo)):
     st6, p6 = stats.ttest_ind(open_BBR_crys, open_AD_crys, equal_var = False) #Welch's t-test b/w BBR and AD
 
     #Only print graphs with significant differences
-    if diff > 0 and p <= 0.05:
+    if diff > 0 and p <= 0.1:
         plot_hbond('closed', file_close, file_p, Hbond_name, avg, err, i, p)
 
-    if diff < 0 and p <= 0.05:
+    if diff < 0 and p <= 0.1:
         plot_hbond('open', file_open, file_p, Hbond_name, avg, err, i, p)
 
     num = [5, 10, 15]
@@ -296,26 +297,30 @@ for i in range(len(per_apo)):
 #Open files for percent of time each h-bond found in literature is formed
 File_a7 = open('../../rebuild_a7/analysis/Hbond_lit_per.txt', 'r').readlines()
 File_a7_AD = open('../../AD_rebuild_a7/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_apo = open('../../Apo/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_AD = open('../../AD/analysis/Hbond_lit_per.txt', 'r').readlines()
 File_dis7 = open('../../rebuild_a7_high/config7/analysis/Hbond_lit_per.txt', 'r').readlines()
-File_dis7_AD = open('../../AD_dis/config7/Hbond_lit_per.txt', 'r').readlines()
-File_dis9 = open('../../Apo_dis/config9/Hbond_lit_per.txt', 'r').readlines()
-File_dis9_AD = open('../../AD_dis/config9/Hbond_lit_per.txt', 'r').readlines()
-File_dis11 = open('../../Apo_dis/config11/Hbond_lit_per.txt', 'r').readlines()
-File_dis11_AD = open('../../AD_dis/config11/Hbond_lit_per.txt', 'r').readlines()
-File_1sug = open('../../1sug/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_AD = open('../../1sug_AD/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_alt_AD = open('../../1sug_AD_dis_alt/run_1/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_alt2_AD = open('../../1sug_AD_dis_alt/run_2/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_dis7 = open('../../1sug_dis/config7/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_dis7_AD = open('../../1sug_dis_AD/config7/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_dis9 = open('../../1sug_dis/config9/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_dis9_AD = open('../../1sug_dis_AD/config9/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_dis11 = open('../../1sug_dis/config11/Hbond_lit_per.txt', 'r').readlines()
-File_1sug_dis11_AD = open('../../1sug_dis_AD/config11/Hbond_lit_per.txt', 'r').readlines()
-File_BBR_a7 = open('../../BBR_a7/Hbond_lit_per.txt', 'r').readlines()
-File_BBR_dis = open('../../BBR_dis/config9/Hbond_lit_per.txt', 'r').readlines()
+File_dis7_AD = open('../../AD_dis/analysis/config7/Hbond_lit_per.txt', 'r').readlines()
+File_dis9 = open('../../rebuild_a7_high/config9/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_dis9_AD = open('../../AD_dis/analysis/config9/Hbond_lit_per.txt', 'r').readlines()
+File_dis11 = open('../../rebuild_a7_high/config11/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_dis11_AD = open('../../AD_dis/analysis/config11/Hbond_lit_per.txt', 'r').readlines()
+File_1sug = open('../../Apo_1SUG/analysis/1sug/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_AD = open('../../1sug_AD/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_alt_AD = open('../../1sug_dis_AD/analysis/config_alt/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_alt2_AD = open('../../1sug_dis_AD/analysis/config_alt/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_na7 = open('../../1sug_no_a7/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_na7_AD = open('../../1sug_no_a7_AD/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_dis7 = open('../../1sug_dis/analysis/config7/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_dis7_AD = open('../../1sug_dis_AD/analysis/config7/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_dis9 = open('../../1sug_dis/analysis/config9/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_dis9_AD = open('../../1sug_dis_AD/analysis/config9/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_dis11 = open('../../1sug_dis/analysis/config11/Hbond_lit_per.txt', 'r').readlines()
+File_1sug_dis11_AD = open('../../1sug_dis_AD/analysis/config11/Hbond_lit_per.txt', 'r').readlines()
+File_BBR_a7 = open('../../BBR_a7/analysis/Hbond_lit_per.txt', 'r').readlines()
+File_BBR_dis = open('../../BBR_dis/analysis/config9/Hbond_lit_per.txt', 'r').readlines()
 
-Hbond_name_lit = open('Hbond_lit.txt', 'r').readlines()
+Hbond_name_lit = []
 
 per_a7, per_a7_AD, per_apo, per_AD, per_1sug, per_1sug_AD, per_1sug_na7, per_1sug_na7_AD, per_1sug_alt_AD, per_1sug_alt2_AD = [],[],[],[],[],[],[],[],[],[]
 per_1sug_dis7, per_1sug_dis7_AD, per_1sug_dis9, per_1sug_dis9_AD, per_1sug_dis11, per_1sug_dis11_AD = [],[],[],[],[],[]
@@ -323,27 +328,29 @@ per_dis7, per_dis7_AD, per_dis9, per_dis9_AD, per_dis11, per_dis11_AD = [],[],[]
 per_BBR_a7, per_BBR_dis = [],[]
 
 for i in range(len(Hbond_name_lit)):
-    per_a7.append(float(File_a7[i]))
-    per_a7_AD.append(float(File_a7_AD[i]))
-    per_dis7.append(float(File_dis7[i]))
-    per_dis7_AD.append(float(File_dis7_AD[i]))
-    per_dis9.append(float(File_dis9[i]))
-    per_dis9_AD.append(float(File_dis9_AD[i]))
-    per_dis11.append(float(File_dis11[i]))
-    per_dis11_AD.append(float(File_dis11_AD[i]))
-    per_1sug.append(float(File_1sug[i]))
-    per_1sug_AD.append(float(File_1sug_AD[i]))
-    per_1sug_alt_AD.append(float(File_1sug_alt_AD[i]))
-    per_1sug_alt2_AD.append(float(File_1sug_alt2_AD[i]))
-    per_1sug_dis7.append(float(File_1sug_dis7[i]))
-    per_1sug_dis7_AD.append(float(File_1sug_dis7_AD[i]))
-    per_1sug_dis9.append(float(File_1sug_dis9[i]))
-    per_1sug_dis9_AD.append(float(File_1sug_dis9_AD[i]))
-    per_1sug_dis11.append(float(File_1sug_dis11[i]))
-    per_1sug_dis11_AD.append(float(File_1sug_dis11_AD[i]))
-    per_BBR_a7.append(float(File_BBR_a7[i]))
-    per_BBR_dis.append(float(File_BBR_dis[i]))
-
+    if i%2 != 0:
+        per_a7.append(float(File_a7[i]))
+        per_a7_AD.append(float(File_a7_AD[i]))
+        per_dis7.append(float(File_dis7[i]))
+        per_dis7_AD.append(float(File_dis7_AD[i]))
+        per_dis9.append(float(File_dis9[i]))
+        per_dis9_AD.append(float(File_dis9_AD[i]))
+        per_dis11.append(float(File_dis11[i]))
+        per_dis11_AD.append(float(File_dis11_AD[i]))
+        per_1sug.append(float(File_1sug[i]))
+        per_1sug_AD.append(float(File_1sug_AD[i]))
+        per_1sug_alt_AD.append(float(File_1sug_alt_AD[i]))
+        per_1sug_alt2_AD.append(float(File_1sug_alt2_AD[i]))
+        per_1sug_dis7.append(float(File_1sug_dis7[i]))
+        per_1sug_dis7_AD.append(float(File_1sug_dis7_AD[i]))
+        per_1sug_dis9.append(float(File_1sug_dis9[i]))
+        per_1sug_dis9_AD.append(float(File_1sug_dis9_AD[i]))
+        per_1sug_dis11.append(float(File_1sug_dis11[i]))
+        per_1sug_dis11_AD.append(float(File_1sug_dis11_AD[i]))
+        per_BBR_a7.append(float(File_BBR_a7[i]))
+        per_BBR_dis.append(float(File_BBR_dis[i]))
+    else:
+        Hbond_name_lit.append(File_a7[i])
 avg = np.zeros([len(Hbond_name_lit), 7])
 err = np.zeros([len(Hbond_name_lit), 7])
 for i in range(len(Hbond_name_lit)):
