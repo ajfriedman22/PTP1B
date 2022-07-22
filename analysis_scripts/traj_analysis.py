@@ -29,6 +29,28 @@ def lig_dist_uncorr(num_pairs, dist_all, lig, dist2_all, t_dist):
     else:
         return dist_uncorr
 
+def lig_hel_inter(num_pairs, dist, dist2, n, lig_tot_cont, lig, lig2_tot_cont, bond):
+    check = 0
+    check2 = 0
+    for j in range(num_pairs): #Determine # of contacts with a3 helix
+            if dist[i][j] <= 0.5:
+                check += 1
+                if j < n:
+                    check_top += 1
+                lig_tot_cont[bond] += 1
+            if lig == 'both' and dist2[i][j] <= 0.5:
+                check2 += 1
+                lig2_tot_cont[bond] += 1
+            bond += 1
+    if lig == 'both' and n > 0:
+        return check, check2, check_top, lig_tot_cont, lig2_tot_cont, bond
+    elif lig == 'both' and n == 0:
+        return check, check2, lig_tot_cont, lig2_tot_cont, bond
+    elif lig != 'both' and n > 0:
+        return check, check_top, lig_tot_cont, bond
+    elif lig != 'both' and n == 0:
+        return check, lig_tot_cont, bond
+
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, protein and ligand RMSD, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
@@ -819,22 +841,22 @@ if lig_check == True:
 
     #Set new arrays with uncorrelated samples
     if lig == 'both':
-        dist_a3 = lig_dist_uncorr(num_pairs_a3, dist_a3_all, lig, t_dist)
-        dist_a4 = lig_dist_uncorr(num_pairs_a4, dist_a4_all, lig, t_dist)
-        dist_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, t_dist)
-        dist_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, t_dist)
-        dist_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, t_dist)
+        dist_a3 = lig_dist_uncorr(num_pairs_a3, dist_a3_all, lig, dist2_a3_all, t_dist)
+        dist_a4 = lig_dist_uncorr(num_pairs_a4, dist_a4_all, lig, dist2_a4_all, t_dist)
+        dist_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, dist2_a5_all, t_dist)
+        dist_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, dist2_a6_all, t_dist)
+        dist_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, dist2_bend_all, t_dist)
         if a7_present = True:
-            dist_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, t_dist)
+            dist_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, dist2_a7_all, t_dist)
 
     else:
-        dist_a3, dist2_a3 = lig_dist_uncorr(num_pairs_a3, dist_a3_all, lig, t_dist)
-        dist_a4, dist2_a4 = lig_dist_uncorr(num_pairs_a4, dist_a4_all, lig, t_dist)
-        dist_a5, dist2_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, t_dist)
-        dist_a6, dist2_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, t_dist)
-        dist_bend, dist2_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, t_dist)
+        dist_a3, dist2_a3 = lig_dist_uncorr(num_pairs_a3, dist_a3_all, lig, 0, t_dist)
+        dist_a4, dist2_a4 = lig_dist_uncorr(num_pairs_a4, dist_a4_all, lig, 0, t_dist)
+        dist_a5, dist2_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, 0, t_dist)
+        dist_a6, dist2_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, 0, t_dist)
+        dist_bend, dist2_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, 0, t_dist)
         if a7_present = True:
-            dist_a7, dist2_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, t_dist)
+            dist_a7, dist2_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, 0, t_dist)
 
     #Set array for the crystal structure binding location and two alternatives
     if lig == 'AD' or lig == 'both':
@@ -865,64 +887,33 @@ if lig_check == True:
     #Loop through all frames
     for i in range(time_uncorr):
         #At each time point reset counters for helix interactions
-        check_a3 = 0
-        check_a3_top = 0
-        check_a4 = 0
-        check_a5 = 0
         check_a6 = 0
         check_a6_mid = 0
         check_bend = 0
         check_a7 = 0
         check_a7_top = 0
         if lig == 'both':
-            check2_a3 = 0
-            check2_a4 = 0
-            check2_a5 = 0
             check2_a6 = 0
             check2_bend = 0
             check2_a7 = 0
 
         #Index for residues interactions in a3, a6, and a7 + the bend with ligand
         bond = 0
-        for j in range(num_pairs_a3): #Determine # of contacts with a3 helix
-            if dist_a3[i][j] <= 0.5:
-                check_a3 += 1
-                if j < 7:
-                    check_a3_top += 1
-                lig_tot_cont[bond] += 1
-            if lig == 'both' and dist2_a3[i][j] <= 0.5:
-                check2_a3 += 1
-                lig2_tot_cont[bond] += 1
-            bond += 1
-        for k in range(num_pairs_a4): #Determine # of contacts with a4 helix
-            if dist_a4[i][k] <= 0.5:
-                check_a4 += 1
-            if lig == 'both' and dist2_a4[i][k] <= 0.5:
-                check2_a4 += 1
-        for l in range(num_pairs_a5):  #Determine # of contacts with a5 helix
-            if dist_a5[i][l] <= 0.5:
-                check_a5 += 1
-            if lig == 'both' and dist2_a5[i][l] <= 0.5:
-                check2_a5 += 1
-        for m in range(num_pairs_a6):  #Determine # of contacts with a6 helix
-            if dist_a6[i][m] <= 0.5:
-                check_a6 += 1
-                if m < 8:
-                    check_a6_mid += 1
-                lig_tot_cont[bond] += 1
-            if lig == 'both' and dist2_a6[i][m] <= 0.5:
-                check2_a6 += 1
-                lig2_tot_cont[bond] += 1
-            bond += 1
-        for o in range(num_pairs_bend): #Determine the # of contacts between a6 and a7 helices
-            if dist_bend[i][o] <= 0.5:
-                check_bend += 1
-                lig_tot_cont[bond] += 1
-            if lig == 'both' and dist2_bend[i][o] <= 0.5:
-                check2_bend += 1
-                lig2_tot_cont[bond] += 1
-            bond += 1
-    
+        if lig == 'both':
+            check_a3, check2_a3, check_a3_top, lig_tot_cont, lig2_tot_cont, bond = lig_hel_inter(num_pairs_a3, dist_a3, dist2_a3, 7, lig_tot_cont, lig, lig2_tot_cont, bond)
+            check_a4, check2_a4, lig_tot_cont, lig2_tot_cont, bond = lig_hel_inter(num_pairs_a4, dist_a4, dist2_a4, 0, lig_tot_cont, lig, lig2_tot_cont, bond)
+            check_a5, check2_a5, lig_tot_cont, lig2_tot_cont, bond = lig_hel_inter(num_pairs_a5, dist_a5, dist2_a5, 0, lig_tot_cont, lig, lig2_tot_cont, bond)
+            check_a6, check2_a6, check_a6_mid, lig_tot_cont, lig2_tot_cont, bond = lig_hel_inter(num_pairs_a6, dist_a6, dist2_a6, 8, lig_tot_cont, lig, lig2_tot_cont, bond)
+            check_bend, check2_bend, lig_tot_cont, lig2_tot_cont, bond = lig_hel_inter(num_pairs_bend, dist_bend, dist2_bend, 0, lig_tot_cont, lig, lig2_tot_cont, bond)
+
+        else:
+            check_a3, check_a3_top, lig_tot_cont, bond = lig_hel_inter(num_pairs_a3, dist_a3, 0, 7, lig_tot_cont, lig, 0, bond)
+            check_a4, lig_tot_cont, bond = lig_hel_inter(num_pairs_a4, dist_a4, 0, 0, lig_tot_cont, lig, 0, bond)
+            check_a5, lig_tot_cont, bond = lig_hel_inter(num_pairs_a5, dist_a5, 0, 0, lig_tot_cont, lig, 0, bond)
+            check_a6, check_a6_mid, lig_tot_cont, bond = lig_hel_inter(num_pairs_a6, dist_a6, 0, 8, lig_tot_cont, lig, 0, bond)
+            check_bend, lig_tot_cont, bond = lig_hel_inter(num_pairs_bend, dist_bend, 0, 0, lig_tot_cont, lig, 0, bond)
+
+
         #Output number of interactions to files for a3-a6 at each time point
         file_a3.write(str(check_a3) + '\n')
         file_a4.write(str(check_a4) + '\n')
@@ -935,19 +926,19 @@ if lig_check == True:
             file2_a6.write(str(check2_a6) + '\n')
         
         if traj_prot.n_residues > 297:
-            for n in range(num_pairs_a7):#Determine # of contacts with the a7 helix pt1
-                if dist_a7[i][n] <= 0.5:
-                    check_a7 += 1
-                    if n > 8:
-                        check_a7_top += 1
-                    lig_tot_cont[bond] += 1
-                bond += 1
+            if lig == 'both':
+                check_a7, check2_a7, check_a7_top, lig_tot_cont, lig2_tot_cont, bond = lig_hel_inter(num_pairs_a7, dist_a7, dist2_a7, 8, lig_tot_cont, lig, lig2_tot_cont, bond)
+            else:
+                check_a7, check_a7_top, lig_tot_cont, bond = lig_hel_inter(num_pairs_a7, dist_a7, 0, 8, lig_tot_cont, lig, 0, bond)
+
             #Output number of interactions to file for a7
             file_a7.write(str(check_a7) + '\n')
+            if lig == 'both':
+                file2_a7.write(str(check2_a7) + '\n')
 
         if lig == 'AD' or lig == 'both': 
             if traj_prot.n_residues > 297:
-               #Determine ligand binding Location
+                #Determine ligand binding Location
                 #Sum total interactions for each binding location
                 total_contact_loc1 = check_a3 + check_a7 #Crystal structure binding location
                 total_contact_loc2 = check_a6 + check_bend + check_a7 #Alt loc 1
