@@ -57,13 +57,13 @@ pairs_all = pair_a7_a3
 pairs_all.extend(pair_a7_a6)
 
 #Open input files or contacts over time
-Apo_open_dir_list = ['rebuild_a7_high/config9/analysis', 'rebuild_a7_high/config11/analysis', 'Apo_dis/analysis']
+Apo_open_dir_list = ['rebuild_a7_high/config11/analysis', 'Apo_dis/analysis']
 Apo_close_dir_list = ['Apo_1SUG/analysis/1sug', 'Apo_1SUG/analysis/1sug2']
 AD_dir_list = ['1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2', 'mutate/WT/AD/analysis']
-BBR_dir_list = ['BBR_a7/analysis', 'BBR_dis/analysis/config9', 'mutate/WT/BBR/analysis'] 
+BBR_dir_list = ['BBR_a7/analysis', 'mutate/WT/BBR/analysis'] 
 
 #Load all percentages into arrays
-inters = ['a3_a7', 'a6_a7']
+inters = ['a7_a3', 'a7_a6']
 num_bonds = len(pairs_all)
 Apo_open_per_inter = np.zeros([len(Apo_open_dir_list), num_bonds])
 Apo_close_per_inter = np.zeros([len(Apo_close_dir_list), num_bonds])
@@ -106,7 +106,7 @@ for n in range(num_bonds):
     sem_inter[1][n] = stats.sem(Apo_close) #Apo Closed
     sem_inter[2][n] = stats.sem(AD) #AD
     sem_inter[3][n] = stats.sem(BBR) #BBR
-    
+
     #Run Welch's test on BBR vs AD helix interactions for a3-a7
     st1, p1 = stats.ttest_ind(AD, BBR, equal_var = False) #Welch's t-test b/w interactions with AD open + BBR open
     st2, p2 = stats.ttest_ind(AD, Apo_open, equal_var = False) #Welch's t-test b/w interactions with AD + Apo Open
@@ -115,17 +115,17 @@ for n in range(num_bonds):
    
     diff_AD = mean_inter[0][n] - mean_inter[2][n]
     diff_BBR = mean_inter[0][n] - mean_inter[3][n]
-    
+
     #Both AD amd BBR disrupt the interactions
-    if (p2 < 0.1 or p3 < 0.05) and (diff_AD > 10 or diff_BBR > 10):
-        output_lig_disrupt.write(str(pairs_all[n]) + ':\n'+ 'AD: ' + str(mean_inter[2][n]) + ' +/- ' + str(sem_inter[2][n]) + '\np to Apo open: ' + str(p2) + '\nBBR: ' + str(mean_inter[3][n]) + ' +/- ' + str(sem_inter[3][n])+ '\np to Apo open: ' + str(p2) + '\n')
+    if (p2 < 0.05 or p3 < 0.05) and (diff_AD > 10 or diff_BBR > 10):
+        output_lig_disrupt.write(str(pairs_all[n]) + ':\n'+ 'AD: ' + str(mean_inter[2][n]) + ' +/- ' + str(sem_inter[2][n]) + '\np to Apo open: ' + str(p2) + '\nBBR: ' + str(mean_inter[3][n]) + ' +/- ' + str(sem_inter[3][n])+ '\np to Apo open: ' + str(p3) + '\n')
         output_lig_disrupt.write('Apo Open: ' + str(mean_inter[0][n]) + '+/-' + str(sem_inter[0][n]) + '\n')
         output_lig_disrupt.write('Apo Closed: ' + str(mean_inter[1][n]) + '+/-' + str(sem_inter[1][n]) + '\n')
 
         box_plot(Apo_open, Apo_close, AD, BBR, pairs_all[n], 'Ligand_disrupt/', p2, p3)
 
-    if (p2 < 0.1 or p3 < 0.05) and diff_AD < -10 and diff_BBR < -10:
-        output_lig_inc.write(str(pairs_all[n]) + ':\n'+ 'AD: ' + str(mean_inter[2][n]) + ' +/- ' + str(sem_inter[2][n]) + '\np to Apo open: ' + str(p2) + '\nBBR: ' + str(mean_inter[3][n]) + ' +/- ' + str(sem_inter[3][n])+ '\np to Apo open: ' + str(p2) + '\n')
+    if (p2 < 0.05 or p3 < 0.05) and diff_AD < -10 and diff_BBR < -10:
+        output_lig_inc.write(str(pairs_all[n]) + ':\n'+ 'AD: ' + str(mean_inter[2][n]) + ' +/- ' + str(sem_inter[2][n]) + '\np to Apo open: ' + str(p2) + '\nBBR: ' + str(mean_inter[3][n]) + ' +/- ' + str(sem_inter[3][n])+ '\np to Apo open: ' + str(p3) + '\n')
         output_lig_inc.write('Apo Open: ' + str(mean_inter[0][n]) + '+/-' + str(sem_inter[0][n]) + '\n')
         output_lig_inc.write('Apo Closed: ' + str(mean_inter[1][n]) + '+/-' + str(sem_inter[1][n]) + '\n')
 
@@ -133,7 +133,7 @@ for n in range(num_bonds):
 
     diff_Apo = mean_inter[1][n] - mean_inter[0][n]
     if p4 < 0.05 and diff_Apo > 0:
-        output_Apo_disrupt.write(str(pairs_all[n]) + ':\n'+ 'AD: ' + str(mean_inter[2][n]) + ' +/- ' + str(sem_inter[2][n]) + '\np to Apo open: ' + str(p2) + '\nBBR: ' + str(mean_inter[3][n]) + ' +/- ' + str(sem_inter[3][n])+ '\np to Apo open: ' + str(p2) + '\n')
+        output_Apo_disrupt.write(str(pairs_all[n]) + ':\n'+ 'AD: ' + str(mean_inter[2][n]) + ' +/- ' + str(sem_inter[2][n]) + '\np to Apo open: ' + str(p2) + '\nBBR: ' + str(mean_inter[3][n]) + ' +/- ' + str(sem_inter[3][n])+ '\np to Apo open: ' + str(p3) + '\n')
         output_Apo_disrupt.write('Apo Open: ' + str(mean_inter[0][n]) + '+/-' + str(sem_inter[0][n]) + '\n')
         output_Apo_disrupt.write('Apo Closed: ' + str(mean_inter[1][n]) + '+/-' + str(sem_inter[1][n]) + '\n')
 
