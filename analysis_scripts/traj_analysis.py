@@ -13,6 +13,22 @@ import sys
 from mpl_toolkits import mplot3d
 import os.path
 
+def lig_dist_uncorr(num_pairs, dist_all, lig, dist2_all, t_dist):
+    time_uncorr = len(t_dist)
+    dist_uncorr = np.zeros((time_uncorr, num_pairs))
+    if lig == 'both':
+        dist2_uncorr = np.zeros((time_uncorr, num_pairs))
+    for i in range(num_pairs):
+        dist = dist_all[:,i]
+        dist_uncorr[:,i] = uncorr.sort(dist, t_dist)
+        if lig == 'both':
+            dist2 = dist2_all[:,i]
+            dist2_uncorr[:,i] = uncorr.sort(dist2, t_dist)
+    if lig == 'both':
+        return dist_uncorr, dist2_uncorr
+    else:
+        return dist_uncorr
+
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, protein and ligand RMSD, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
 parser.add_argument('-t', required=True, help='File name for input trajectory')
@@ -184,7 +200,14 @@ if active_ck == True:
     import pyny3d.geoms as pyny
     #Determine frames to evaluate
     if t_full == False:
-        indices = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
+        if os.path.exists('uncorrelated_frames.txt'):
+            lines = open('uncorrelated_frames.txt', 'r').readlines()
+            t_full = []
+            for i in lines:
+                t_full.append(float(i.strip()))
+        else:
+            print('WARNING: Uncorrelated samples not removed!')
+            indices = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
     else:
         indices = t_full
 
@@ -260,7 +283,7 @@ if wpd_ck == True:
                 t_full.append(float(i.strip()))
             WPD_uncorr_dist = uncorr.sort(WPD_dist, t_full)
         else:
-            print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
+            print('WARNING: Uncorrelated samples not removed!')
             WPD_uncorr_dist = WPD_dist
     else:
         WPD_uncorr_dist = uncorr.sort(WPD_dist, t_full)
@@ -357,7 +380,7 @@ if dssp_check == True:
             for i in lines:
                 t_full.append(float(i.strip()))
         else:
-            print('WARNING: RMSD not calculated. Uncorrelated samples not removed!\n')
+            print('WARNING: Uncorrelated samples not removed!\n')
             t_full = np.linspace(0, len(phi_angle), num=len(phi_angle))
     #limit to uncorrelated data based on the uncorrelated samples for bb rmsd of the full protein
     phi_uncorr = np.zeros((len(t_full), angles)) #declare empty vectors for data
@@ -547,7 +570,7 @@ if check_hel == True:
             for i in lines:
                 t_dist.append(float(i.strip()))
         else:
-            print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
+            print('WARNING: Uncorrelated Samples not removed!')
             t_dist = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
     else:
         #Limit to uncorrelated samples
@@ -593,7 +616,7 @@ if check_hel_indv == True:
             for i in lines:
                 t_full.append(float(i.strip()))
         else:
-            print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
+            print('WARNING: Uncorrelated Samples not removed!')
             t_full = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
    
     #Send to function to compute distances and save to file
@@ -651,7 +674,7 @@ if lig_rmsd_check == True:
                 dist_lig2_193 = uncorr.sort(lig_dist[:,2], t_full)
                 dist_lig2_283 = uncorr.sort(lig_dist[:,3], t_full)
         else:
-            print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
+            print('WARNING: Uncorrelated samples not removed!')
             dist_lig_193 = lig_dist[:,0]
             dist_lig_283 = lig_dist[:,1]
             if lig == 'both':
@@ -707,7 +730,7 @@ if lig_rmsd_check == True:
                     t_full.append(float(i.strip()))
                 displacment = uncorr.sort(displacment, t_full)
             else:
-                print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
+                print('WARNING: Uncorrelated samples not removed!')
         else:
             displacment = uncorr.sort(displacment, t_full)
         rmsd = np.array([math.sqrt(np.mean(displacment))])
@@ -787,66 +810,31 @@ if lig_check == True:
             for i in lines:
                 t_dist.append(float(i.strip()))
         else:
-            print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
+            print('WARNING: Uncorrelated Samples not removed!')
             t_dist = np.linspace(0, time, num = time)
     else:
         #Limit to uncorrelated samples
         t_dist = t_full #Determine indices of uncorrelated samples from RMSD of full trajectory
     time_uncorr = len(t_dist)
 
-    #Set open arrays for all samples
-    dist_a3 = np.zeros((time_uncorr, num_pairs_a3))
-    dist_bend = np.zeros((time_uncorr, num_pairs_bend))
-    dist_a4 = np.zeros((time_uncorr, num_pairs_a4))
-    dist_a5 = np.zeros((time_uncorr, num_pairs_a5))
-    dist_a6 = np.zeros((time_uncorr, num_pairs_a6))
-    if a7_present == True:
-        dist_a7 = np.zeros((time_uncorr, num_pairs_a7))
-    if lig == 'both':
-        dist2_a3 = np.zeros((time_uncorr, num_pairs_a3))
-        dist2_bend = np.zeros((time_uncorr, num_pairs_bend))
-        dist2_a4 = np.zeros((time_uncorr, num_pairs_a4))
-        dist2_a5 = np.zeros((time_uncorr, num_pairs_a5))
-        dist2_a6 = np.zeros((time_uncorr, num_pairs_a6))
-        if a7_present == True:
-            dist2_a7 = np.zeros((time_uncorr, num_pairs_a7))
-
     #Set new arrays with uncorrelated samples
-    for i in range(num_pairs_a3):
-        dist = dist_a3_all[:,i]
-        dist_a3[:,i] = uncorr.sort(dist, t_dist)
-        if lig == 'both':
-            dist2 = dist2_a3_all[:,i]
-            dist2_a3[:,i] = uncorr.sort(dist2, t_dist)
+    if lig == 'both':
+        dist_a3 = lig_dist_uncorr(num_pairs_a3, dist_a3_all, lig, t_dist)
+        dist_a4 = lig_dist_uncorr(num_pairs_a4, dist_a4_all, lig, t_dist)
+        dist_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, t_dist)
+        dist_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, t_dist)
+        dist_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, t_dist)
+        if a7_present = True:
+            dist_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, t_dist)
 
-    for i in range(num_pairs_a4):
-        dist = dist_a4_all[:,i]
-        dist_a4[:,i] = uncorr.sort(dist, t_dist)
-        if lig == 'both':
-            dist2 = dist2_a4_all[:,i]
-            dist2_a4[:,i] = uncorr.sort(dist2, t_dist)
-
-    for i in range(num_pairs_a5):
-        dist = dist_a5_all[:,i]
-        dist_a5[:,i] = uncorr.sort(dist, t_dist)
-        if lig == 'both':
-            dist2 = dist2_a5_all[:,i]
-            dist2_a5[:,i] = uncorr.sort(dist2, t_dist)
-
-    for i in range(num_pairs_a6):
-        dist = dist_a6_all[:,i]
-        dist_a6[:,i] = uncorr.sort(dist, t_dist)
-        if lig == 'both':
-            dist2 = dist2_a6_all[:,i]
-            dist2_a6[:,i] = uncorr.sort(dist2, t_dist)
-
-    if traj_ns.n_residues > 297:
-        for i in range(num_pairs_a7):
-            dist = dist_a7_all[:,i]
-            dist_a7[:,i] = uncorr.sort(dist, t_dist)
-            if lig == 'both':
-                dist2 = dist2_a7_all[:,i]
-                dist2_a7[:,i] = uncorr.sort(dist2, t_dist)
+    else:
+        dist_a3, dist2_a3 = lig_dist_uncorr(num_pairs_a3, dist_a3_all, lig, t_dist)
+        dist_a4, dist2_a4 = lig_dist_uncorr(num_pairs_a4, dist_a4_all, lig, t_dist)
+        dist_a5, dist2_a5 = lig_dist_uncorr(num_pairs_a5, dist_a5_all, lig, t_dist)
+        dist_a6, dist2_a6 = lig_dist_uncorr(num_pairs_a6, dist_a6_all, lig, t_dist)
+        dist_bend, dist2_bend = lig_dist_uncorr(num_pairs_bend, dist_bend_all, lig, t_dist)
+        if a7_present = True:
+            dist_a7, dist2_a7 = lig_dist_uncorr(num_pairs_a7, dist_a7_all, lig, t_dist)
 
     #Set array for the crystal structure binding location and two alternatives
     if lig == 'AD' or lig == 'both':
