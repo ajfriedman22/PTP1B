@@ -11,6 +11,7 @@ from itertools import product
 from statistics import stdev
 import sys
 from mpl_toolkits import mplot3d
+import os.path
 
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of DSSP, H-bonds, Ligand Contacts, protein and ligand RMSD, Helical interactions and PCA for GROMACS Trajectory of PTP1B')
@@ -23,15 +24,18 @@ parser.add_argument('-rn', required=False, help='Reference name for RMSD')
 parser.add_argument('-l', required=False, default='none', help='If ligand analysis should be performed, which ligand is present?')
 parser.add_argument('-lref', required=False, default='none', help='Ligand reference for RMSD')
 parser.add_argument('-a', required=False, default=False, type=bool, help='Should DSSP be calculated?')
-parser.add_argument('-b', required=False, default=False, type=bool, help='Should Hbond Analysis be preformed?')
+parser.add_argument('-b', required=False, default=False, type=bool, help='Should full Hbond Analysis be preformed?')
+parser.add_argument('-bn', required=False, default=False, type=bool, help='Should Hbond Network Analysis be preformed?')
 parser.add_argument('-i', required=False, default=False, type=bool, help='Should helical interactions be measured?')
 parser.add_argument('-hd', required=False, default=False, type=bool, help='Should individual helical distances be measured?')
 parser.add_argument('-input', required=False, default=False, type=str, help='Provide input file for residue pairs. Otherwise use default.')
 parser.add_argument('-p', required=False, default=False, type=bool, help='Should PCA be preformed?')
 parser.add_argument('-rms', required=False, default=False, type=bool, help='Should RMSF and RMSD analysis be computed?')
 parser.add_argument('-w', required=False, default=False, type=bool, help='Should WPD loop analysis be completed?')
+parser.add_argument('-pl', required=False, default=False, type=bool, help='Should P-loop analysis be completed?')
+parser.add_argument('-aa', required=False, default=False, type=bool, help='Should Active Site Area be calculated?')
 parser.add_argument('-d', required=True, type=str, help='Directory Path for PTP1B repository')
-parser.add_argument('-n', required=False, default=200, type=int, help='Total length of trajectory(ns)')
+parser.add_argument('-n', required=False, default = 300, type=int, help='Total length of trajectory(ns)')
 
 #Import Arguments
 args = parser.parse_args()
@@ -45,12 +49,16 @@ File_base = args.f
 ref_type = args.r
 dssp_check = args.a
 hbond_check = args.b
+hbond_net_check = args.bn
 eq_time = args.e
 check_hel = args.i
 check_hel_indv = args.hd
 input_inter = args.input
 pca_ck = args.p
 wpd_ck = args.w
+pl_chk = args.pl
+
+active_ck = args.aa
 rms_chk = args.rms
 lig = args.l
 lig_ref_pdb = args.lref
@@ -68,7 +76,7 @@ import uncorr
 import plot
 
 #Load trajectories
-traj_bb, traj_prot, traj_ns, traj_a7, miss_first = mdfunc.mdtraj_load(File_traj, File_gro, [287, 295]) 
+traj_bb, traj_prot, traj_ns, traj_a7, miss_first = mdfunc.mdtraj_load(File_traj, File_gro, [286, 294]) 
 
 #Determine if the full a7 helix is present (residues 287 to 295)
 if traj_prot.n_residues > 295:
@@ -152,13 +160,13 @@ if rms_chk == True:
         #Set sections of interest
         if a7_present == True: #Only compute these distances if the a7 helix is presenty
             sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'WPD_181', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'a7', 'L11', 'Q', 'beg'] #Section names
-            sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [181, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
-                [274, 280], [286, 294], [150, 153], [258, 262], [26, 35]])#Section start and end points
+            sect_res = np.array([[176, 184], [184, 187], [213, 220], [214, 0], [180, 0], [112, 117], [185, 199], [185, 190], [220, 237], [244, 251], [263, 280],
+                [274, 280], [286, 294], [150, 152], [258, 262], [26, 35]])#Section start and end points
 
         else: #Omit sections which include the a7 helix
             sect_names = ['WPD', 'WPD_a3', 'P', 'CYS', 'WPD_181', 'SBL', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'L11', 'Q', 'beg'] #Section names
-            sect_res = np.array([[176, 184], [184, 187], [213, 222], [214, 0], [181, 0], [112, 119], [185, 199], [185, 190], [220, 237], [218, 227], [244, 251], [263, 280],
-                [274, 280], [150, 153], [258, 262], [26, 35]])#Section start and end points
+            sect_res = np.array([[176, 184], [184, 187], [213, 220], [214, 0], [180, 0], [112, 117], [185, 199], [185, 190], [220, 237], [244, 251], [263, 280],
+                [274, 280], [150, 152], [258, 262], [26, 35]])#Section start and end points
 
         #Compute RMSD for all sections of interest and save to text file
         for i in range(len(sect_names)):
@@ -176,12 +184,15 @@ if active_ck == True:
     import pyny3d.geoms as pyny
     #Determine frames to evaluate
     if t_full == False:
-        indices = np.lispace(0, traj_ns.n_frames, num = traj_ns.n_frames)
+        indices = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
     else:
         indices = t_full
 
-    top = traj_ns.topology
+    #remove last frame
+    indices = np.delete(indices, -1)
 
+    top = traj_ns.topology
+    
     #Assign residues to define the active site
     if miss_first == True:
         res1 = 114 - 2
@@ -194,29 +205,33 @@ if active_ck == True:
         res3 = 263 - 1
         res4 = 217 - 1
     
+    #Convert from coordinate space to Angstrom
+    corr_test = np.mean(np.sqrt(np.sum((traj_ns.xyz[:, top.select('resid ' + str(res1) + ' and name CA'), :] - traj_ns.xyz[:, top.select('resid ' + str(res2) + ' and name CA'), :])**2, axis=1)))
+    res = np.zeros((1, 2))
+    res[0,:] = [top.select('resid ' + str(res1) + ' and name CA'), top.select('resid ' + str(res2) + ' and name CA')]
+    A_test = np.mean(md.compute_distances(traj_ns, res))
+    convert_factor = A_test/corr_test
+
     #Go through frames
-    area = np.zeros(len(t_full))
+    area = np.zeros(len(indices))
     n = 0
     for i in indices:
-        pt1 = traj.xyz[i, top.select('resid ' + str(res1) + ' and name CA'), :]
-        pt2 = traj.xyz[i, top.select('resid ' + str(res2) + ' and name CA'), :]
-        pt3 = traj.xyz[i, top.select('resid ' + str(res3) + ' and name CA'), :]
-        pt4 = traj.xyz[i, top.select('resid ' + str(res4) + ' and name CA'), :]
+        corr = np.zeros((4, 3))
+        corr[0, :] = np.array(traj_ns.xyz[int(i), top.select('resid ' + str(res1) + ' and name CA'), :])
+        corr[1, :] = np.array(traj_ns.xyz[int(i), top.select('resid ' + str(res2) + ' and name CA'), :])
+        corr[2, :] = np.array(traj_ns.xyz[int(i), top.select('resid ' + str(res3) + ' and name CA'), :])
+        corr[3, :] = np.array(traj_ns.xyz[int(i), top.select('resid ' + str(res4) + ' and name CA'), :])
         
-        x = [pt1[0], pt2[0], pt3[0], pt4[0]]
-        y = [pt1[1], pt2[1], pt3[1], pt4[1]]
-        z = [pt1[2], pt2[2], pt3[2], pt4[2]]
-
-        polygon = pyny.Polygon([x, y, z])
-        area[n] = polygon.get_area()
+        polygon = pyny.Polygon(corr)
+        area[n] = polygon.get_area()*convert_factor**2 #Convert to Angstrom^2
         n += 1
     #Save to file
     np.savetxt('Active_area.txt', area)
-    print(np.mean(area))
 
     print('Active Site Area Completed')
 else:
     print('Active Site Area Skipped')
+
 #WPD Loop Analysis
 if wpd_ck == True:
     #Determine distance between catalytic residues 181 and 215
@@ -238,38 +253,53 @@ if wpd_ck == True:
     
     #Remove uncorrelated samples
     if rms_chk == False:
-        print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
-        WPD_uncorr_dist = WPD_dist
+        if os.path.exists('uncorrelated_frames.txt'):
+            lines = open('uncorrelated_frames.txt', 'r').readlines()
+            t_full = []
+            for i in lines:
+                t_full.append(float(i.strip()))
+            WPD_uncorr_dist = uncorr.sort(WPD_dist, t_full)
+        else:
+            print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
+            WPD_uncorr_dist = WPD_dist
     else:
         WPD_uncorr_dist = uncorr.sort(WPD_dist, t_full)
     
     #Save to file
     np.savetxt('WPD_dist' + name_add + '.txt', WPD_uncorr_dist)
     
+    print('WPD Loop Analysis Completed')
+else:
+    print('WPD Loop Analysis Skipped')
+
+#Determine P-loop contacts
+if pl_chk == True:
+    top = traj_ns.topology
+
     #Determine residues in close contact with the WPD loop
     if miss_first == False:
-        WPD_start = 176
-        WPD_end = 184
+        P_start = 213
+        P_end = 220
     else:
-        WPD_start = 175
-        WPD_end = 183
+        P_start = 212
+        P_end = 219
    
-    res_WPD = top.select(str(WPD_start) + '<= resid and resid <=' + str(WPD_end))#select atoms in the WPD loop
+    res_P = top.select(str(P_start) + '<= resid and resid <=' + str(P_end))#select atoms in the WPD loop
     
-    neighbors = md.compute_neighbors(traj = traj_ns, cutoff = 0.45, query_indices = res_WPD)
+    neighbors = md.compute_neighbors(traj = traj_ns, cutoff = 0.45, query_indices = res_P)
 
     #Determine all atoms in contact with the WPD loop
-    atom_cont_WPD = []
+    atom_cont_P = []
     for i in range(traj_ns.n_frames):
         atoms = neighbors[int(i)][:]
         for j in atoms:
-            if j not in atom_cont_WPD:
-                atom_cont_WPD.append(j)
+            if j not in atom_cont_P:
+                atom_cont_P.append(j)
 
     #Determine the percent of the trajectory the WPD loop in in contact with each atom
     per_atom_cont = []
     count = 0
-    for i in atom_cont_WPD:
+    for i in atom_cont_P:
         for j in range(traj_ns.n_frames):
             atoms = neighbors[int(j)][:]
             if i in atoms:
@@ -278,32 +308,35 @@ if wpd_ck == True:
         count = 0
 
     #Convert from atom number to residue number
-    res_cont_WPD = []
+    res_cont_P = []
     per_res_cont = []
     for i in range(traj_ns.n_residues):
         res_atom = top.select('resid == ' + str(i))
         per_res = []
         for j in res_atom:
-            if j in atom_cont_WPD:
-                index = atom_cont_WPD.index(j)
+            if j in atom_cont_P:
+                index = atom_cont_P.index(j)
                 per_res.append(per_atom_cont[index])
-                if i not in res_cont_WPD:
-                    res_cont_WPD.append(i)
-        if i in res_cont_WPD:
+                if i not in res_cont_P:
+                    res_cont_P.append(i)
+        if i in res_cont_P:
             if len(per_res) > 1:
                 per_res_cont.append(max(per_res))
             else:
                 per_res_cont.append(per_res)
 
     #Output to file
-    output = open('WPD_inter.txt', 'w')
-    for i in range(len(res_cont_WPD)):
-        output.write(str(res_cont_WPD[i]) + ' ' + str(per_res_cont[i]) + '\n')
+    output = open('P_inter.txt', 'w')
+    for i in range(len(res_cont_P)):
+        if per_res_cont[i] < 1:
+             output.write(str(res_cont_P[i]) + ' 0\n') 
+        else:
+            output.write(str(res_cont_P[i]) + ' ' + str(per_res_cont[i]) + '\n')
     output.close()
 
-    print('WPD Loop Analysis Completed')
+    print('P-Loop Analysis Completed')
 else:
-    print('WPD Loop Analysis Skipped')
+    print('P-Loop Analysis Skipped')
 
 
 #Only do DSSP if input option is selected
@@ -318,31 +351,33 @@ if dssp_check == True:
     file_dssp = open('DSSP_'+ File_base + name_add + '.txt','w') #Create output file for DSSP and write over if file is present
 
     if rms_chk == False:
-        print('WARNING: RMSD not calculated. Uncorrelated samples not removed!\n')
-        phi_uncorr = phi_angle
-        psi_uncorr = psi_angle
-        
-        dssp_uncorr = dssp_list
-    else:
-        #Limit to uncorrelated data based on the uncorrelated samples for bb RMSD of the full protein
-        phi_uncorr = np.zeros((len(t_full), angles)) #Declare empty vectors for data
-        psi_uncorr = np.zeros((len(t_full), angles))
-        for i in range(angles): #Loop through all angles
-            phi_uncorr[:,i] = uncorr.sort(phi_angle[:,i], t_full)
-            psi_uncorr[:,i] = uncorr.sort(psi_angle[:,i], t_full)
+        if os.path.exists('uncorrelated_frames.txt'):
+            lines = open('uncorrelated_frames.txt', 'r').readlines()
+            t_full = []
+            for i in lines:
+                t_full.append(float(i.strip()))
+        else:
+            print('WARNING: RMSD not calculated. Uncorrelated samples not removed!\n')
+            t_full = np.linspace(0, len(phi_angle), num=len(phi_angle))
+    #limit to uncorrelated data based on the uncorrelated samples for bb rmsd of the full protein
+    phi_uncorr = np.zeros((len(t_full), angles)) #declare empty vectors for data
+    psi_uncorr = np.zeros((len(t_full), angles))
+    for i in range(angles): #loop through all angles
+        phi_uncorr[:,i] = uncorr.sort(phi_angle[:,i], t_full)
+        psi_uncorr[:,i] = uncorr.sort(psi_angle[:,i], t_full)
 
-        #Limit to Uncorrelated data
-        frame_max,residue = dssp_list.shape #Determine the number of frames and residues for which DSSP analysis was completed
-        dssp_uncorr = np.full((len(t_full) - 1, residue), None) #Declare an empty vector to input uncorrelated DSSP values for each residue
-        for i in range(residue): #Loop through each residue seperately
-            dssp_res = dssp_list[:,i] #Seperate all time values for a single residue
-            dssp_res_mod = [] 
-            for j in dssp_res:
-                if j == ' ': #In DSSP a space designates a loop or irregular element
-                    dssp_res_mod.append('L') #Subsitute an L for this designation to prevent issues with reading character values
-                else: #If not a space keep the same character designation
-                    dssp_res_mod.append(j)
-            dssp_uncorr[:,i] = uncorr.char(dssp_res_mod, t_full)
+    #limit to uncorrelated data
+    frame_max,residue = dssp_list.shape #determine the number of frames and residues for which dssp analysis was completed
+    dssp_uncorr = np.full((len(t_full) - 1, residue), none) #declare an empty vector to input uncorrelated dssp values for each residue
+    for i in range(residue): #loop through each residue seperately
+        dssp_res = dssp_list[:,i] #seperate all time values for a single residue
+        dssp_res_mod = [] 
+        for j in dssp_res:
+            if j == ' ': #in dssp a space designates a loop or irregular element
+                dssp_res_mod.append('l') #subsitute an l for this designation to prevent issues with reading character values
+            else: #if not a space keep the same character designation
+                dssp_res_mod.append(j)
+        dssp_uncorr[:,i] = uncorr.char(dssp_res_mod, t_full)
     
     #Output DSSP to file
     frame_uncorr, residue = dssp_uncorr.shape
@@ -394,6 +429,46 @@ if hbond_check == True:
         per.append(100*count/num_t) #Percentage of time each h-bond is present in trajectory
     np.savetxt('Hbonds_per_' + File_base + name_add + '.txt', per)
 
+    #Delete unneededarrays to save memory
+    del hbonds; del label; del per; del da_distances; del da_angles
+
+    #If ligand analysis is requested determine h-bonds between ligand and PTP1B residues
+    if lig_check == True:
+        file_lig = open('Hbonds_lig_' +  File_base + name_add + '.txt', 'w') #Create file for list of h-bonds determined to be present more than 10% of the trajectory
+        if lig == 'both':            
+            ligand = traj_ns.topology.select('resname AD') #Select the ligand by name (based on topology) from the trajectory
+            ligand2 = traj_ns.topology.select('resname BBR') #Select the ligand by name (based on topology) from the trajectory
+        else:
+            ligand = traj_ns.topology.select('resname ' + str(lig)) #Select the ligand by name (based on topology) from the trajectory
+        protein = traj_ns.topology.select('protein') #Select protein from the trajectory
+        hbonds = md.baker_hubbard(traj_ns, freq = 0.1, exclude_water=True, periodic=True) #Find all h-bonds present >10% of the trajectory
+        label = lambda hbond : '%s -- %s' % (traj_ns.topology.atom(hbond[0]), traj_ns.topology.atom(hbond[2])) #Seperate the names of the h-bonds based on topology nomenclature
+        if lig == 'both':
+            file_lig.write('AD:\n')
+        for hbond in hbonds: #search all h-bonds
+            if (hbond[0] in ligand) and (hbond[2] in protein) or (hbond[2] in ligand) and (hbond[0] in protein): #seperate only those h-bonds which form between the ligand and the protein
+                file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
+                file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
+        if lig == 'both':
+            file_lig.write('BBR:\n')
+            for hbond in hbonds: #search all h-bonds
+                if (hbond[0] in ligand2) and (hbond[2] in protein) or (hbond[2] in ligand2) and (hbond[0] in protein): #seperate only h-bonds which form between the ligand and the protein
+                    file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
+                    file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
+        file_lig.close() #close file
+        #Delete arrays to save memory
+        del protein; del ligand; del hbonds; del label
+        if lig == 'both':
+            del ligand2
+
+    #Write to screen when code section is completed
+    print('Hbond Analysis Written')
+
+#Skip Hbond analysis if desired
+else:
+    print('Hbond Analysis Skipped')
+
+if hbond_net_check == True:
     #Look specifically for hbonds important to the allosteric network
     hbond_allo_name = open(directory + '/analysis_scripts/Hbond_allo.txt', 'r').readlines()
     top = traj_ns.topology
@@ -408,10 +483,11 @@ if hbond_check == True:
         else:
             res1 = int(bond[1]) - 1
             res2 = int(bond[4]) - 1
-
-        hbond_allo_atom[i,0] = top.select('resid ' + str(res1) + ' and name ' + str(bond[2]))
-        hbond_allo_atom[i,2] = top.select('resid ' + str(res2) + ' and name ' + str(bond[5]))
-        hbond_allo_atom[i,1] = hbond_allo_atom[i,0]+1
+        
+        if traj_prot.n_residues > res1 and traj_prot.n_residues > res2:
+            hbond_allo_atom[i,0] = top.select('resid ' + str(res1) + ' and name ' + str(bond[2]))
+            hbond_allo_atom[i,2] = top.select('resid ' + str(res2) + ' and name ' + str(bond[5]))
+            hbond_allo_atom[i,1] = hbond_allo_atom[i,0]+1
 
     per = [] #Declare empty array for percentage of time h-bond is formed
     da_distances = md.compute_distances(traj_ns, hbond_allo_atom[:,[1,2]], periodic=False) #Compute distance between h-bond donor and acceptor
@@ -430,42 +506,14 @@ if hbond_check == True:
         output.write(str(hbond_allo_name[i]) + ': ' + str(per[i]) + '\n')
 
     #Delete unneededarrays to save memory
-    del hbonds; del label; del per; del da_distances; del da_angles
+    del hbond_allo_name; del hbond_allo_atom; del per; del da_distances; del da_angles
 
-    #If ligand analysis is requested determine h-bonds between ligand and PTP1B residues
-    if lig_check == True:
-        file_lig = open('Hbonds_lig_' +  File_base + name_add + '.txt', 'w') #Create file for list of h-bonds determined to be present more than 10% of the trajectory
-        if lig == 'both':            
-            ligand = traj_ns.topology.select('resname AD') #Select the ligand by name (based on topology) from the trajectory
-            ligand2 = traj_ns.topology.select('resname BBR') #Select the ligand by name (based on topology) from the trajectory
-        else:
-            ligand = traj_ns.topology.select('resname ' + str(lig)) #Select the ligand by name (based on topology) from the trajectory
-        protein = traj_ns.topology.select('protein') #Select protein from the trajectory
-        hbonds = md.baker_hubbard(traj_ns, freq = 0.1, exclude_water=True, periodic=True) #Find all h-bonds present >10% of the trajectory
-        label = lambda hbond : '%s -- %s' % (traj.topology.atom(hbond[0]), traj.topology.atom(hbond[2])) #Seperate the names of the h-bonds based on topology nomenclature
-        if lig == 'both':
-            file_lig.write('AD:\n')
-        for hbond in hbonds: #search all h-bonds
-            if (hbond[0] in ligand) and (hbond[2] in protein) or (hbond[2] in ligand) and (hbond[0] in protein): #seperate only those h-bonds which form between the ligand and the protein
-                file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
-                file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
-        if lig == 'both':
-            file_lig.write('BBR:\n')
-            for hbond in hbonds: #search all h-bonds
-                if (hbond[0] in ligand2) and (hbond[2] in protein) or (hbond[2] in ligand2) and (hbond[0] in protein): #seperate only h-bonds which form between the ligand and the protein
-                    file_lig.write(str(label(hbond)) + '\n') #Write h-bond names to file
-                    file_lig.write(str(hbond[0]) + ' ' + str(hbond[1]) + ' ' + str(hbond[2]) + '\n') #Write atoms involved in h-bond to file
-        file_lig.close() #close file
-        #Delete arrays to save memory
-        del protein; del ligand; del hbonds; del label
-        if lig == 'both':
-            del ligand2
     #Write to screen when code section is completed
-    print('Hbond Analysis Written')
+    print('Hbond Network Analysis Written')
 
 #Skip Hbond analysis if desired
 else:
-    print('Hbond Analysis Skipped')
+    print('Hbond Network Analysis Skipped')
 
 #Residue pairs needed for either Ligand Interaction of Protein Interaction Analysis
 if check_hel == True or lig_check == True:
@@ -493,24 +541,30 @@ if check_hel == True:
             188, 189, 190, 191, 192, 193, 199, 200, 201, 202, 203, 204, 205, 211, 212, 213, 214, 215, 216, 217] #Upper region of a7 with lower region of the a6 helix
 
     if rms_chk == False:
-        print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
-        t_dist = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
-        time_uncorr = traj_ns.n_frames
+        if os.path.exists('uncorrelated_frames.txt'):
+            lines = open('uncorrelated_frames.txt', 'r').readlines()
+            t_dist = []
+            for i in lines:
+                t_dist.append(float(i.strip()))
+        else:
+            print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
+            t_dist = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
     else:
         #Limit to uncorrelated samples
         t_dist = t_full #Determine indices of uncorrelated samples from RMSD of full trajectory
-        time_uncorr = len(t_dist)
-    
+    time_uncorr = len(t_dist)
+
     file_mean = open('inter_mean.txt', 'w') #File for the mean number of interactions between any two given residues
     
     #Compute Distances
-    #mdfunc.hel_inter(traj_ns, group_3, group_6, t_dist, time_uncorr, 0, 0, 0, file_mean, 'a3', 'a6', directory)
-    #mdfunc.hel_inter(traj_ns, group_3, group_WPD, t_dist, time_uncorr, 0, 0, 0, file_mean, 'a3', 'WPD', directory)
-    #mdfunc.hel_inter(traj_ns, group_3, group_bend, t_dist, time_uncorr, 0, 0, 0, file_mean, 'a3', 'bend', directory)
+    mdfunc.hel_inter(traj_ns, group_3, group_6, t_dist, time_uncorr, 0, 0, 0, file_mean, 'a3', 'a6', directory)
+    mdfunc.hel_inter(traj_ns, group_3, group_WPD, t_dist, time_uncorr, 0, 0, 0, file_mean, 'a3', 'WPD', directory)
+    mdfunc.hel_inter(traj_ns, group_3, group_bend, t_dist, time_uncorr, 0, 0, 0, file_mean, 'a3', 'bend', directory)
     if traj_ns.n_residues > 297: #Only include these pairs if the a7 is present in the trajectory
-        mdfunc.hel_inter(traj_ns, group_3, group_7, t_dist, time_uncorr, a3_a7_pt1_ind, a3_a7_pt2_ind, 0, file_mean, 'a3', 'a7', directory)
-        mdfunc.hel_inter(traj_ns, group_6, group_7, t_dist, time_uncorr, a6_a7_pt1_ind, a6_a7_pt2_ind, a6_a7_pt3_ind, file_mean, 'a6', 'a7', directory)
-    
+        mdfunc.hel_inter(traj_ns, group_3, group_7, t_dist, time_uncorr, a3_a7_pt1_ind, a3_a7_pt2_ind, 0, file_mean, 'a7', 'a3', directory)
+        mdfunc.hel_inter(traj_ns, group_6, group_7, t_dist, time_uncorr, a6_a7_pt1_ind, a6_a7_pt2_ind, a6_a7_pt3_ind, file_mean, 'a7', 'a6', directory)
+        mdfunc.hel_inter(traj_ns, group_L11, group_7, t_dist, time_uncorr, 0, 0, 0, file_mean, 'a7', 'L11', directory)
+   
     print('Helix Interaction Analysis Completed')
 else:
     print('Helix Interaction Analysis Skipped')
@@ -519,7 +573,11 @@ if check_hel_indv == True:
     #Compute percent individual interactions are formed
     #Determine interaction pairs to evaluate
     if input_inter == False:
-        hel_inter = np.array([[200, 282], [179, 191], [185, 191], [151, 191], [264, 185], [178, 150], [81, 199], [117, 182], [117, 217], [192, 225], [182, 220], [187, 269], [178, 190], [152, 177], [200, 287], [276, 292], [189, 295], [280, 287], [152, 297]])
+        if traj_prot.n_residues > 297: #Only include these pairs if the a7 is present in the trajectory
+            hel_inter = np.array([[200, 282], [179, 191], [185, 191], [151, 191], [264, 185], [178, 150], [81, 199], [117, 182], [117, 217], [192, 225], [182, 220], [187, 269], [178, 190], [152, 177], [200, 287], [276, 292], [189, 295], [280, 287], [152, 297]])
+        else:
+            hel_inter = np.array([[200, 282], [179, 191], [185, 191], [151, 191], [264, 185], [178, 150], [81, 199], [117, 182], [117, 217], [192, 225], [182, 220], [187, 269], [178, 190], [152, 177], [200, 287], [280, 287]])
+
     else:
         #Read input file if provided
         hel_str = open(input_inter, 'r').readlines()
@@ -527,7 +585,17 @@ if check_hel_indv == True:
         for i in range(len(hel_str)):
             res1, res2 = hel_str[i].split()
             hel_inter[i][:] = [int(res1), int(res2)]
-    
+ 
+    if rms_chk == False:
+        if os.path.exists('uncorrelated_frames.txt'):
+            lines = open('uncorrelated_frames.txt', 'r').readlines()
+            t_full = []
+            for i in lines:
+                t_full.append(float(i.strip()))
+        else:
+            print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
+            t_full = np.linspace(0, traj_ns.n_frames, num = traj_ns.n_frames)
+   
     #Send to function to compute distances and save to file
     if miss_first == True:
         mdfunc.pair_dist(traj_ns, hel_inter, t_full, 2, directory)
@@ -571,12 +639,24 @@ if lig_rmsd_check == True:
     lig_dist = md.compute_distances(traj_ns, res_pair, periodic = True)
     
     if rms_chk == False:
-        print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
-        dist_lig_193 = lig_dist[:,0]
-        dist_lig_283 = lig_dist[:,1]
-        if lig == 'both':
-            dist_lig2_193 = lig_dist[:,2]
-            dist_lig2_283 = lig_dist[:,3]
+        if os.path.exists('uncorrelated_frames.txt'):
+            lines = open('uncorrelated_frames.txt', 'r').readlines()
+            t_full = []
+            for i in lines:
+                t_full.append(float(i.strip()))
+            #Remove uncorrelated samples
+            dist_lig_193 = uncorr.sort(lig_dist[:,0], t_full)
+            dist_lig_283 = uncorr.sort(lig_dist[:,1], t_full)
+            if lig == 'both':
+                dist_lig2_193 = uncorr.sort(lig_dist[:,2], t_full)
+                dist_lig2_283 = uncorr.sort(lig_dist[:,3], t_full)
+        else:
+            print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
+            dist_lig_193 = lig_dist[:,0]
+            dist_lig_283 = lig_dist[:,1]
+            if lig == 'both':
+                dist_lig2_193 = lig_dist[:,2]
+                dist_lig2_283 = lig_dist[:,3]
     else:
         #Remove uncorrelated samples
         dist_lig_193 = uncorr.sort(lig_dist[:,0], t_full)
@@ -620,7 +700,14 @@ if lig_rmsd_check == True:
         for i in range(time):
             displacment[i] = (com[i][0] - com_ref[0][0])**2 + (com[i][1] - com_ref[0][1])**2 + (com[i][2] - com_ref[0][2])**2
         if rms_chk == False:
-            print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
+            if os.path.exists('uncorrelated_frames.txt'):
+                lines = open('uncorrelated_frames.txt', 'r').readlines()
+                t_full = []
+                for i in lines:
+                    t_full.append(float(i.strip()))
+                displacment = uncorr.sort(displacment, t_full)
+            else:
+                print('WARNING: RMSD not calculated. Uncorrelated samples not removed!')
         else:
             displacment = uncorr.sort(displacment, t_full)
         rmsd = np.array([math.sqrt(np.mean(displacment))])
@@ -694,13 +781,18 @@ if lig_check == True:
         time, num_pairs_a7 = np.shape(dist_a7_all)
 
     if rms_chk == False:
-        print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
-        t_dist = np.linspace(0, time, num = time)
-        time_uncorr = time
+        if os.path.exists('uncorrelated_frames.txt'):
+            lines = open('uncorrelated_frames.txt', 'r').readlines()
+            t_dist = []
+            for i in lines:
+                t_dist.append(float(i.strip()))
+        else:
+            print('WARNING: RMSD not calculated. Uncorrelated Samples not removed!')
+            t_dist = np.linspace(0, time, num = time)
     else:
         #Limit to uncorrelated samples
         t_dist = t_full #Determine indices of uncorrelated samples from RMSD of full trajectory
-        time_uncorr = len(t_dist)
+    time_uncorr = len(t_dist)
 
     #Set open arrays for all samples
     dist_a3 = np.zeros((time_uncorr, num_pairs_a3))
@@ -1112,7 +1204,7 @@ if pca_ck == True:
 
     #Plot PCA
     fig = plt.figure()
-    plt.scatter(reduced_cartesian[:, 0], reduced_cartesian[:,1], marker='x', c=traj.time)
+    plt.scatter(reduced_cartesian[:, 0], reduced_cartesian[:,1], marker='x', c=traj_ns.time)
     plt.xlabel('PC1')
     plt.ylabel('PC2')
     plt.title('Cartesian coordinate PCA for '+File_base)
