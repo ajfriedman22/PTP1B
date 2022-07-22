@@ -94,7 +94,7 @@ if rms_chk == True:
         ref = directory + 'analysis_scripts/RMSD_ref/Apo_closed_bb_cluster.pdb'
         ref_name = 'closed'
     else:
-        if len(ref_type.split('.')) != 2: #Add default file extension if not in input
+        if ref_type.split('.')[-1] != 'pdb': #Add default file extension if not in input
             ref = ref_type + '.pdb'
         else:
             ref = ref_type
@@ -171,6 +171,52 @@ else:
     print('RMSD and RMSF Analysis Skipped')
     t_full = False
 
+#Compute active site area
+if active_ck == True:
+    import pyny3d.geoms as pyny
+    #Determine frames to evaluate
+    if t_full == False:
+        indices = np.lispace(0, traj_ns.n_frames, num = traj_ns.n_frames)
+    else:
+        indices = t_full
+
+    top = traj_ns.topology
+
+    #Assign residues to define the active site
+    if miss_first == True:
+        res1 = 114 - 2
+        res2 = 182 - 2
+        res3 = 263 - 2
+        res4 = 217 - 2
+    else:
+        res1 = 114 - 1
+        res2 = 182 - 1
+        res3 = 263 - 1
+        res4 = 217 - 1
+    
+    #Go through frames
+    area = np.zeros(len(t_full))
+    n = 0
+    for i in indices:
+        pt1 = traj.xyz[i, top.select('resid ' + str(res1) + ' and name CA'), :]
+        pt2 = traj.xyz[i, top.select('resid ' + str(res2) + ' and name CA'), :]
+        pt3 = traj.xyz[i, top.select('resid ' + str(res3) + ' and name CA'), :]
+        pt4 = traj.xyz[i, top.select('resid ' + str(res4) + ' and name CA'), :]
+        
+        x = [pt1[0], pt2[0], pt3[0], pt4[0]]
+        y = [pt1[1], pt2[1], pt3[1], pt4[1]]
+        z = [pt1[2], pt2[2], pt3[2], pt4[2]]
+
+        polygon = pyny.Polygon([x, y, z])
+        area[n] = polygon.get_area()
+        n += 1
+    #Save to file
+    np.savetxt('Active_area.txt', area)
+    print(np.mean(area))
+
+    print('Active Site Area Completed')
+else:
+    print('Active Site Area Skipped')
 #WPD Loop Analysis
 if wpd_ck == True:
     #Determine distance between catalytic residues 181 and 215
@@ -355,7 +401,6 @@ if hbond_check == True:
     hbond_allo_atom = np.zeros((len(hbond_allo_name), 3))
     for i in range(len(hbond_allo_name)):
         bond = hbond_allo_name[i].strip().split()
-        print(bond[1] + ' ' + bond[4])
 
         if miss_first == True:
             res1 = int(bond[1]) - 2
