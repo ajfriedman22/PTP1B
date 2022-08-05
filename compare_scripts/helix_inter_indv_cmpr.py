@@ -28,7 +28,7 @@ def box_plot(Apo_open, Apo_close, AD, BBR, pair, output_dir, p, p1):
     AD_df = pd.DataFrame({'AD': AD})
     BBR_df = pd.DataFrame({'BBR': BBR})
     mean = np.array([np.mean(Apo_open), np.mean(Apo_close), np.mean(AD), np.mean(BBR)])
-
+    
     df = pd.concat([Apo_open_df, Apo_close_df, AD_df, BBR_df])
 
     ax = sns.stripplot(data = df, dodge=True, alpha=0.25, zorder=1, palette='bright')
@@ -36,10 +36,10 @@ def box_plot(Apo_open, Apo_close, AD, BBR, pair, output_dir, p, p1):
     
     plot.error_bar(0, 2, mean[0], mean[2], p, 1, 'k')
     plot.error_bar(0, 3, mean[0], mean[3], p1, 1, 'k')
-    plt.xticks(fontsize = 13)
-    plt.yticks(fontsize = 13)
-    plt.ylabel('% Time Interaction Formed', fontsize = 14)
-    plt.title('Residue Interactions b/w ' + str(pair), fontsize = 18)
+    plt.xticks(fontsize = 14)
+    plt.yticks(fontsize = 14)
+    plt.ylabel('Frequency Formed(%)', fontsize = 16)
+    plt.title('Interactions b/w res' + str(pair[0]) + ' and res' + str(pair[1]), fontsize = 18)
     plt.savefig(output_dir + '/Hel_inter_' + str(pair) + '_box.png')
     plt.close()
 

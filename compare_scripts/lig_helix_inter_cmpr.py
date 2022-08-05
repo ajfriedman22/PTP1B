@@ -33,12 +33,13 @@ def plot_helix_inter(helix, err, hel_num, p):
     num = [1, 2]
     label = ['AD', 'BBR']
 
-    fig = plt.figure()
-    plt.title(r'Interactions with $\alpha$' + str(hel_num) + ' Helix', fontsize = 14)
-    plt.ylabel('Mean Simultaneous Interactions', fontsize = 12)
+    fig = plt.figure(figsize=(8,6))
+    plt.title(r'Interactions with $\alpha$' + str(hel_num) + ' Helix', fontsize = 18)
+    plt.ylabel('Mean Simultaneous Interactions', fontsize = 16)
     plt.bar(num, helix, color = ['blue', 'purple'], width=0.8)
     plt.errorbar(num, helix, yerr=err, fmt='o', color='black')
-    plt.xticks(num, label, fontsize=12)
+    plt.xticks(num, label, fontsize=16)
+    plt.yticks(fontsize = 14)
     plot.error_bar(1, 2, helix[0], helix[1], p, 0.5, 'k')
     fig.savefig('a' + str(hel_num) + '_helix_inter_cmpr.png')
     plt.close(fig)
@@ -131,8 +132,6 @@ plot_helix_inter(helix_a6, err_a6, 6, p_a6)
 
 #Plot Bar graph comparing averages for a7 helix
 plot_helix_inter(helix_a7, err_a7, 7, p_a7)
-print((helix_a3[0]-helix_a3[1])/helix_a3[1])
-print((helix_a7[0]-helix_a7[1])/helix_a7[1])
 
 plot.plot_gen_box(a3_AD, a3_BBR, 'AD', 'BBR', p_a3, 12, 'Ligand', 'Mean Simultaneous Interactison', '', 'a3_helix_box_cmpr.png', 8, 8)
 #plot.plot_gen_box(a3_AD_all, a3_BBR, 'AD', 'BBR', p_a3, 12, 'Ligand', 'Mean Simultaneous Interactison', '', 'a3_helix_box_all_cmpr.png', 8, 8)

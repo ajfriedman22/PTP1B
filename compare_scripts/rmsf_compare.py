@@ -20,16 +20,11 @@ def set_axis_style(ax, labels):
     ax.set_xlabel('Sample name')
 
 def load_txt(folder_path, file_name):
-    t,r = [],[]
-    with open('../../' + folder_path + '/rmsf_' + file_name + '_equil.xvg') as f:
-        for _ in range(17):
-            next(f)
-        for line in f:
-            cols = line.split()
-            if len(cols) == 2:
-                t.append(float(cols[0]))
-                r.append(float(cols[1])*10) #Convert to angstrom
-    return t, r
+    data = open('../../' + folder_path + '/rmsf_ref_self.txt', 'r').readlines()
+    t = open('../../' + folder_path + '/uncorrelated_time.txt', 'r').readlines()
+    for i in range(len(data)):
+        data[i] = float(data[i])
+    return t, data
 
 #Input Files
 t_a7, r_a7 = load_txt('rebuild_a7/analysis', 'a7')
@@ -61,7 +56,6 @@ t_BBR_1sug_dis7, r_BBR_1sug_dis7 = load_txt('BBR_1sug_dis/analysis/config7', 'BB
 t_BBR_1sug_dis11, r_BBR_1sug_dis11 = load_txt('BBR_1sug_dis/analysis/config11', 'BBR_1sug_dis11')
 t_AD_BBR, r_AD_BBR = load_txt('AD_BBR/analysis', 'AD_BBR')
 
-print(len(r_a7))
 #WPD RMSF
 res_w = np.array([177, 178, 179, 180, 181, 182, 183, 184, 185]) #Residues in WPD loop
 w_Apo_open, w_Apo_close, w_AD_open, w_AD_close, w_BBR_open, w_BBR_close = [],[],[],[],[],[] #Empty array for RMSF of WPD residues
@@ -442,15 +436,15 @@ a7_dis_bound_sem = np.array(a7_lig_bound_sem)
 
 fig3 = plt.figure()
 ax1 = fig3.add_subplot(111)
-ax1.set_title(r"Comparison of $\alpha$-7 helix RMSF for Apo Structures", fontsize=15) 
-ax1.set_xlabel('Residue ID', fontsize=13)
-ax1.set_ylabel(r'RMSF($\AA$)', fontsize=13)
+ax1.set_title(r"Comparison of $\alpha$-7 helix RMSF for Apo Structures", fontsize=18) 
+ax1.set_xlabel('Residue ID', fontsize=14)
+ax1.set_ylabel(r'RMSF($\AA$)', fontsize=14)
 ax1.plot(res_a7,a7_dis_unb, label='Ligand Does not Bind', color = 'red')
 ax1.plot(res_a7,a7_dis_bound, label='Ligand Binds', color = 'blue')
 ax1.fill_between(res_a7, a7_dis_unb-a7_dis_unb_sem, a7_dis_unb+a7_dis_unb_sem, alpha=0.3, facecolor = 'red', edgecolor = 'red')
 ax1.fill_between(res_a7, a7_dis_bound-a7_dis_bound_sem, a7_dis_bound+a7_dis_bound_sem, alpha=0.3, facecolor = 'blue', edgecolor = 'blue')
-plt.xticks(fontsize=11)
-plt.yticks(fontsize=12)
-leg = ax1.legend(loc='upper left', fontsize=12)
+plt.xticks(fontsize=13)
+plt.yticks(fontsize=13)
+leg = ax1.legend(loc='upper left', fontsize=13)
 fig3.savefig('a7_RMSF_Apo_dis_compare.png') 
 

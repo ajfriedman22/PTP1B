@@ -25,7 +25,7 @@ def plot_compare(RMSD_mean, RMSD_err, Label, sect, n, ref):
     num = np.linspace(1, len(Label)+1, num = len(Label))
     fig = plt.figure(figsize=(18,10))
     ax1 = fig.add_subplot(111)
-    ax1.set_title("Comparison of RMSD for " + section + ' to ' + ref)
+    ax1.set_title("RMSD for " + section + ' to ' + ref)
     ax1.set_ylabel(r'RMSD($\AA$)')
     ax1.bar(num, rmsd_n)
     plt.xticks(num, Label, fontsize=14)
@@ -33,15 +33,25 @@ def plot_compare(RMSD_mean, RMSD_err, Label, sect, n, ref):
     fig.savefig('RMSD_compare_' + section + '_' + ref + '.png') 
     plt.close(fig)
 
+def plot_kernel_mut(df, sect_name, sect_file, xmin, xmax):
+    ax = sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
+    plt.setp(ax.get_legend().get_texts(), fontsize='12') # for legend text
+    plt.xlabel(r'RMSD($\AA$)', fontsize = 14)
+    plt.xlim(xmin, xmax)
+    plt.xticks(fontsize = 13)
+    plt.yticks(fontsize = 13)
+    plt.ylabel(r'Normalized Density', fontsize = 14)
+    plt.title(str(sect_name) + r' RMSD Relative to WT Closed', fontsize = 15)
+    plt.savefig('mutate_RMSD_' + str(sect_file) + '.png')
+    plt.close()
+
 def plot_kernel_cmpr_lig(apo_df, AD_df, BBR_df, mut, sect, n):
     df = pd.concat([apo_df, AD_df, BBR_df])
 
     sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-    plt.axvline(x = RMSD_mean_close[0,n], color = 'r')
-    plt.axvline(x = RMSD_mean_close[1,n], color = 'b')
-    plt.xlabel(r'RMSD($\AA$)')
-    plt.ylabel(r'Normalized Density')
-    plt.title(sect + ' RMSD Compared to WT Closed')
+    plt.xlabel(r'RMSD($\AA$)', fontsize = 14)
+    plt.ylabel(r'Normalized Density', fontsize = 14)
+    plt.title(sect + ' RMSD Compared to WT Closed', fontsize = 15)
     plt.savefig('mutate_RMSD_' + sect + '_' + mut + '.png')
     plt.close()
 
@@ -77,7 +87,7 @@ file_path_close = ['../Apo_1SUG/analysis/1sug', '../Apo_dis/analysis', 'L192F/Ap
 file_path_close_AD = ['L192F/AD/analysis', 'E276F/AD/analysis', 'F280Y/AD/analysis', 'L195F/AD/analysis', 'F196A/AD/analysis', 'V287T/AD/analysis']
 file_path_close_BBR = ['L192F/BBR/analysis', 'E276F/BBR/analysis', 'F280Y/BBR/analysis', 'L195F/BBR/analysis', 'F196A/BBR/analysis', 'V287T/BBR/analysis']
 
-sections = ['WPD', 'WPD_a3', 'SBL', 'beg', 'P', 'CYS', 'a3', 'a3_top', 'a4', 'a4_P', 'a5', 'a6', 'a6_bot', 'a7', 'Q']
+sections = ['WPD', 'WPD_a3', 'SBL', 'beg', 'P', 'CYS', 'a3', 'a3_top', 'a4', 'a5', 'a6', 'a6_bot', 'a7', 'Q']
 ref = ['open', 'closed', 'self', 'F196A', 'V287T']
 
 #open all files
@@ -197,40 +207,13 @@ a3_top_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a3_top_F196A_BBR})
 a3_top_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a3_top_V287T_BBR})
 
 df = pd.concat([a3_top_Apo_open_df, a3_top_Apo_close_df, a3_top_L192F_df, a3_top_E276F_df, a3_top_V287T_df, a3_top_F196A_df, a3_top_F280Y_df, a3_top_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 2)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'Top of the $\alpha$3 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a3_top_all.png')
-plt.close()
+plot_kernel_mut(df, r'Top of $\alpha$3', 'a3_top_all', 0, 2)
 
 df = pd.concat([a3_top_L192F_df, a3_top_E276F_df, a3_top_V287T_df, a3_top_F196A_df, a3_top_F280Y_df, a3_top_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 2)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'Top of the $\alpha$3 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a3_top_mut_all.png')
-plt.close()
+plot_kernel_mut(df, r'Top of $\alpha$3', 'a3_top_mut_all', 0, 2)
 
 df = pd.concat([a3_top_Apo_open_df, a3_top_Apo_close_df, a3_top_V287T_df, a3_top_F280Y_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 2)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'Top of the $\alpha$3 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a3_top_mut_extr.png')
-plt.close()
+plot_kernel_mut(df, r'Top of $\alpha$3', 'a3_top_extr', 0, 2)
 
 plot_kernel_cmpr_lig(a3_top_L192F_df, a3_top_L192F_AD_df, a3_top_L192F_BBR_df, 'L192F', sections[7], 7)
 plot_kernel_cmpr_lig(a3_top_L195F_df, a3_top_L195F_AD_df, a3_top_L195F_BBR_df, 'L195F', sections[7], 7)
@@ -260,37 +243,13 @@ a3_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a3_F196A_BBR})
 a3_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a3_V287T_BBR})
 
 df = pd.concat([a3_Apo_open_df, a3_Apo_close_df, a3_L192F_df, a3_E276F_df, a3_V287T_df, a3_F196A_df, a3_F280Y_df, a3_L195F_df])
-
-ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)')
-plt.xlim(0, 2)
-plt.ylabel(r'Normalized Density')
-plt.title(r'$\alpha$-3 RMSD Compared to WT Closed')
-plt.savefig('mutate_RMSD_a3_all.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$3', 'a3_all', 0, 2)
 
 df = pd.concat([a3_L192F_df, a3_E276F_df, a3_V287T_df, a3_F196A_df, a3_F280Y_df, a3_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 2)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'$\alpha$-3 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a3_mut_all.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$3', 'a3_mut_all', 0, 2)
 
 df = pd.concat([a3_Apo_open_df, a3_Apo_close_df, a3_V287T_df, a3_F280Y_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)')
-plt.xlim(0, 2)
-plt.ylabel(r'Normalized Density')
-plt.title(r'$\alpha$-3 RMSD Compared to WT Closed')
-plt.savefig('mutate_RMSD_a3_mut_extr.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$3', 'a3_mut_extr', 0, 2)
 
 plot_kernel_cmpr_lig(a3_L192F_df, a3_L192F_AD_df, a3_L192F_BBR_df, 'L192F', sections[6], 6)
 plot_kernel_cmpr_lig(a3_L195F_df, a3_L195F_AD_df, a3_L195F_BBR_df, 'L195F', sections[6], 6)
@@ -320,39 +279,13 @@ a4_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a4_F196A_BBR})
 a4_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a4_V287T_BBR})
 
 df = pd.concat([a4_Apo_open_df, a4_Apo_close_df, a4_L192F_df, a4_E276F_df, a4_V287T_df, a4_F196A_df, a4_F280Y_df, a4_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.xlim(0, 1.5)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'$\alpha$-4 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a4_all.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$4', 'a4_all', 0, 1.5)
 
 df = pd.concat([a4_L192F_df, a4_E276F_df, a4_V287T_df, a4_F196A_df, a4_F280Y_df, a4_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.xlim(0, 1.5)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'$\alpha$-4 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a4_mut_all.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$4', 'a4_mut_all',0, 1.5)
 
 df = pd.concat([a4_Apo_open_df, a4_Apo_close_df, a4_V287T_df, a4_F196A_df, a4_F280Y_df])
-
-ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)')
-plt.xlim(0, 1.5)
-plt.ylabel(r'Normalized Density')
-plt.title(r'$\alpha$-4 RMSD Compared to WT Closed')
-plt.savefig('mutate_RMSD_a4.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$4', 'a4', 0, 1.5)
 
 plot_kernel_cmpr_lig(a4_F196A_df, a4_F196A_AD_df, a4_F196A_BBR_df, 'F196A', sections[8], 8)
 plot_kernel_cmpr_lig(a4_F280Y_df, a4_F280Y_AD_df, a4_F280Y_BBR_df, 'F280Y', sections[8], 8)
@@ -396,28 +329,10 @@ a6_F196A_BBR_df = pd.DataFrame({'F196A BBR': rmsd_a6_F196A_BBR})
 a6_V287T_BBR_df = pd.DataFrame({'V287T BBR': rmsd_a6_V287T_BBR})
 
 df = pd.concat([a6_Apo_open_df, a6_Apo_close_df, a6_L192F_df, a6_E276F_df, a6_V287T_df, a6_F196A_df, a6_F280Y_df, a6_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 2)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'$\alpha$-6 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a6_all.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$6', 'a6_all', 0, 2)
 
 df = pd.concat([a6_L192F_df, a6_E276F_df, a6_V287T_df, a6_F196A_df, a6_F280Y_df, a6_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_norm = True, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 2)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'$\alpha$-6 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_a6_mut_all.png')
-plt.close()
+plot_kernel_mut(df, r'$\alpha$6', 'a6_mut_all', 0, 2)
 
 plot_kernel_cmpr_lig(a6_L192F_df, a6_L192F_AD_df, a6_L192F_BBR_df, 'L192F', sections[11], 11)
 plot_kernel_cmpr_lig(a6_L195F_df, a6_L195F_AD_df, a6_L195F_BBR_df, 'L195F', sections[11], 11)
@@ -435,28 +350,10 @@ cys_F196A_df = pd.DataFrame({'F196A': rmsd_CYS_F196A})
 cys_V287T_df = pd.DataFrame({'V287T': rmsd_CYS_V287T})
 
 df = pd.concat([cys_Apo_open_df, cys_Apo_close_df, cys_L192F_df, cys_E276F_df, cys_V287T_df, cys_F196A_df, cys_F280Y_df, cys_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 1)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'CYS215 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_cys_all.png')
-plt.close()
+plot_kernel_mut(df, 'CYS215', 'cys_all', 0, 1)
 
 df = pd.concat([cys_L192F_df, cys_E276F_df, cys_V287T_df, cys_F196A_df, cys_F280Y_df, cys_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xlim(0, 1)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'CYS215 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_cys_mut_all.png')
-plt.close()
+plot_kernel_mut(df, 'CYS215', 'cys_mut_all', 0, 1)
 
 rmsd_cys = [rmsd_CYS_1sug, rmsd_CYS_apo, rmsd_CYS_F196A]
 ax = plt.figure(figsize=(12, 6), frameon=False) # no visible frame
@@ -476,26 +373,10 @@ beg_F196A_df = pd.DataFrame({'F196A': rmsd_beg_F196A})
 beg_V287T_df = pd.DataFrame({'V287T': rmsd_beg_V287T})
 
 df = pd.concat([beg_Apo_open_df, beg_Apo_close_df, beg_L192F_df, beg_E276F_df, beg_V287T_df, beg_F196A_df, beg_F280Y_df, beg_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'L1 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_beg_all.png')
-plt.close()
+plot_kernel_mut(df, 'L1', 'beg_all', 0, 4)
 
 df = pd.concat([beg_L192F_df, beg_E276F_df, beg_V287T_df, beg_F196A_df, beg_F280Y_df, beg_L195F_df])
-
-sns.kdeplot(data = df, fill=True, alpha=0.5, common_grid = True)
-plt.xlabel(r'RMSD($\AA$)', fontsize = 12)
-plt.xticks(fontsize = 10)
-plt.yticks(fontsize = 10)
-plt.ylabel(r'Normalized Density', fontsize = 12)
-plt.title(r'L1 RMSD Compared to WT Closed', fontsize = 14)
-plt.savefig('mutate_RMSD_beg_mut_all.png')
-plt.close()
+plot_kernel_mut(df, 'L1', 'beg_mut_all', 0, 4)
 
 #Determine p-values for each of the sections of focus
 file_p = open('p_values_mut.txt', 'w')

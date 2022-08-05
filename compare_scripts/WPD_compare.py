@@ -4,33 +4,30 @@ import matplotlib.pyplot as plt
 from scipy import stats
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter, AutoMinorLocator)
 
-def load_data(file_dir, file_name, eq_time):
-    t, w = [],[]
-    #Equilibrium time 
-    eq_time = eq_time * 1000
+def load_data(file_dir):
+    w, w_eq = [],[]
     #Load data
-    with open('../../' + file_dir + '/' + file_name + '_WPD.xvg') as f:
-        for _ in range(17):
-            next(f)
-        for line in f:
-            cols = line.split()
-            if len(cols) == 2:
-                t.append(float(cols[0]))
-                w.append(float(cols[1]))
+    for f in open('../../' + file_dir + '/WPD_dist_full.txt').readlines():
+        w.append(float(f))
+    for f in open('../../' + file_dir + '/WPD_dist.txt').readlines():
+        w_eq.append(float(f))
+    
+    #Remove last element
+    w = w[:-1]
+    w_eq = w_eq[:-1]
+
     #Count variable for number of time steps the WPD loop is open
     count = 0
     count_eq = 0 #equilibrium section only
-    count_eq_tot = 0 #total for equilibrium section
 
-    for i in range(len(t)):
+    for i in range(len(w)):
         if w[i]>1:
             count +=1
-            if t[i] >= eq_time:
-                count_eq += 1
-        if t[i] >= eq_time:
-            count_eq_tot += 1
-    per_eq = 100*count_eq/count_eq_tot
-    per = 100*count/len(t)
+    for i in range(len(w_eq)):
+        if w_eq[i]>1:
+           count_eq += 1
+    per_eq = 100*count_eq/len(w_eq)
+    per = 100*count/len(w)
     
     return w, per, per_eq
 
@@ -41,7 +38,6 @@ all_dir = ['rebuild_a7/analysis', 'AD_rebuild_a7/analysis', 'Apo/analysis', 'AD/
         'BBR_1sug_dis/analysis/config7', 'BBR_1sug_dis/analysis/config11']
 all_name = ['a7', 'a7_AD', 'Apo', 'AD', '1sug', '1sug2', '1sug3', '1sug_AD', '1sug_no_a7', '1sug_no_a7_AD', 'config7', 'config9', 'config11', 'complex7', 'complex9', 'complex11', 'complex11_2', 'alt', 'alt2', 'config7', 'config9', 'config11', 'Apo_dis', 'complex7', 'complex9', 'complex11', 'BBR_a7', 
         'BBR_1sug', 'BBR_dis7', 'BBR_dis9', 'BBR_dis11', 'BBR_dis7', 'BBR_dis11']
-eq_time_list = [50, 80, 50, 25, 5, 5, 5, 80, 75, 5, 10, 5, 5, 5, 5, 5, 5, 60, 30, 150, 5, 75, 5, 15, 25, 25, 70, 5, 70, 5, 75, 60, 60, 10, 10]
 
 #empty vector for the percent of time the WPD loop is open
 per = np.zeros(len(all_dir))
@@ -54,7 +50,7 @@ per_BBR_order, per_BBR_dis = [],[]
 file_per = open('Per_all.txt', 'w') #File for all percentages
 
 for i in range(len(all_dir)):
-    data, per[i], per_eq[i] = load_data(all_dir[i], all_name[i], eq_time_list[i])
+    data, per[i], per_eq[i] = load_data(all_dir[i])
     
     #Save all percentages to files
     file_per.write(all_name[i] + ':\n' + 'Full: ' + str(per[i]) + '\n' + 'Equilibrated: ' + str(per_eq[i]) + '\n')
@@ -205,9 +201,9 @@ time = np.linspace(0, 300, num = len(w_1sug_AD))
 time2 = np.linspace(0, 300, num = len(w_BBR_a7))
 fig2 = plt.figure()
 ax1 = fig2.add_subplot(111)
-ax1.set_title("WPD Loop Opening with Ordered a7", fontsize = 18)
-ax1.set_xlabel('Time (ns)', fontsize = 14)
-ax1.set_ylabel('Residue Distances (nm)', fontsize = 14)
+ax1.set_title(r'WPD Loop Opening Initialized with Ordered $\alpha$7', fontsize = 18)
+ax1.set_xlabel('Time (ns)', fontsize = 15)
+ax1.set_ylabel('Residue Distances (nm)', fontsize = 15)
 ax1.plot(time,w_1sug_AD, label='AD', color = 'blue')
 ax1.plot(time2, w_BBR_a7, label='BBR', color = 'purple')
 plt.xticks(fontsize = 12)
@@ -225,9 +221,9 @@ time = np.linspace(0, 300, num = len(w_1sug_dis11_AD))
 time2 = np.linspace(0, 300, num = len(w_BBR_1sug_dis11))
 fig4 = plt.figure()
 ax1 = fig4.add_subplot(111)
-ax1.set_title("WPD Loop Opening with Disordered a7", fontsize = 18)    
-ax1.set_xlabel('Time (ns)', fontsize = 14)
-ax1.set_ylabel('Residue Distances (nm)', fontsize = 14)
+ax1.set_title(r'WPD Loop Opening Initialized with Disordered $\alpha$7', fontsize = 18)  
+ax1.set_xlabel('Time (ns)', fontsize = 15)
+ax1.set_ylabel('Residue Distances (nm)', fontsize = 15)
 ax1.plot(time,w_1sug_dis11_AD, label='AD', color = 'blue')
 ax1.plot(time2,w_BBR_1sug_dis11, label='BBR', color = 'purple')
 plt.xticks(fontsize = 12)
