@@ -3,6 +3,7 @@ import mdtraj as md
 import numpy as np
 import argparse
 import sys
+from itertools import product
 
 #Import custom modules
 sys.path.insert(1, '/ocean/projects/cts160011p/afriedma/code/PTP1B/util/')
@@ -25,10 +26,28 @@ def sep_num(s):
 
 def deter_bond(top, res1, res2, name1, name2, i):
     bond = np.zeros(3)
-    bond[0] = top.select('resid ' + str(res1[i]) + ' and name ' + str(name1[i]))
-    bond[2] = top.select('resid ' + str(res2[i]) + ' and name ' + str(name2[i]))
-    bond[1] = bond[0]+1
-    return bond
+    donor = top.select('resid ' + str(res1[i]) + ' and name ' + str(name1[i]))
+    acceptor = top.select('resid ' + str(res2[i]) + ' and name ' + str(name2[i]))
+    H = top.select("resid " + str(res1[i]) + " and element H")
+    return donor, acceptor, H
+
+def deter_H(acceptor, H, traj_ns):
+    #easure distance between all hydrogens and the acceptor atom
+    bond_d = list(product(acceptor, H))
+    dist_all = md.compute_distances(traj_ns, bond_d, periodic = False)
+    
+    #Determine the minimum mean distance
+    mean_dist = np.zeros(len(H))
+    for j in range(len(H)):
+        mean_dist[j] = np.mean(dist_all[:,j])
+    #Determine index for minimum distance
+    index_min = np.argmin(mean_dist)
+        
+    #Atom number for hydrogen likely to be involved in bond
+    H_min = H[index_min]
+    dist = dist_all[:,index_min]
+
+    return H_min, dist
 
 #Declare arguments
 parser = argparse.ArgumentParser(description = 'Determination of Percentage of time each individual h-bond is formed and for h-bonds Formed simultaneously')
@@ -78,27 +97,36 @@ for i in name_bonds:
 #Declare array for bond correlations
 num_bonds = len(name_bonds)
 bond_single_frac = np.zeros((num_bonds))
-print(traj_prot.n_residues)
+comb1, comb2 = [],[]
 
 #track bond indicies
 #Determine the percent of time each bond combination is present
 for i in range(num_bonds):
     if int(res1[i]) >= 0 and int(res2[i]) >= 0 and int(res1[i]) < (traj_prot.n_residues-1) and int(res2[i]) < (traj_prot.n_residues-1):
-        bond = deter_bond(top, res1, res2, name1, name2, i)
-                
-        #Seperate atom indices into float format
-        bond_d = np.array([[float(bond[1]), float(bond[2])]])
-        bond_a = np.array([[float(bond[0]), float(bond[1]), float(bond[2])]])
+        donor, acceptor, H = deter_bond(top, res1, res2, name1, name2, i)
+
+        #Determine hydrogen with minimum distance
+        H_min, dist = deter_H(acceptor, H, traj_ns)
+
+        #Determine angle b/w donor and acceptor
+        bond_a = np.array([[donor[0], H_min, acceptor[0]]])
 
         #Compute distances and angles over time for both bonds
-        dist = md.compute_distances(traj_ns, bond_d, periodic = False)
         angle = md.compute_angles(traj_ns, bond_a , periodic = False)
         
         #Determine the percent of time both bonds are formed
         count_s=0 #single bonds
         for k in range(len(dist)):
-            if dist[k][0] <= 0.25 and angle[k][0] >= 2.094:
+            if dist[k] <= 0.25 and angle[k][0] >= 2.094:
                 count_s += 1
+                if name_bonds[i] == 'ASN193-ND2 -- GLU297-OE1\n':
+                    comb1.append(1)
+                if name_bonds[i] == 'ASN193-ND2 -- GLU297-OE2\n':
+                    comb2.append(1)
+            elif name_bonds[i] == 'ASN193-ND2 -- GLU297-OE1\n':
+                comb1.append(0)      
+            elif name_bonds[i] == 'ASN193-ND2 -- GLU297-OE2\n':
+                comb2.append(0)      
         output_single.write(name_bonds[i] + str(100*count_s/len(dist)) + '\n')
         bond_single_frac[i] = count_s/len(dist)
     else:
@@ -121,21 +149,31 @@ for i in name_note:
 
 num_bonds = len(name_note)
 for i in range(len(name_note)):
-    bond = deter_bond(top, res1, res2, name1, name2, i)
+    if int(res1[i]) >= 0 and int(res2[i]) >= 0 and int(res1[i]) < (traj_prot.n_residues-1) and int(res2[i]) < (traj_prot.n_residues-1):
+        donor, acceptor, H = deter_bond(top, res1, res2, name1, name2, i)
 
-    #Seperate atom indices into float format
-    bond_d = np.array([[float(bond[1]), float(bond[2])]])
-    bond_a = np.array([[float(bond[0]), float(bond[1]), float(bond[2])]])
+        #Determine hydrogen with minimum distance
+        H_min, dist = deter_H(acceptor, H, traj_ns)
     
-    #Compute distances and angles over time for both bonds
-    dist = md.compute_distances(traj_ns, bond_d, periodic = False)
-    angle = md.compute_angles(traj_ns, bond_a , periodic = False)
-    
-    #Determine the percent of time both bonds are formed
-    count_s=0 #single bonds
-    for k in range(len(dist)):
-        if dist[k][0] <= 0.25 and angle[k][0] >= 2.094:
-            count_s += 1
-    output_note.write(name_bonds[i] + str(100*count_s/len(dist)) + '\n')
+        #Determine angle b/w donor and acceptor
+        bond_a = np.array([[donor[0], H_min, acceptor[0]]])
 
+        #Compute distances and angles over time for both bonds
+        angle = md.compute_angles(traj_ns, bond_a , periodic = False)
+        
+        #Determine the percent of time both bonds are formed
+        count_s=0 #single bonds
+        for k in range(len(dist)):
+            if dist[k] <= 0.25 and angle[k][0] >= 2.094:
+                count_s += 1
+        output_note.write(name_note[i] + str(100*count_s/len(dist)) + '\n')
+    else:
+        output_note.write(name_note[i] + '0\n')
+if traj_prot.n_residues > 295:
+    comb_count = 0
+    for i in range(len(comb1)):
+        if comb1[i] == 1 or comb2[i] == 1:
+            comb_count +=1
+    output_single.write('ASN193-ND2 -- GLU297-OE1/2\n' + str(100*comb_count/len(comb1)) + '\n')
+output_single.write('ASN193-ND2 -- GLU297-OE1/2\n' + '0\n')
 print('Hbond Percentages Calculated')
