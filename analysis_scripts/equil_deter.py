@@ -45,7 +45,7 @@ time = np.linspace(0, t_max, num = len(rmsd_max))
 count = 0
 for i in range(1, len(rmsd_max)):
     diff = abs(rmsd_max[i] - rmsd_min[i-1])
-    if diff < 2:
+    if diff < 0.5:
         count += 1
     else:
         count = 0
@@ -62,7 +62,7 @@ for i in range(int(start_i*5), len(rmsd)):
 
 #Check when the difference is less than 2A
 diff = np.array(diff)
-check_converge = ((diff <= 2).sum() == diff.size).astype(np.int)
+check_converge = ((diff <= 0.2).sum() == diff.size).astype(np.int)
 if check_converge == True:
     output.write('Convergence Reached')
 else:
