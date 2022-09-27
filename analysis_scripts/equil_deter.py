@@ -28,13 +28,12 @@ t, rmsd = plot.col2_load_data(file_dir, file_name, False)
 
 #Average rmsd every 1 ns
 int_per_ns = int(len(rmsd)/(t_max))
-rmsd_max = np.zeros(int_per_ns*5)
-rmsd_min = np.zeros(int_per_ns*5)
+rmsd_max = np.zeros(t_max*5)
+rmsd_min = np.zeros(t_max*5)
 n=0
 
 for i in range(len(rmsd_max)):
     k = int(n + (int_per_ns/5))
-#    print(str(n) + ' ' + str(k) + ' ' + str(len(rmsd[n:k])))
     rmsd_max[i] = max(rmsd[n:k])
     rmsd_min[i] = min(rmsd[n:k])
     n = k
@@ -45,7 +44,7 @@ time = np.linspace(0, t_max, num = len(rmsd_max))
 count = 0
 for i in range(1, len(rmsd_max)):
     diff = abs(rmsd_max[i] - rmsd_min[i-1])
-    if diff < 0.5:
+    if diff < 0.2:
         count += 1
     else:
         count = 0
