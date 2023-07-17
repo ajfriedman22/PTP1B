@@ -26,7 +26,7 @@ def mdtraj_load(File_traj, File_gro, a7_res):
     last = int(a7_res[1]) - 1
 
     #Detemine if first residue is missing
-    if traj_prot.n_residues == 299:
+    if traj_prot.n_residues == 299 or traj_prot.n_residues == 287:
         miss_first = False
     else:
         miss_first = True
@@ -45,7 +45,7 @@ def mdtraj_load(File_traj, File_gro, a7_res):
 #a7_present = If the a7 helix is present in the protein
 #Output:
 #group sections for each of the structures of interest
-def set_sect(miss_first, lig, a7_present):
+def set_sect(miss_first, lig, a7_present, top):
     import numpy as np
     #MDtraj numbers residues starting with zero. Add an offset to ensure that the same residues are compared between trajectories
     if miss_first == True:
@@ -57,12 +57,13 @@ def set_sect(miss_first, lig, a7_present):
     group_4 = np.linspace(220-offset, 237-offset, num = 18) #residues in the a4 helix
     group_5 = np.linspace(244-offset, 251-offset, num = 8) #residues in the a5 helix
     group_6 = np.linspace(263-offset, 280-offset, num = 18) #residues in the a6 helix
-    group_bend = np.linspace(281-offset, 285-offset, num = 5) #residues in the bend b/w the a6 and a7 helices
-    group_7 = np.linspace(286-offset, 297-offset, num = 12) #residues in the a7 helix
+    group_bend = np.linspace(277-offset, 286-offset, num = 5) #residues in the bend b/w the a6 and a7 helices
+    group_7 = np.linspace(286-offset, 299-offset, num = 12) #residues in the a7 helix
     group_L11 = np.linspace(149-offset, 152-offset, num = 4) #residues in the L11 loop
     pair_other = [[150-offset, 190-offset], [263-offset, 184-offset], [149-offset, 177-offset], [80-offset, 198-offset], [116-offset, 181-offset], [116-offset, 216-offset], [191-offset, 224-offset], 
             [181-offset, 219-offset], [186-offset, 268-offset], [177-offset, 189-offset], [151-offset, 176-offset]] #Residue pairs for distances not included above
-    
+    group_B = np.linspace(142-offset, 162-offset, num = 21) #residues in the Beta sheet connected to L-11
+   
     #Set the index for the ligand if present in trajectory
     if lig != 'none':
         if a7_present == True: #w/ a7 helix
@@ -77,12 +78,13 @@ def set_sect(miss_first, lig, a7_present):
                 group_l2 = [288 - offset]
             else:
                 group_l = [287 - offset]
+        print(group_l)
         if lig == 'both':
-            return group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other, group_l, group_l2
+            return group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other, group_l, group_l2, group_B
         else:
-            return group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other, group_l
+            return group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other, group_l, group_B
     else:
-        return group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other
+        return group_WPD, group_3, group_4, group_5, group_6, group_bend, group_7, group_L11, pair_other, group_B
 
 #Function computes the % of time there are simultaneous contacts between the ligand and residues in pairs A with those in pairs A, B, and C 
 #Input:
@@ -227,7 +229,7 @@ def moving_average(x, w):
 #Output:
 #rmsd_uncorr = RMSD for each frame at each uncorrelated frame in the trajectory
 #t = uncorreated time frames in trajectory
-def compute_rmsd(traj, ref):
+def compute_rmsd(traj, ref, t_full):
     import mdtraj as md
     import sys
     #Import custom modules
@@ -235,7 +237,10 @@ def compute_rmsd(traj, ref):
     import uncorr
 
     rmsd = md.rmsd(traj, ref, parallel=True, precentered=False)
-    t = uncorr.ind(rmsd)
+    if t_full == False:
+        t = uncorr.ind(rmsd)
+    else:
+        t = t_full
     rmsd_uncorr = uncorr.sort(rmsd, t)
     return rmsd_uncorr, t
 
@@ -249,7 +254,7 @@ def compute_rmsd(traj, ref):
 #ref_name = Name corresponding to the reference type above
 #miss_first = Whether the first residue is missing and indices need to be subtracted by 1
 #Output none but save file for uncorrelated samples
-def compute_save_rmsd_sect(ref, ref_top, traj, top, sect, ref_type, name, ref_name, miss_first):
+def compute_save_rmsd_sect(ref, ref_top, traj, top, sect, ref_type, name, ref_name, miss_first, t_full):
     import mdtraj as md
     import numpy as np
 
@@ -274,8 +279,129 @@ def compute_save_rmsd_sect(ref, ref_top, traj, top, sect, ref_type, name, ref_na
             traj_sect = traj.atom_slice(top.select(str(sect[0] - 1) + ' <= resid and resid <= ' + str(sect[1] - 1))) #Limit trajectory to the section of choice
     
     #Compute RMSD for section of interest
-    rmsd_sect_uncorr, t_sect = compute_rmsd(traj_sect, ref_sect)
+    rmsd_sect_uncorr, t_sect = compute_rmsd(traj_sect, ref_sect, t_full)
     
     #Save RMSD to file
     np.savetxt('rmsd_' + name + '_ref_' + str(ref_name) + '.txt', rmsd_sect_uncorr)
+
+#Determine the pairwise distance between residues in a predefined set
+#Input:traj_ns = trajectory with solvent molecules removed, hel_inter = residue pairs to measure distance b/w, t_full = uncorrelated trajectory frames or "False" to use all frames,
+#offset = Number of residues to offset based on the 0 base used for MDTraj, directory = directory containing custom functions to load
+#Output: None but save interaction data to text file
+def pair_dist(traj_ns, hel_inter, t_full, offset, directory):
+    import mdtraj as md
+    import numpy as np
+    import sys
+
+    #Import custom modules
+    sys.path.insert(1, directory + '/util/')
+    import uncorr
+   
+    #Adjust for MDTraj Numbering and missing reisudes
+    pairs, x = np.shape(hel_inter)
+    hel_inter_name = np.zeros((pairs, x), dtype = int)
+    for i in range(pairs):
+        hel_inter_name[i][0] = round(hel_inter[i][0])
+        hel_inter_name[i][1] = round(hel_inter[i][1])
+        hel_inter[i][0] = hel_inter[i][0] - offset
+        hel_inter[i][1] = hel_inter[i][1] - offset
+
+    #Compute distance between all pairs
+    [dist, pairs] = md.compute_contacts(traj_ns, contacts=hel_inter, scheme='ca', ignore_nonprotein = False, periodic=True, soft_min = False)
+    
+    num_pairs = len(pairs)
+
+    for i in range(num_pairs):
+        #Remove uncorrelated samples
+        dist_i = dist[:,i]
+        if t_full != False:
+            dist_i_uncorr = uncorr.sort(dist_i, t_full)
+        else:
+            print('Uncorrelated frames not removed')
+            dist_i_uncorr = dist_i
+        
+        #Save to file
+        np.savetxt(str(hel_inter_name[i][0]) + '_' + str(hel_inter_name[i][1]) + '_inter.txt', np.asarray(dist_i_uncorr))
+
+#Determine the pairwise distance between structural elements like helices
+#Input:traj_ns = trajectory with solvent molecules removed, group_A = residues in element 1, group_B = elements in element 2, 
+#t_dist = frames to evaluate residue contacts, time_uncorr = len(
+# directory = directory containing custom functions to load
+#Output: None but save interaction data to text file
+def hel_inter(traj_ns, group_A, group_B, t_dist, time_uncorr, pt1_ind, pt2_ind, pt3_ind, file_mean, hel1, hel2, directory):
+    #Import modules
+    import mdtraj as md
+    import numpy as np
+    import sys
+    from itertools import product
+    
+    #Import custom modules
+    sys.path.insert(1, directory + '/util/')
+    import uncorr
+
+    #Set pairs to compute distances
+    pair = list(product(group_A, group_B))
+    
+    #Compute distances betwen helix pairs
+    [dist_all, pairs] = md.compute_contacts(traj_ns, contacts=pair, scheme='closest', ignore_nonprotein = False, periodic=True, soft_min = False)
+    
+    #Compute number of time points and number of diatance pairs for following loops
+    time, num_pairs = np.shape(dist_all)
+    
+    #Set new arrays with uncorrelated samples
+    dist_uncorr = np.zeros((time_uncorr, num_pairs))
+    for i in range(num_pairs):
+        dist = dist_all[:,i]
+        dist_uncorr[:,i] = uncorr.sort(dist, t_dist)
+    
+    #Loop through all time points
+    inter_all = []
+    inter_indv = np.zeros((num_pairs, time))
+    if pt1_ind != 0 and pt2_ind != 0:
+        inter_pt1, inter_pt2 = [],[]
+    if pt3_ind != 0:
+        inter_pt3 = []
+
+    for i in range(time_uncorr):
+        #Set all interaction counters to zero for each new time point
+        check_inter = 0
+        check_pt1 = 0
+        check_pt2 = 0
+        check_pt3 = 0
+
+        #Loop through all residue pairs in the a3 and a6 helices
+        for j in range(num_pairs): #Determine # of contacts b/w the helices
+            if dist_uncorr[i][j] <= 0.5: #Count the contact if the residue distance is less than 0.5 nm
+                check_inter += 1
+                if pt1_ind != 0 and pt2_ind != 0:
+                    if j in pt1_ind: #If this residue pair index is in part 1 of the helices
+                        check_pt1 += 1
+                    if j in pt2_ind: #If this residue pair index is in part 2 of the a6 and a7 helices
+                        check_pt2 += 1
+                if pt3_ind != 0:
+                    if j in pt3_ind: #If this residue pair index is in part 3 of the a6 and a7 helices
+                        check_pt3 += 1
+                inter_indv[j][i] = 1 #Record presence of contact for given residue pair(j) and time(i)
+        inter_all.append(check_inter) #Save the total number of residue contacts b/w the a3 and a6 helices to array
+        if pt1_ind != 0 and pt2_ind != 0:
+            inter_pt1.append(check_pt1)
+            inter_pt2.append(check_pt2)
+        if pt3_ind != 0:
+            inter_pt3.append(check_pt3)
+
+    np.savetxt(hel1 + '_' + hel2 + '_inter.txt', np.asarray(inter_all))
+    if pt1_ind != 0 and pt2_ind != 0:
+        np.savetxt(hel1 + '_' + hel2 + 'pt1_tot_inter.txt', np.asarray(inter_pt1))
+        np.savetxt(hel1 + '_' + hel2 + 'pt2_tot_inter.txt', np.asarray(inter_pt2))
+    if pt3_ind != 0:
+        np.savetxt(hel1 + '_' + hel2 + 'pt3_tot_inter.txt', np.asarray(inter_pt3))
+    
+    #Save all individual interactions to file
+    file_inters = open(hel1 + '_' + hel2 + '_inter_all.txt', 'w')
+    for i in range(num_pairs):
+        file_inters.write(str(100*sum(inter_indv[i,:])/time_uncorr) + '\n')
+    
+    #Save mean # of interactions over all time points
+    file_mean.write(hel1 + '-' + hel2 + ' inters mean: ' + str(sum(inter_all)/time_uncorr) + '\n')
+
 

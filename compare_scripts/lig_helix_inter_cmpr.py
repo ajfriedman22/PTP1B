@@ -45,8 +45,8 @@ def plot_helix_inter(helix, err, hel_num, p):
     plt.close(fig)
 
 #List of all directory paths for each group
-dir_path_AD_crys = ['mutate/WT/AD/analysis', '1sug_dis_AD/analysis/config11']
-dir_path_AD_alt = ['1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2']
+dir_path_AD_crys = ['mutate/WT/AD/analysis', '1sug_dis_AD/analysis/config_alt2']
+dir_path_AD_alt = ['1sug_dis_AD/analysis/config_alt']
 dir_path_AD_alt2 = ['AD_rebuild_a7/analysis', 'AD/analysis', '1sug_AD/analysis']
 dir_path_BBR = ['mutate/WT/BBR/analysis', 'BBR_a7/analysis', 'BBR_dis/analysis/config11']
 
@@ -133,6 +133,6 @@ plot_helix_inter(helix_a6, err_a6, 6, p_a6)
 #Plot Bar graph comparing averages for a7 helix
 plot_helix_inter(helix_a7, err_a7, 7, p_a7)
 
-plot.plot_gen_box(a3_AD, a3_BBR, 'AD', 'BBR', p_a3, 12, 'Ligand', 'Mean Simultaneous Interactison', '', 'a3_helix_box_cmpr.png', 8, 8)
-#plot.plot_gen_box(a3_AD_all, a3_BBR, 'AD', 'BBR', p_a3, 12, 'Ligand', 'Mean Simultaneous Interactison', '', 'a3_helix_box_all_cmpr.png', 8, 8)
+#plot.plot_gen_box(a3_AD, a3_BBR, 'AD', 'BBR', p_a3, 12, 'Ligand', 'Mean Simultaneous Interactison', '', 'a3_helix_box_cmpr.png', 8, 8)
+plot.plot_gen_box(a3_AD_all, a3_BBR, 'AD', 'BBR', p_a3, 12, 'Ligand', 'Mean Simultaneous Interactison', '', 'a3_helix_box_all_cmpr.png', 8, 8)
 

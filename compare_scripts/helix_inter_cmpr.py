@@ -23,13 +23,13 @@ def plot_mean(inter, err, hel1, hel2, p, p1, p2):
     plt.errorbar(num, inter, yerr= err, fmt='o', color='black')
     plt.xticks(num, Method, fontsize=14)
 
-    plot.error_bar(5, 15, inter[0], inter[2], p, 1, 'k')
-    plot.error_bar(5, 20, inter[0], inter[3], p1, 1, 'k')
-    plot.error_bar(5, 10, inter[0], inter[1], p2, 1, 'k')
+    plot.error_bar(5, 15, inter[0], inter[2], p, 2, 'green') #Apo open + AD
+    plot.error_bar(5, 20, inter[0], inter[3], p1, 3, 'red') #Apo open + BBR
+    plot.error_bar(5, 10, inter[0], inter[1], p2, 1, 'blue') #Apo open + closed
     fig.savefig(hel1 + '_' + hel2 + '_inter.png')
     plt.close(fig)
 
-def plot_box(d_Apo_open, d_Apo_close, d_AD, d_BBR, inter1, inter2, p, p1, ylim):
+def plot_box(d_Apo_open, d_Apo_close, d_AD, d_BBR, inter1, inter2, p, p1, p2, ylim):
     d_Apo_open_df = pd.DataFrame({'Apo Open': d_Apo_open})
     d_Apo_close_df = pd.DataFrame({'Apo Closed': d_Apo_close})
     d_AD_df = pd.DataFrame({'AD': d_AD})
@@ -41,8 +41,9 @@ def plot_box(d_Apo_open, d_Apo_close, d_AD, d_BBR, inter1, inter2, p, p1, ylim):
     ax = sns.stripplot(data = df, dodge=True, alpha=0.05, zorder=1, palette='bright')
     ax = sns.pointplot(data = df, join=False, scale=0.75, palette='dark')
     
-    plot.error_bar(0, 2, mean[0], mean[2], p, 1, 'k')
-    plot.error_bar(0, 3, mean[0], mean[3], p1, 1, 'k')
+    plot.error_bar(0, 2, mean[0], mean[2], p, 2, 'green') #Apo open + AD
+    plot.error_bar(0, 3, mean[0], mean[3], p1, 3, 'red') #Apo open + BBR
+    plot.error_bar(0, 1, mean[0], mean[1], p2, 1, 'blue') #Apo open + closed
 
     plt.ylabel('Mean # of Interactions', fontsize = 14)
     plt.xticks(fontsize = 12)
@@ -72,7 +73,7 @@ dL11_a7_Apo_open, dL11_a7_Apo_close = [],[]
 #List of all directory paths for each group
 dir_path_Apo_open = ['rebuild_a7_high/config11/analysis', 'Apo_dis/analysis']
 dir_path_Apo_close = ['Apo_1SUG/analysis/1sug', 'Apo_1SUG/analysis/1sug2']
-dir_path_AD = ['mutate/WT/AD/analysis', '1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2']
+dir_path_AD = ['mutate/WT/AD/analysis', 'AD_dis/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2']
 dir_path_BBR = ['mutate/WT/BBR/analysis', 'BBR_a7/analysis']
 
 #List interactions of interest
@@ -177,10 +178,10 @@ plot_mean(da6_a7, da6_a7_err, 'a6', 'a7', p7, p8, p9)
 plot_mean(dL11_a7, dL11_a7_err, 'L11', 'a7', p10, p11, p12)
 
 #Create box plots for the data frames
-plot_box(da3_a6_Apo_open, da3_a6_Apo_close, da3_a6_AD, da3_a6_BBR, '3', '6', p1, p2, 35)
-plot_box(da3_a7_Apo_open, da3_a7_Apo_close, da3_a7_AD, da3_a7_BBR, '3', '7', p4, p5, 30)
-plot_box(da6_a7_Apo_open, da6_a7_Apo_close, da6_a7_AD, da6_a7_BBR, '6', '7', p7, p8, 20)
-plot_box(dL11_a7_Apo_open, dL11_a7_Apo_close, dL11_a7_AD, dL11_a7_BBR, '7', 'L11', p10, p11, 20)
+plot_box(da3_a6_Apo_open, da3_a6_Apo_close, da3_a6_AD, da3_a6_BBR, '3', '6', p1, p2, p3, 35)
+plot_box(da3_a7_Apo_open, da3_a7_Apo_close, da3_a7_AD, da3_a7_BBR, '3', '7', p4, p5, p6, 30)
+plot_box(da6_a7_Apo_open, da6_a7_Apo_close, da6_a7_AD, da6_a7_BBR, '6', '7', p7, p8, p9, 20)
+plot_box(dL11_a7_Apo_open, dL11_a7_Apo_close, dL11_a7_AD, dL11_a7_BBR, '7', 'L11', p10, p11, p12, 20)
 
 output = open('a3_a6.txt', 'w')
 output.write('Apo Open:' + str(da3_a6[0]) + '+/-' + str(da3_a6_err[0]) + '\n')

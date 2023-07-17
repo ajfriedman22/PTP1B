@@ -6,8 +6,12 @@
 #Output: x, y = vectors for each of the two columns in the input file
 def col2_load_data(file_dir, file_name, convert):
     x,y = [],[]
+    #Add file extension
+    if file_name.split('.')[-1] != 'xvg': #Add file extension if not in input
+        file_name = file_name + '.xvg'
+
     #Load data
-    with open(file_dir + '/' + file_name + '.xvg') as f:
+    with open(file_dir + '/' + file_name) as f:
         for _ in range(18):
             next(f)
         for line in f:
@@ -100,8 +104,8 @@ def write_lig_bind(lig_frac, Loc_frac, lig):
     if lig == 'AD':
         Loc_frac.write('Binding location 1(crystal): ' + str(100 * lig_frac[0]) + '\n')
         Loc_frac.write('Binding location 2(alt 1): ' + str(100 * lig_frac[1]) + '\n')
-        Loc_frac.write('Binding location 3(alt 2): ' + str(100 * lig_frac[2]) + '\n')
-        Loc_frac.write('Binding location 4(alt 3): ' + str(100 * lig_frac[3]) + '\n')
+        Loc_frac.write('Binding location 3(alt 2): ' + str(100 * lig_frac[3]) + '\n')
+        Loc_frac.write('Binding location 4(alt 3): ' + str(100 * lig_frac[2]) + '\n')
         Loc_frac.write('Unbound: ' + str(100 * lig_frac[4]) + '\n')
         Loc_frac.write('Other Bound: ' + str(100 * lig_frac[5]))
     if lig == 'BBR':

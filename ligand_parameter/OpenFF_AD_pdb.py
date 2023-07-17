@@ -26,7 +26,7 @@ parsley = ForceField('openff_unconstrained-1.3.0.offxml')
 #Loading up an OpenFF Topology from amorphadiene's SMILES <can be changed to other ligands>
 from openff.toolkit.topology import Molecule, Topology
 
-AD = Molecule.from_smiles('CC1CCC2C(C)CCC(C2C1)C(C)=C', allow_undefined_stereo=True)
+AD = Molecule.from_smiles('C[C@@H]1CC[C@H]([C@@H]2[C@H]1CCC(=C2)C)C(=C)C', allow_undefined_stereo=True)
 
 #Import PDB file <change name as necessary>
 pdbfile = PDBFile(File_name)

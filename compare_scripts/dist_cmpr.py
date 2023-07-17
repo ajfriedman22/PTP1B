@@ -33,7 +33,7 @@ eq_time = [5, 5, 50, 5, 75, 5, 5, 5, 70, 5, 60, 30]
 tot_time = [200, 200, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300]
 
 #Load file path
-file_path = open('Input_path/dist_file_path.txt', 'r').readlines()
+file_path = open('dist_file_path.txt', 'r').readlines()
 
 #Load distance for all pairs
 for i in range(len(pairs)):

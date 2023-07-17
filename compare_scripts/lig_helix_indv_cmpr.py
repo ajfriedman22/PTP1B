@@ -23,7 +23,7 @@ group_p  = [186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199
 num_bonds = len(group_p)
 
 #Open input files or contacts over time
-dir_list = ['1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2', 'AD_dis/analysis/config11', 'mutate/WT/AD/analysis', 'BBR_a7/analysis', 'BBR_1sug/analysis', 'BBR_dis/analysis/config9', 'BBR_1sug_dis/analysis/config7', 'mutate/WT/BBR/analysis'] 
+dir_list = ['AD_dis/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2', 'mutate/WT/AD/analysis', 'BBR_a7/analysis', 'BBR_1sug/analysis', 'BBR_dis/analysis/config9', 'BBR_1sug_dis/analysis/config7', 'mutate/WT/BBR/analysis'] 
 
 #Empty array for each set of percentages
 num_bonds = len(group_p)
@@ -44,20 +44,14 @@ mean_inter = np.zeros([4, num_bonds])
 sem_inter = np.zeros([4, num_bonds])
 
 for n in range(num_bonds):
-    AD_open = [all_inter[0][n], all_inter[1][n], all_inter[2][n], all_inter[4][n]]
-    AD_close = all_inter[3][n]
-    BBR_open = [all_inter[5][n], all_inter[6][n], all_inter[9][n]]
-    BBR_close = [all_inter[7][n], all_inter[8][n]]
+    AD_open = [all_inter[0][n], all_inter[1][n], all_inter[2][n]]
+    BBR_open = [all_inter[3][n], all_inter[4][n], all_inter[6][n]]
 
     mean_inter[0][n] = np.mean(AD_open) #AD Open
-    mean_inter[1][n] = AD_close #AD Closed
     mean_inter[2][n] = np.mean(BBR_open) #BBR Open
-    mean_inter[3][n] = np.mean(BBR_close) #BBR Closed
 
     sem_inter[0][n] = stats.sem(AD_open) #AD Open
-    sem_inter[1][n] = 0 #AD Closed
     sem_inter[2][n] = stats.sem(BBR_open) #BBR Open
-    sem_inter[3][n] = stats.sem(BBR_close) #BBR Closed
     
     #Run Welch's test on BBR vs AD helix interactions for a3-a7
     st1, p1 = stats.ttest_ind(AD_open, BBR_open, equal_var = False) #Welch's t-test b/w interactions with AD open + BBR open
@@ -108,5 +102,4 @@ for n in range(num_bonds):
             plt.text((x1+x2)*0.5, y+h, "***" , ha='center', va='bottom', color=col)
         fig.savefig('AD_BBR_' + str(group_p[n]) +'_cmpr.png')
         plt.close(fig)
-
 

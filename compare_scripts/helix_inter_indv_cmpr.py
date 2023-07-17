@@ -22,7 +22,7 @@ def load_file(file_dir, inters, num_bonds):
 
     return inter_per
 
-def box_plot(Apo_open, Apo_close, AD, BBR, pair, output_dir, p, p1):
+def box_plot(Apo_open, Apo_close, AD, BBR, pair, output_dir, p, p1, p2, p3, p4):
     Apo_open_df = pd.DataFrame({'Apo Open': Apo_open})
     Apo_close_df = pd.DataFrame({'Apo Closed': Apo_close})
     AD_df = pd.DataFrame({'AD': AD})
@@ -34,8 +34,14 @@ def box_plot(Apo_open, Apo_close, AD, BBR, pair, output_dir, p, p1):
     ax = sns.stripplot(data = df, dodge=True, alpha=0.25, zorder=1, palette='bright')
     ax = sns.pointplot(data = df, join=False, scale=0.75, palette='dark')
     
-    plot.error_bar(0, 2, mean[0], mean[2], p, 1, 'k')
-    plot.error_bar(0, 3, mean[0], mean[3], p1, 1, 'k')
+    plot.error_bar(0, 2, mean[0], mean[2], p, 2, 'green') #Apo open to AD
+    plot.error_bar(0, 3, mean[0], mean[3], p1, 3, 'purple') #Apo open to BBR
+    plot.error_bar(0, 1, mean[0], mean[1], p2, 1, 'blue') #Apo open to closed
+    if p > 0.05: #Only include if there is no significant difference b/w lig + Apo open for clarity
+        plot.error_bar(1, 2, mean[1], mean[2], p3, 2, 'green') #Apo closed to AD
+    if p1 > 0.05:
+        plot.error_bar(1, 3, mean[1], mean[3], p4, 3, 'purple') #Apo closed to BBR
+
     plt.xticks(fontsize = 14)
     plt.yticks(fontsize = 14)
     plt.ylabel('Frequency Formed(%)', fontsize = 16)
@@ -59,7 +65,7 @@ pairs_all.extend(pair_a7_a6)
 #Open input files or contacts over time
 Apo_open_dir_list = ['rebuild_a7_high/config11/analysis', 'Apo_dis/analysis']
 Apo_close_dir_list = ['Apo_1SUG/analysis/1sug', 'Apo_1SUG/analysis/1sug2']
-AD_dir_list = ['1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2', 'mutate/WT/AD/analysis']
+AD_dir_list = ['AD_dis/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2', 'mutate/WT/AD/analysis']
 BBR_dir_list = ['BBR_a7/analysis', 'mutate/WT/BBR/analysis'] 
 
 #Load all percentages into arrays
@@ -112,7 +118,9 @@ for n in range(num_bonds):
     st2, p2 = stats.ttest_ind(AD, Apo_open, equal_var = False) #Welch's t-test b/w interactions with AD + Apo Open
     st3, p3 = stats.ttest_ind(BBR, Apo_open, equal_var = False) #Welch's t-test b/w interactions with BBR + Apo Open
     st4, p4 = stats.ttest_ind(Apo_close, Apo_open, equal_var = False) #Welch's t-test b/w interactions with Apo Open + closed
-   
+    st5, p5 = stats.ttest_ind(AD, Apo_close, equal_var = False) #Welch's t-test b/w interactions with AD + Apo Close
+    st6, p6 = stats.ttest_ind(BBR, Apo_close, equal_var = False) #Welch's t-test b/w interactions with BBR + Apo Close
+  
     diff_AD = mean_inter[0][n] - mean_inter[2][n]
     diff_BBR = mean_inter[0][n] - mean_inter[3][n]
 
@@ -122,14 +130,14 @@ for n in range(num_bonds):
         output_lig_disrupt.write('Apo Open: ' + str(mean_inter[0][n]) + '+/-' + str(sem_inter[0][n]) + '\n')
         output_lig_disrupt.write('Apo Closed: ' + str(mean_inter[1][n]) + '+/-' + str(sem_inter[1][n]) + '\n')
 
-        box_plot(Apo_open, Apo_close, AD, BBR, pairs_all[n], 'Ligand_disrupt/', p2, p3)
+        box_plot(Apo_open, Apo_close, AD, BBR, pairs_all[n], 'Ligand_disrupt/', p2, p3, p4, p5, p6)
 
     if (p2 < 0.05 or p3 < 0.05) and diff_AD < -10 and diff_BBR < -10:
         output_lig_inc.write(str(pairs_all[n]) + ':\n'+ 'AD: ' + str(mean_inter[2][n]) + ' +/- ' + str(sem_inter[2][n]) + '\np to Apo open: ' + str(p2) + '\nBBR: ' + str(mean_inter[3][n]) + ' +/- ' + str(sem_inter[3][n])+ '\np to Apo open: ' + str(p3) + '\n')
         output_lig_inc.write('Apo Open: ' + str(mean_inter[0][n]) + '+/-' + str(sem_inter[0][n]) + '\n')
         output_lig_inc.write('Apo Closed: ' + str(mean_inter[1][n]) + '+/-' + str(sem_inter[1][n]) + '\n')
 
-        box_plot(Apo_open, Apo_close, AD, BBR, pairs_all[n], 'Ligand_inc/', p2, p3)
+        box_plot(Apo_open, Apo_close, AD, BBR, pairs_all[n], 'Ligand_inc/', p2, p3, p4, p5, p6)
 
     diff_Apo = mean_inter[1][n] - mean_inter[0][n]
     if p4 < 0.05 and diff_Apo > 0:
@@ -137,5 +145,4 @@ for n in range(num_bonds):
         output_Apo_disrupt.write('Apo Open: ' + str(mean_inter[0][n]) + '+/-' + str(sem_inter[0][n]) + '\n')
         output_Apo_disrupt.write('Apo Closed: ' + str(mean_inter[1][n]) + '+/-' + str(sem_inter[1][n]) + '\n')
 
-        box_plot(Apo_open, Apo_close, AD, BBR, pairs_all[n], 'Apo_disrupt/', p2, p3)
-
+        box_plot(Apo_open, Apo_close, AD, BBR, pairs_all[n], 'Apo_disrupt/', p2, p3, p4, p5, p6)

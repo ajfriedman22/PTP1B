@@ -19,7 +19,7 @@ from openff.toolkit.topology import Molecule, Topology
 BBR = Molecule.from_smiles('CCC1=C(C2=C(O1)C=C(C=C2)S(=O)(=O)NC3=CC=C(C=C3)S(=O)(=O)NC4=NC=CS4)C(=O)C5=CC(=C(C(=C5)Br)O)Br', allow_undefined_stereo=True)
 top_ff = Topology.from_molecules(1*[BBR])
 #Import PDB file
-pdbfile = PDBFile('BBR_processed.pdb')
+pdbfile = PDBFile('BBR_fit.pdb')
 
 #Generate topology
 top_mm = top_ff.to_openmm()

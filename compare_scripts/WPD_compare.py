@@ -32,11 +32,11 @@ def load_data(file_dir):
     return w, per, per_eq
 
 #Input Data and Determine the Percent of Time the WPD loop is open
-all_dir = ['rebuild_a7/analysis', 'AD_rebuild_a7/analysis', 'Apo/analysis', 'AD/analysis', 'Apo_1SUG/analysis/1sug', 'Apo_1SUG/analysis/1sug2', 'Apo_1SUG/analysis/1sug3', '1sug_AD/analysis', '1sug_no_a7/analysis', '1sug_no_a7_AD/analysis', '1sug_dis/analysis/config7', '1sug_dis/analysis/config9', 
-        '1sug_dis/analysis/config11', '1sug_dis_AD/analysis/config7', '1sug_dis_AD/analysis/config9', '1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config11_2', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2', 'rebuild_a7_high/config7/analysis', 
+all_dir = ['rebuild_a7/analysis', 'AD_a7/analysis', 'Apo/analysis', 'AD/analysis', 'Apo_1SUG/analysis/1sug', 'Apo_1SUG/analysis/1sug2', 'Apo_1SUG/analysis/1sug3', '1sug_AD/analysis', '1sug_no_a7/analysis', '1sug_no_a7_AD/analysis', '1sug_dis/analysis/config7', '1sug_dis/analysis/config9', 
+        '1sug_dis/analysis/config11', '1sug_dis_AD/analysis/config7', '1sug_dis_AD/analysis/config9', '1sug_dis_AD/analysis/config11', '1sug_dis_AD/analysis/config_alt', '1sug_dis_AD/analysis/config_alt2', 'rebuild_a7_high/config7/analysis', 
         'rebuild_a7_high/config9/analysis', 'rebuild_a7_high/config11/analysis', 'Apo_dis/analysis', 'AD_dis/analysis/config7', 'AD_dis/analysis/config9', 'AD_dis/analysis/config11', 'BBR_a7/analysis', 'BBR_1sug/analysis', 'BBR_dis/analysis/config7', 'BBR_dis/analysis/config9', 'BBR_dis/analysis/config11', 
         'BBR_1sug_dis/analysis/config7', 'BBR_1sug_dis/analysis/config11']
-all_name = ['a7', 'a7_AD', 'Apo', 'AD', '1sug', '1sug2', '1sug3', '1sug_AD', '1sug_no_a7', '1sug_no_a7_AD', 'config7', 'config9', 'config11', 'complex7', 'complex9', 'complex11', 'complex11_2', 'alt', 'alt2', 'config7', 'config9', 'config11', 'Apo_dis', 'complex7', 'complex9', 'complex11', 'BBR_a7', 
+all_name = ['a7', 'AD_a7', 'Apo', 'AD', '1sug', '1sug2', '1sug3', '1sug_AD', '1sug_no_a7', '1sug_no_a7_AD', 'config7', 'config9', 'config11', 'complex7', 'complex9', 'complex11', 'alt', 'alt2', 'config7', 'config9', 'config11', 'Apo_dis', 'complex7', 'complex9', 'complex11', 'BBR_a7', 
         'BBR_1sug', 'BBR_dis7', 'BBR_dis9', 'BBR_dis11', 'BBR_dis7', 'BBR_dis11']
 
 #empty vector for the percent of time the WPD loop is open
@@ -103,49 +103,46 @@ for i in range(len(all_dir)):
         w_1sug_dis11_AD = data
         per_AD_dis.append(per_eq[i])
     if i == 16:
-        w_1sug_dis11_2_AD = data
-        per_AD_dis.append(per_eq[i])
-    if i == 17:
         w_1sug_alt_AD = data
         per_AD_dis.append(per_eq[i])
-    if i == 18:
+    if i == 17:
         w_1sug_alt2_AD = data
         per_AD_dis.append(per_eq[i])
-    if i == 19:
+    if i == 18:
         w_dis7 = data
         per_apo_dis_o.append(per_eq[i])
-    if i == 20:
+    if i == 19:
         w_dis9 = data
         per_apo_dis_o.append(per_eq[i])
-    if i == 21:
+    if i == 20:
         w_dis11 = data
         per_apo_dis_o.append(per_eq[i])
-    if i == 22:
+    if i == 21:
         w_apo_dis = data
         per_apo_dis_o.append(per_eq[i])
-    if i == 23:
+    if i == 22:
         w_AD_dis7 = data
-    if i == 24:
+    if i == 23:
         w_AD_dis9 = data
-    if i == 25:
+    if i == 24:
         w_AD_dis11 = data
         per_AD_dis.append(per_eq[i])
-    if i == 26:
+    if i == 25:
         w_BBR_a7 = data
         per_BBR_order.append(per_eq[i])
-    if i == 27:
+    if i == 26:
         w_BBR_1sug = data
-    if i == 28:
+    if i == 27:
         w_BBR_dis7 = data
         per_BBR_dis.append(per_eq[i])
-    if i == 29:
+    if i == 28:
         w_BBR_dis9 = data
         per_BBR_dis.append(per_eq[i])
-    if i == 30:
+    if i == 29:
         w_BBR_dis11 = data
-    if i == 31:
+    if i == 30:
         w_BBR_1sug_dis7 = data
-    if i == 32:
+    if i == 31:
         w_BBR_1sug_dis11 = data
         per_BBR_dis.append(per_eq[i])
 
